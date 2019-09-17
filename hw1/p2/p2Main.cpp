@@ -27,7 +27,7 @@ int main()
    }
 
    string command_raw;
-   regex reg("ADD ([a-zA-Z]*) ([0-9]*)");
+   regex reg("ADD (.*) ([0-9]*)");
    smatch m;
 
    // Runing command loop
