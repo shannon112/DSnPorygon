@@ -2,11 +2,11 @@
   FileName     [ p2Main.cpp ]
   PackageName  [ p2 ]
   Synopsis     [ Define main() function ]
-  Author       [ Chung-Yang (Ric) Huang ]
-  Copyright    [ Copyleft(c) 2016-present DVLab, GIEE, NTU, Taiwan ]
+  Author       [ Shang-Lun (Shannon) Lee ]
 ****************************************************************************/
 #include <iostream>
 #include <string>
+#include <regex>
 #include "p2Json.h"
 
 using namespace std;
@@ -26,9 +26,52 @@ int main()
       exit(-1); // jsonFile does not exist.
    }
 
-   // TODO read and execute commands
-   // cout << "Enter command: ";
+   string command_raw;
+   regex reg("ADD ([a-zA-Z]*) ([0-9]*)");
+   smatch m;
+
+   // Runing command loop
+   getline(cin, command_raw); //to ignore the enter
    while (true) {
-      // cout << "Enter command: ";
+     cout << "Enter command: ";
+     string command;
+     string command_key;
+     string command_value;
+
+     // command parser
+     getline(cin, command_raw);
+     if(regex_match(command_raw, m, reg)) {
+       command = "ADD";
+       command_key = m[1];
+       command_value = m[2];
+     }else{
+       command = command_raw;
+     }
+
+     // Decision maker
+     if (command == "PRINT"){
+       json.print();
+
+     }else if( command == "SUM"){
+       cout << "you are executing "<<command<<endl;
+
+     }else if( command == "AVE"){
+       cout << "you are executing "<<command<<endl;
+
+     }else if( command == "MAX"){
+       cout << "you are executing "<<command<<endl;
+
+     }else if( command == "MIN"){
+       cout << "you are executing "<<command<<endl;
+
+     }else if(( command == "ADD")&&( !command_key.empty() )&&( !command_value.empty() )){
+       json.add(command_key,atoi(command_value.c_str()));
+
+     }else if( command == "EXIT"){
+       exit(0);
+
+     }else{
+       cout << "Wrong input!"<<endl;
+     }
    }
 }
