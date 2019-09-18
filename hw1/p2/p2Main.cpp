@@ -7,12 +7,14 @@
 #include <iostream>
 #include <string>
 #include <regex>
+#include <iomanip>
 #include "p2Json.h"
 
 using namespace std;
 
 int main()
 {
+   // Declare a Json object
    Json json;
 
    // Read in the csv file. Do NOT change this part of code.
@@ -26,8 +28,9 @@ int main()
       exit(-1); // jsonFile does not exist.
    }
 
+   // Define regex pattern
    string command_raw;
-   regex reg("ADD (.*) ([0-9]*)");
+   regex reg("ADD (.*) (-[0-9]*|[0-9]*)");
    smatch m;
 
    // Runing command loop
@@ -53,19 +56,23 @@ int main()
        json.print();
 
      }else if( command == "SUM"){
-       cout << "you are executing "<<command<<endl;
+       if (json.size() > 0) cout<<"The summation of the values is: "<<json.sum()<<"."<<endl;
+       else cout<<"Error: No element found!!"<<endl;
 
      }else if( command == "AVE"){
-       cout << "you are executing "<<command<<endl;
+       if (json.size() > 0) cout<<"The average of the values is: "<<fixed<<setprecision(1)<<json.ave()<<"."<<endl;
+       else cout<<"Error: No element found!!"<<endl;
 
      }else if( command == "MAX"){
-       cout << "you are executing "<<command<<endl;
+       if (json.size() > 0) cout<<"The maximum element is: { "<<json.max()<<" }."<<endl;
+       else cout<<"Error: No element found!!"<<endl;
 
      }else if( command == "MIN"){
-       cout << "you are executing "<<command<<endl;
+       if (json.size() > 0) cout<<"The minimum element is: { "<<json.min()<<" }."<<endl;
+       else cout<<"Error: No element found!!"<<endl;
 
      }else if(( command == "ADD")&&( !command_key.empty() )&&( !command_value.empty() )){
-       json.add(command_key,atoi(command_value.c_str()));
+       json.add( command_key, atoi( command_value.c_str() ) );
 
      }else if( command == "EXIT"){
        exit(0);
