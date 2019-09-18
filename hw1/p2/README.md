@@ -35,3 +35,27 @@ cd ref
 ./p2Run-linux
 ./p2Run-mac
 ```
+
+run the checking step
+```js
+# step 1 : create dofile (commad list)
+vim dofile
+    test1.json
+    PRINT
+    EXIT
+
+# step 2 : redirect dofile in and get log file
+./p2Run < dofile > output.log
+./ref/ref-linux < dofile > output_ref.log
+
+# Error message form ref is print by cerr<<"ERROR" instead of cout
+# For testing things like "Error: This is a NULL column!!"
+./refProgram < dofile &> output_ref.log
+./p2Run < dofile &> output.log
+
+# step 3 : check difference
+diff output.log output_ref.log
+
+# if no output for diff  ==>  done
+# otherwise, check the differences!
+```

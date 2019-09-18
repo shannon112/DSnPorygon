@@ -57,7 +57,8 @@ Json::print()
 {
    cout<<"{"<<endl;
    for(int i=0; i<this->size(); i++){
-     cout<<"  "<<_obj[i]<<endl;
+     if( i == this->size()-1 ) cout<<"  "<<_obj[i]<<endl;
+     else cout<<"  "<<_obj[i]<<","<<endl;
    }
    cout<<"}"<<endl;
 }

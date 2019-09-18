@@ -74,11 +74,14 @@ int main()
      }else if(( command == "ADD")&&( !command_key.empty() )&&( !command_value.empty() )){
        json.add( command_key, atoi( command_value.c_str() ) );
 
+     }else if(( command == "ADD")&&(( command_key.empty() )||( command_value.empty() ))){
+       cout<<"Error: Missing argument!!"<<endl;
+
      }else if( command == "EXIT"){
        exit(0);
 
      }else{
-       cout << "Wrong input!"<<endl;
+       cout << "Error: unknown command: \""<< command <<"\""<<endl;
      }
    }
 }
