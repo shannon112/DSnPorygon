@@ -18,7 +18,7 @@ bool
 Json::read(const string& jsonFile)
 {
    // regex pattern
-   regex reg(" *\"([a-zA-Z]*)\" * :  *(-[0-9]*|[0-9]*).*");
+   regex reg("[ \t\b\r\n]*\"([^ \t\b\r\n]+)\"[ \t\b\r\n]*[ |\t]:[ |\t][ \t\b\r\n]*(-[0-9]*|[0-9]*).*");
    smatch m;
 
    // read input file
