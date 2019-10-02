@@ -1,5 +1,7 @@
 # problem2 json parser
 
+<img src= "https://raw.githubusercontent.com/shannon112/DSnPorygon/master/hw1/p2/demo.png" width=400/>
+
 Limitations on our test JSON file format
 ```
 ü Each file will contain one and only one JSON object.
