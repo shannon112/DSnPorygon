@@ -73,8 +73,7 @@ inline ParseChar returnCh(int); // the implementation is at the bottom
 ParseChar
 getChar(istream& istr)
 {
-   char ch = mygetc(istr);
-
+   char ch = mygetc(istr); // get the input char
    if (istr.eof())
       return returnCh(INPUT_END_KEY);
    switch (ch) {
