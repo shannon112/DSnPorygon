@@ -1,4 +1,4 @@
-# problem2 json parser
+# HW2 json parser
 
 <img src= "https://raw.githubusercontent.com/shannon112/DSnPorygon/master/hw1/p2/demo.png" width=400/>
 
@@ -58,4 +58,10 @@ vim dofile
 # if no output for diff  ==>  done
 # otherwise, check the differences!
 diff output.log output_ref.log
+```
+
+Final upload files
+```
+r07921001_hw1/
+r07921001_hw1.tgz
 ```

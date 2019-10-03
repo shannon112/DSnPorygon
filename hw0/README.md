@@ -1,4 +1,4 @@
-# problem1 check environment
+# HW0 check environment
 ```
 make
 ```
