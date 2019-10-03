@@ -62,6 +62,10 @@ cmdParser.h: cmdCharDef.h
 .cmdCharDef:
 	@rm -f cmdCharDef.o
 
+16.linux 18.linux:
+	@ln -sf cmdReader.o.$@ cmdReader.o.linux
+	@ln -sf cmdReader-ref.$@ cmdReader-ref.linux
+
 linux mac:
 	@ln -sf cmdReader.o.$@ cmdReader.o.ref
 
