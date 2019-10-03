@@ -55,3 +55,19 @@ make ref #using provided “cmdReader.o.ref” to create the reference program.
 make clean #to clean up all the object files and the executables “cmdReader” and “testAsc”.
 make ctags #to creates the ctags for source code tracing. To trace into a symbol, place your cursor on top of it and type “Ctrl-]”. To get back, type “Ctrl-t”.
 ```
+
+# 3.Structure
+```
+main.cpp
+-> open dofile
+-> call CmdParser::readCmd
+cmdReader.cpp
+-> CmdParser::readCmd call CmdParser::readCmdInt(cin)
+-> In CmdParser::readCmdInt(cin) enter while loop
+-> ParseChar pch = getChar(istr);
+-> simple switch(pch) to enter execution function
+cmdCharDef.cpp
+-> In getChar global function
+-> char ch = mygetc(istr);
+-> complex switch(ch) to return ParseChar enum
+```
