@@ -69,5 +69,6 @@ cmdReader.cpp
 cmdCharDef.cpp
 -> In getChar global function
 -> char ch = mygetc(istr);
--> complex switch(ch) to return ParseChar enum
+-> complex switch(ch) to return ParseChar returnCh(int(ch))
+-> inline function returnCh return ParseChar(int)
 ```
