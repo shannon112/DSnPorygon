@@ -58,10 +58,12 @@ homework, ALL the TODO’s (except for the keyboard mapping in
 make 16.linux #or 18.linux can create the symbolic link on .o file and exe file to specify version
 cmdReader.o.linux -> cmdReader.o.16.linux
 cmdReader-ref.linux -> cmdReader-ref.16.linux
-
+```
+```sh
 make linux #or make mac can create the symbolic link to linux or mac platform, respectively.
 cmdReader.o.ref -> cmdReader.o.linux
-
+```
+```sh
 make ref #using provided “cmdReader.o.ref” to create the reference program.
 ./cmdReader-ref.linux
 ```
