@@ -3,7 +3,7 @@
   PackageName  [ cmd ]
   Synopsis     [ Process keyboard inputs ]
   Author       [ Chung-Yang (Ric) Huang ]
-  Copyright    [ Copyleft(c) 2007-present LaDs(III), GIEE, NTU, Taiwan ]
+  Copyright    [ Copyleft(c) 2007-2015 LaDs(III), GIEE, NTU, Taiwan ]
 ****************************************************************************/
 #include <iostream>
 #include <iomanip>
@@ -60,7 +60,7 @@ void mybeep()
    cout << char(BEEP_CHAR);
 }
 
-inline ParseChar returnCh(int);
+inline ParseChar returnCh(int); // the implementation is at the bottom
 
 #ifndef TA_KB_SETTING
 // YOU NEED TO CUSTOMIZE THIS PART...
@@ -87,20 +87,34 @@ getChar(istream& istr)
       case NEWLINE_KEY:     // enter('\n') or ctrl-m
          return returnCh(ch);
 
-      // TODO... Check and change if necessary!!!!!!
       // -- The following simple/combo keys are platform-dependent
       //    You should test to check the returned codes of these key presses
       // -- You should either modify the "enum ParseChar" definitions in
       //    "cmdCharDef.h", or revise the control flow of the "case ESC" below
-      //
-      // -- You need to handle:
-      //    { BACK_SPACE_KEY, ARROW_UP/DOWN/RIGHT/LEFT,
-      //      HOME/END/PG_UP/PG_DOWN/INSERT/DELETE }
-      //
-      // Combo keys: multiple codes for one key press
-      // -- Usually starts with ESC key, so we check the "case ESC"
-      // case ESC_KEY:
+      case BACK_SPACE_KEY:
+         return returnCh(ch);
 
+      // Combo keys: multiple codes for one key press
+      // -- Usually starts with ESC key == 27, so we check the "case ESC"
+      case ESC_KEY: { //First Combo
+         char combo = mygetc(istr); //Second Combo
+         // Note: ARROW_KEY_INT == MOD_KEY_INT ==91, so we only check MOD_KEY_INT
+         if (combo == char(MOD_KEY_INT)) {
+            char key = mygetc(istr); //Third Combo
+            if ((key == char(INSERT_KEY)) || (key == char(DELETE_KEY)) || (key == char(PG_UP_KEY)) || (key == char(PG_DOWN_KEY))) {
+               if (mygetc(istr) == MOD_KEY_DUMMY) //Fourth Combo == 126
+                  return returnCh(int(key) + MOD_KEY_FLAG);
+               else return returnCh(UNDEFINED_KEY);
+            }
+            else if ((key == char(END_KEY)) || (key == char(HOME_KEY))) {
+              return returnCh(int(key) + MOD_KEY_FLAG);
+            }
+            else if ((key >= char(ARROW_KEY_BEGIN)) && (key <= char(ARROW_KEY_END)))
+               return returnCh(int(key) + ARROW_KEY_FLAG);
+            else return returnCh(UNDEFINED_KEY);
+         }
+         else { mybeep(); return getChar(istr); }
+      }
       // For the remaining printable and undefined keys
       default:
          if (isprint(ch)) return returnCh(ch);
@@ -109,6 +123,7 @@ getChar(istream& istr)
 
    return returnCh(UNDEFINED_KEY);
 }
+
 #else // TA_KB_SETTING is defined
 // DO NOT CHANGE THIS PART...
 // DO NOT CHANGE THIS PART...
@@ -171,7 +186,7 @@ getChar(istream& istr)
 #endif // TA_KB_SETTING
 
 inline ParseChar
-returnCh(int ch)
+returnCh(int ch) // input an ascii int return a ParseChar enum
 {
 #ifndef MAKE_REF
    return ParseChar(ch);
@@ -212,4 +227,3 @@ returnCh(int ch)
    }
 #endif
 }
-

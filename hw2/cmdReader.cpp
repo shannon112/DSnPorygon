@@ -43,22 +43,22 @@ CmdParser::readCmdInt(istream& istr)
       if (pch == INPUT_END_KEY) break;
       switch (pch) {
          case LINE_BEGIN_KEY :
-         case HOME_KEY       : moveBufPtr(_readBuf); break;
+         case HOME_KEY       : cout << "HOME_KEY"<<endl; moveBufPtr(_readBuf); break;
          case LINE_END_KEY   :
-         case END_KEY        : moveBufPtr(_readBufEnd); break;
-         case BACK_SPACE_KEY : /* TODO */ break;
-         case DELETE_KEY     : deleteChar(); break;
+         case END_KEY        : cout << "END_KEY"<<endl; moveBufPtr(_readBufEnd); break;
+         case BACK_SPACE_KEY : cout << "BACK_SPACE_KEY"<<endl; /* TODO */ break;
+         case DELETE_KEY     : cout << "DELETE_KEY"<<endl; deleteChar(); break;
          case NEWLINE_KEY    : addHistory();
                                cout << char(NEWLINE_KEY);
                                resetBufAndPrintPrompt(); break;
-         case ARROW_UP_KEY   : moveToHistory(_historyIdx - 1); break;
-         case ARROW_DOWN_KEY : moveToHistory(_historyIdx + 1); break;
-         case ARROW_RIGHT_KEY: /* TODO */ break;
-         case ARROW_LEFT_KEY : /* TODO */ break;
-         case PG_UP_KEY      : moveToHistory(_historyIdx - PG_OFFSET); break;
-         case PG_DOWN_KEY    : moveToHistory(_historyIdx + PG_OFFSET); break;
+         case ARROW_UP_KEY   : cout << "ARROW_UP_KEY"<<endl; moveToHistory(_historyIdx - 1); break;
+         case ARROW_DOWN_KEY : cout << "ARROW_DOWN_KEY"<<endl; moveToHistory(_historyIdx + 1); break;
+         case ARROW_RIGHT_KEY: /* TODO */cout << "ARROW_RIGHT_KEY"<<endl; break;
+         case ARROW_LEFT_KEY : /* TODO */cout << "ARROW_LEFT_KEY"<<endl; break;
+         case PG_UP_KEY      : cout << "PG_UP_KEY"<<endl; moveToHistory(_historyIdx - PG_OFFSET); break;
+         case PG_DOWN_KEY    : cout << "PG_DOWN_KEY"<<endl; moveToHistory(_historyIdx + PG_OFFSET); break;
          case TAB_KEY        : /* TODO */ break;
-         case INSERT_KEY     : // not yet supported; fall through to UNDEFINE
+         case INSERT_KEY     : cout << "INSERT_KEY"<<endl;// not yet supported; fall through to UNDEFINE
          case UNDEFINED_KEY:   mybeep(); break;
          default:  // printable character
             insertChar(char(pch)); break;
@@ -185,7 +185,7 @@ CmdParser::moveToHistory(int index)
 
 
 // This function adds the string in _readBuf to the _history.
-// The size of _history may or may not change. Depending on whether 
+// The size of _history may or may not change. Depending on whether
 // there is a temp history string.
 //
 // 1. Remove ' ' at the beginning and end of _readBuf
