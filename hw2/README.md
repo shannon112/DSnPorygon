@@ -55,11 +55,14 @@ homework, ALL the TODO’s (except for the keyboard mapping in
 “cmdCharDef.*”) are in this file.
 6. ```cmdReader.o.linux```, ```cmdReader.o.ref```, ```cmdReader-ref.linux```: reference files
 ```sh
+make 16.linux #or 18.linux can create the symbolic link on .o file and exe file to specify version
 cmdReader.o.linux -> cmdReader.o.16.linux
-cmdReader.o.ref -> cmdReader.o.linux
 cmdReader-ref.linux -> cmdReader-ref.16.linux
+
+make linux #or make mac can create the symbolic link to linux or mac platform, respectively.
+cmdReader.o.ref -> cmdReader.o.linux
+
 make ref #using provided “cmdReader.o.ref” to create the reference program.
-make linux #or make mac to create the symbolic link of “cmdReader.o.ref” for linux or mac platform, respectively.
 ./cmdReader-ref.linux
 ```
 7. ```Makefile```: multiple objectives Makefile. Useful targets in the Makefile include:
