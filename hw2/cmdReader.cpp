@@ -43,22 +43,26 @@ CmdParser::readCmdInt(istream& istr)
       if (pch == INPUT_END_KEY) break;
       switch (pch) {
          case LINE_BEGIN_KEY :
-         case HOME_KEY       : cout << "HOME_KEY"<<endl; moveBufPtr(_readBuf); break;
+         case HOME_KEY       : moveBufPtr(_readBuf); break;
          case LINE_END_KEY   :
-         case END_KEY        : cout << "END_KEY"<<endl; moveBufPtr(_readBufEnd); break;
-         case BACK_SPACE_KEY : cout << "BACK_SPACE_KEY"<<endl; /* TODO */ break;
-         case DELETE_KEY     : cout << "DELETE_KEY"<<endl; deleteChar(); break;
+         case END_KEY        : moveBufPtr(_readBufEnd); break;
+         case BACK_SPACE_KEY :  /* TODO */ if(moveBufPtr(_readBufPtr-1)) deleteChar(); break;
+         case DELETE_KEY     : deleteChar(); break;
          case NEWLINE_KEY    : addHistory();
+                               cout<<endl;
+                               cout<<(void*)_readBufEnd<<endl;
+                               cout<<(void*)_readBufPtr<<endl;
+                               cout<<(void*)_readBuf<<endl;
                                cout << char(NEWLINE_KEY);
                                resetBufAndPrintPrompt(); break;
-         case ARROW_UP_KEY   : cout << "ARROW_UP_KEY"<<endl; moveToHistory(_historyIdx - 1); break;
-         case ARROW_DOWN_KEY : cout << "ARROW_DOWN_KEY"<<endl; moveToHistory(_historyIdx + 1); break;
-         case ARROW_RIGHT_KEY: /* TODO */cout << "ARROW_RIGHT_KEY"<<endl; break;
-         case ARROW_LEFT_KEY : /* TODO */cout << "ARROW_LEFT_KEY"<<endl; break;
-         case PG_UP_KEY      : cout << "PG_UP_KEY"<<endl; moveToHistory(_historyIdx - PG_OFFSET); break;
-         case PG_DOWN_KEY    : cout << "PG_DOWN_KEY"<<endl; moveToHistory(_historyIdx + PG_OFFSET); break;
+         case ARROW_UP_KEY   : moveToHistory(_historyIdx - 1); break;
+         case ARROW_DOWN_KEY : moveToHistory(_historyIdx + 1); break;
+         case ARROW_RIGHT_KEY: /* TODO */moveBufPtr(_readBufPtr + 1); break;
+         case ARROW_LEFT_KEY : /* TODO */moveBufPtr(_readBufPtr - 1); break;
+         case PG_UP_KEY      : moveToHistory(_historyIdx - PG_OFFSET); break;
+         case PG_DOWN_KEY    : moveToHistory(_historyIdx + PG_OFFSET); break;
          case TAB_KEY        : /* TODO */ break;
-         case INSERT_KEY     : cout << "INSERT_KEY"<<endl;// not yet supported; fall through to UNDEFINE
+         case INSERT_KEY     : // not yet supported; fall through to UNDEFINE
          case UNDEFINED_KEY:   mybeep(); break;
          default:  // printable character
             insertChar(char(pch)); break;
@@ -85,8 +89,25 @@ CmdParser::readCmdInt(istream& istr)
 bool
 CmdParser::moveBufPtr(char* const ptr)
 {
-   // TODO...
-   return true;
+   // TODO->finished
+   //out of boundary, illegal
+   if((ptr-_readBuf<0) || (ptr-_readBufEnd>0)) {
+     mybeep();
+     return false;
+   }
+   //in boundary, legal
+   else{
+     //cursor move left, print Backspace
+     if(_readBufPtr-ptr>0) {
+       for(int i=0; i<_readBufPtr-ptr; i++) cout << '\b';
+     }
+     //cursor move right, print content of address+i
+     else {
+       for(int i=0; i<ptr-_readBufPtr; i++) cout << *(_readBufPtr + i);
+     }
+     _readBufPtr = ptr;
+     return true;
+   }
 }
 
 
@@ -112,8 +133,24 @@ CmdParser::moveBufPtr(char* const ptr)
 bool
 CmdParser::deleteChar()
 {
-   // TODO...
-   return true;
+   // TODO->finished
+   //out of boundary, illegal
+   if(_readBufPtr >= _readBufEnd) {
+     mybeep();
+     return false;
+   }
+   //in boundary, legal
+   else{
+     //modify _readBuf, using i+1 element overlap them
+     for(int i = 0; i < _readBufEnd-_readBufPtr; i++) *(_readBufPtr+i) = *(_readBufPtr+i+1);
+     _readBufEnd--;
+     //print new _readBuf, and white space at tail
+     for(int i = 0; i < _readBufEnd-_readBufPtr; i++) cout<<*(_readBufPtr+i);
+     cout<<" ";
+     //back to the previous cusor position
+     for(int i = 0; i <= _readBufEnd-_readBufPtr; i++) cout<<"\b";
+     return true;
+   }
 }
 
 // 1. Insert character 'ch' for "repeat" times at _readBufPtr
@@ -134,7 +171,18 @@ CmdParser::deleteChar()
 void
 CmdParser::insertChar(char ch, int repeat)
 {
-   // TODO...
+   // TODO->finished
+   //modify _readBuf, move privous input to right
+   for(int i = (_readBufEnd-_readBufPtr); i >= 0; i--) *(_readBufPtr+i+repeat) = *(_readBufPtr+i);
+   //modify _readBuf, insert input ch
+   for(int i = 0; i < repeat; i++) *(_readBufPtr + i) = ch;
+   _readBufEnd += repeat;
+   //print new _readBuf
+   for(int i = 0; i < _readBufEnd-_readBufPtr; i++) cout<<*(_readBufPtr+i);
+   _readBufPtr += repeat;
+   //back to the previous cusor position
+   for(int i = 0; i < _readBufEnd-_readBufPtr; i++) cout<<"\b";
+
    assert(repeat >= 1);
 }
 
