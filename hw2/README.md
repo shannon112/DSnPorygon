@@ -72,3 +72,18 @@ cmdCharDef.cpp
 -> complex switch(ch) to return ParseChar returnCh(int(ch) or ch)
 -> inline function returnCh(int) return ParseChar
 ```
+
+# 4.Test
+1. Compare to reference program
+```
+./cmdReader-ref.16.linux -f hw2.test1 > log_ref.txt
+./cmdReader -f hw2.test1 > log.txt
+diff log.txt log_ref.txt
+```
+2. SelfCheck of homework upload
+```
+mkdir r07921001_hw2
+cp {cmdCharDef.cpp,cmdCharDef.h,cmdReader.cpp} ./r07921001_hw2
+tar zcvf r07921001_hw2.tgz r07921001_hw2
+./SelfCheck r07921001_hw2.tgz
+```
