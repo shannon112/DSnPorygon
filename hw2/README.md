@@ -36,7 +36,13 @@ make test #to create the “testAsc” executable to test your keyboard setting.
 “#ifndef TA_KB_SETTING” and “#else” in both files. The former part is the one **you need to fix in order to work with your terminal**, and the latter part will be used by TAs to grade your program. So please do not modify the latter part.
 4. ```cmdParser.h``` : header file to define class “CmdParser”. Please note that this file is in “MustRemove.txt”. That is, you need to remove it from your submission and we will use the original version (our copy) for grading. Therefore, **DO NOT** customize it for any reason, as it may cause compile error on your submission when we compile your homework.
 5. ```cmdReader.cpp```: define member functions of class “CmdParser”. In this homework, ALL the **TODO**’s (except for the keyboard mapping in “cmdCharDef.*”) are in this file.
-6. ```cmdReader.o.linux```, ```cmdReader.o.ref```, ```cmdReader-ref.linux```: reference files
+6. ```cmdReader.o.linux```, ```cmdReader.o.ref```, ```cmdReader-ref.linux```: reference files, the link relationship is
+```sh
+cmdReader-ref.linux -> cmdReader-ref.16.linux
+cmdReader-ref.16.linux need cmdReader.o.ref
+cmdReader.o.ref -> cmdReader.o.linux
+cmdReader.o.linux -> cmdReader.o.16.linux
+```
 ```sh
 make 16.linux #or 18.linux can create the symbolic link on .o file and exe file to specify version
 cmdReader.o.linux -> cmdReader.o.16.linux
@@ -48,7 +54,8 @@ cmdReader.o.ref -> cmdReader.o.linux
 ```
 ```sh
 make ref #using provided “cmdReader.o.ref” to create the reference program.
-./cmdReader-ref.linux
+./cmdReader-ref
+mv cmdReader-ref cmdReader-ref.16.linux
 ```
 7. ```Makefile```: multiple objectives Makefile. Useful targets in the Makefile include:
 ```sh
