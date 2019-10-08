@@ -232,17 +232,22 @@ CmdParser::deleteLine()
 //
 void
 CmdParser::moveToHistory(int index)
-{
+{//_historyIdx is out of array (at array.size())
    // TODO->finished
    if(index < _historyIdx){//moving up(previous)
      if (_historyIdx==0) {
        mybeep();
        return;
      }
-     if (_historyIdx==int(_history.size())){
+     if (_historyIdx==int(_history.size())){//temp Cmd Stored at new position
        string readBufStr(_readBuf);
        _history.push_back(readBufStr);
        _tempCmdStored = true;
+     }
+     if ( (_historyIdx==int(_history.size())-1) && _tempCmdStored ){//back to temp Cmd Stored position
+       string readBufStr(_readBuf);
+       _history.pop_back();
+       _history.push_back(readBufStr);
      }
      if (index < 0) {
        index = 0;
