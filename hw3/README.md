@@ -73,8 +73,8 @@ Checking main...
 > compiling: main.cpp
 > building mydb...
 ```
-
-make test
+ln -sf cmdReader.o.linux16 cmdReader.o  
+make test  
 ```
 Checking db...
 > compiling: dbCmd.cpp
@@ -96,10 +96,11 @@ Checking test...
 ```
 
 ## 4. Reference exe
-```
+```sh
 cd ref
 ln -sf mydb-linux16 mydb-ref
-./mydb-ref
+./mydb-ref # or
+./mydb-ref -File ../dofiles/do1
 ```
 
 ## 5. Testing
