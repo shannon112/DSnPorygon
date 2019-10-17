@@ -73,8 +73,8 @@ Checking main...
 > compiling: main.cpp
 > building mydb...
 ```
-
-make test
+ln -sf cmdReader.o.linux16 cmdReader.o  
+make test  
 ```
 Checking db...
 > compiling: dbCmd.cpp
