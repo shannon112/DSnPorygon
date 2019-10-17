@@ -96,10 +96,11 @@ Checking test...
 ```
 
 ## 4. Reference exe
-```
+```sh
 cd ref
 ln -sf mydb-linux16 mydb-ref
-./mydb-ref
+./mydb-ref # or
+./mydb-ref -File ../dofiles/do1
 ```
 
 ## 5. Testing
