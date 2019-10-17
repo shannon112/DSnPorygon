@@ -53,7 +53,7 @@ cmd/ db/ main/ Makefile.in Makefile.lib test/ util/
 
 ## 3. Compile  
 
-make
+make (or make all  
 ```
 Checking db...
 > compiling: dbCmd.cpp
