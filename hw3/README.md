@@ -24,6 +24,7 @@ Quit #: quit the execution
 
 ## 2. File/Directory Structure
 ```
+hw3> ls
 Homework_3.pdf Makefile MustExist.txt
 MustRemove.txt bin/ dofiles/ include/ lib/ mydb@ ref/
 src/ testdb@ tests/
@@ -38,3 +39,14 @@ src/ testdb@ tests/
 **“tests/”** directory contains some .json files for you to test.  
 **“include/”** contains the symbolic links of the header files (.h) to be shared within different source code packages.  
 **“src/”** contains the source codes of different packages, each defined in a sub-directory.  
+
+```
+hw3> ls src
+cmd/ db/ main/ Makefile.in Makefile.lib test/ util/
+```
+
+**“main/”** directory, as its name suggests, contains the main() function of the entire program.  
+**“cmd/”** implements the utilities of the command interface. It also defines some common commands such as “help”, “quit”, “history”, etc.  
+**“db/”** directory is for the simple command-line database manager.  
+**“util/”** directory. The common utilities, such as customized string functions, memory management, container classes, etc, should be placed under here. You should try to take advantages of these common utility functions.  
+**“test/”** directory is to test your “db/” implementation before completing the command interface.   
