@@ -25,9 +25,7 @@ Quit #: quit the execution
 ## 2. File/Directory Structure
 ```
 hw3> ls
-Homework_3.pdf Makefile MustExist.txt
-MustRemove.txt bin/ dofiles/ include/ lib/ mydb@ ref/
-src/ testdb@ tests/
+Homework_3.pdf Makefile MustExist.txt MustRemove.txt bin/ dofiles/ include/ lib/ mydb@ ref/ src/ testdb@ tests/
 ```
 **“bin/”** and **“lib/”** are the directories to store the binary (executable) and library files, respectively.  
 **“Makefile”** is the top-level makefile. You only need to type “make” in this root directory and it will go to different source code directories to invoke other makefiles, check the file dependency, compile the source codes, create libraries and final executable, and return.  
@@ -38,6 +36,14 @@ src/ testdb@ tests/
 **“ref/”** includes the reference executables for linux and mac platforms.  
 **“tests/”** directory contains some .json files for you to test.  
 **“include/”** contains the symbolic links of the header files (.h) to be shared within different source code packages.  
+
+```
+cmdCharDef.h -> ../src/cmd/cmdCharDef.h
+cmdParser.h -> ../src/cmd/cmdParser.h
+dbJson.h -> ../src/db/dbJson.h
+util.h -> ../src/util/util.h
+```
+
 **“src/”** contains the source codes of different packages, each defined in a sub-directory.  
 
 ```
@@ -46,10 +52,15 @@ cmd/ db/ main/ Makefile.in Makefile.lib test/ util/
 ```
 
 **“main/”** directory, as its name suggests, contains the main() function of the entire program.  
+```main.cpp```  
 **“cmd/”** implements the utilities of the command interface. It also defines some common commands such as “help”, “quit”, “history”, etc.  
+```cmdCharDef.h, cmdCharDef.cpp, cmdParser.cpp, cmdParser.h, cmdCommon.cpp, cmdCommon.h```  
 **“db/”** directory is for the simple command-line database manager.  
+```dbCmd.h, dbCmd.cpp, dbJson.cpp, dbJson.h```  
 **“util/”** directory. The common utilities, such as customized string functions, memory management, container classes, etc, should be placed under here. You should try to take advantages of these common utility functions.  
+```util.h, util.cpp, myString.cpp, myGetChar.cpp```  
 **“test/”** directory is to test your “db/” implementation before completing the command interface.   
+```test.cpp```  
 
 ## 3. Compile  
 
