@@ -19,6 +19,8 @@ using namespace std;
 //    Otherwise, perform case-insensitive comparison until non-equal result
 //    presents.
 //
+// target str, input str, at least similar char (regardless lower or upper case)
+//
 int
 myStrNCmp(const string& s1, const string& s2, unsigned n)
 {

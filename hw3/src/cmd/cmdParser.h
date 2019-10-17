@@ -62,6 +62,13 @@ enum CmdOptionError
 //----------------------------------------------------------------------
 //    Base class : CmdExec
 //----------------------------------------------------------------------
+// A derived class such as class QuitCmd which defines at least the following three member functions:
+// (1) exec(): parse the command option(s) and execute the command,
+// (2) usage(): print out the command usage, and
+// (3) help(): print out the command definition for the HELp command.
+
+// related to CmdParser::regCmd(), CmdParser::execOneCmd() in “cmdParser.cpp”
+// related to exec/usage/help() members functions of each derived class such as in “cmdCommon.{h,cpp}”.
 
 class CmdExec
 {
@@ -85,6 +92,10 @@ protected:
 private:
    string            _optCmd;
 };
+
+
+// For the sake of convenience, we define a MACRO CmdClass(T)
+// so that we can easily declare an inherited class of CmdExec as: CmdClass(HelpCmd);
 
 #define CmdClass(T)                           \
 class T: public CmdExec                       \
