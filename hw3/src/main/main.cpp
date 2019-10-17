@@ -14,17 +14,23 @@ using namespace std;
 //----------------------------------------------------------------------
 //    Global cmd Manager
 //----------------------------------------------------------------------
+// initial main object
 CmdParser* cmdMgr = new CmdParser("mydb> ");
 
-extern bool initCommonCmd();
-extern bool initDbCmd();
+// initialize Quit, HIStory, HELp, DOfile to cmdMgr
+extern bool initCommonCmd(); //locate at cmd/cmdComnmon.cpp
 
+// initailize TODO
+extern bool initDbCmd(); //locate at db/dbCmd.cpp
+
+// print usage
 static void
 usage()
 {
    cout << "Usage: modCalc [ -File < doFile > ]" << endl;
 }
 
+// exit and print usage
 static void
 myexit()
 {
@@ -32,11 +38,13 @@ myexit()
    exit(-1);
 }
 
+// main
 int
 main(int argc, char** argv)
 {
    ifstream dof;
 
+   // parsing argc and its content error
    if (argc == 3) {  // -file <doFile>
       if (myStrNCmp("-File", argv[1], 2) == 0) {
          if (!cmdMgr->openDofile(argv[2])) {
@@ -54,9 +62,11 @@ main(int argc, char** argv)
       myexit();
    }
 
+   // parsing initializing error
    if (!initCommonCmd() || !initDbCmd())
       return 1;
 
+   // enter loop
    CmdExecStatus status = CMD_EXEC_DONE;
    while (status != CMD_EXEC_QUIT) {  // until "quit" or command error
       status = cmdMgr->execOneCmd();
