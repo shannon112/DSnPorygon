@@ -1,3 +1,16 @@
+# Makefile.in: common core for the makefiles in different source code directories
+#    (i) define the compilation rules,
+#    (ii) create file dependencies,
+#    (iii) create symbolic links for the external header files from the source code directory to the “include” directory
+# Makefile.lib: makefile to create libraries for each package.
+
+# make.{util, test, main, db, cmd}: in each of the source code directories calling “Makefile.in” and “Makefile.lib” to construct library for each source code package. In these file, the macro
+# 		PKGFLAG is to define the compilation flags specific to this package,
+# 		EXTHDRS defines the header files that should be exposed to other (external) packages (so they will be symbolically linked to the “include” directory),
+# 		EXTRAOBJS defines the extra object files that are not compiled from the .cpp files in this directory.
+
+# make.main: in the “main” source code directory: to perform linking and create the final executable.
+
 CSRCS     = $(wildcard *.cpp)
 CHDRS     = $(wildcard *.h)
 COBJS     = $(addsuffix .o, $(basename $(CSRCS)))
@@ -14,7 +27,7 @@ ECHO      = /bin/echo
 
 #CFLAGS = -O3 -Wall -std=c++11 $(PKGFLAG)
 CFLAGS = -O3 -Wall -std=c++11 -DTA_KB_SETTING $(PKGFLAG)
-CFLAGS = -g -Wall -std=c++11 -DTA_KB_SETTING $(PKGFLAG) 
+CFLAGS = -g -Wall -std=c++11 -DTA_KB_SETTING $(PKGFLAG)
 #CFLAGS = -O3 -Wall -std=c++11 -DTA_KB_SETTING $(PKGFLAG) -stdlib=libstdc++
 
 .PHONY: depend extheader

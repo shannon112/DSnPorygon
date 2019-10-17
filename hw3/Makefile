@@ -1,4 +1,8 @@
-LIBPKGS  = db cmd util 
+# 1. Top-level Makefile: for the entire program creation
+# 2. Call make.{util, test, main, db, cmd} in subdirectory
+# 3. Each "make." include Makefile.lib or Makefile.in do the actual g++
+
+LIBPKGS  = db cmd util
 MAIN     = main
 TESTMAIN = test
 
@@ -11,7 +15,7 @@ TESTEXEC = testdb
 all: libs main
 
 test: libs testmain
-	
+
 libs:
 	@for lib in $(LIBPKGS); \
 	do \
@@ -50,11 +54,11 @@ clean:
 	@echo "Removing $(LIBFILES)..."
 	@cd lib; rm -f $(LIBFILES)
 	@echo "Removing $(EXEC)..."
-	@rm -f bin/$(EXEC) 
+	@rm -f bin/$(EXEC)
 	@echo "Removing $(TESTEXEC)..."
-	@rm -f bin/$(TESTEXEC) 
+	@rm -f bin/$(TESTEXEC)
 
-ctags:          
+ctags:
 	@rm -f src/tags
 	@for lib in $(LIBPKGS); \
 	do \
@@ -69,4 +73,3 @@ ctags:
 linux18 linux16 mac:
 	@cd src/cmd; ln -sf cmdReader.o.$@ cmdReader.o
 	@cd ref; ln -sf $(EXEC)-$@ $(EXEC)-ref
-
