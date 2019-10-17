@@ -50,3 +50,70 @@ cmd/ db/ main/ Makefile.in Makefile.lib test/ util/
 **“db/”** directory is for the simple command-line database manager.  
 **“util/”** directory. The common utilities, such as customized string functions, memory management, container classes, etc, should be placed under here. You should try to take advantages of these common utility functions.  
 **“test/”** directory is to test your “db/” implementation before completing the command interface.   
+
+## 3. Compile  
+
+make
+```
+Checking db...
+> compiling: dbCmd.cpp
+> compiling: dbJson.cpp
+Building libdb.a...
+Checking cmd...
+> compiling: cmdCharDef.cpp
+> compiling: cmdCommon.cpp
+> compiling: cmdParser.cpp
+Building libcmd.a...
+Checking util...
+> compiling: myString.cpp
+> compiling: myGetChar.cpp
+> compiling: util.cpp
+Building libutil.a...
+Checking main...
+> compiling: main.cpp
+> building mydb...
+```
+
+make test
+```
+Checking db...
+> compiling: dbCmd.cpp
+> compiling: dbJson.cpp
+Building libdb.a...
+Checking cmd...
+> compiling: cmdCharDef.cpp
+> compiling: cmdCommon.cpp
+> compiling: cmdParser.cpp
+Building libcmd.a...
+Checking util...
+> compiling: myString.cpp
+> compiling: myGetChar.cpp
+> compiling: util.cpp
+Building libutil.a...
+Checking test...
+> compiling: test.cpp
+> building testdb...
+```
+
+## 4. Reference exe
+```
+cd ref
+ln -sf mydb-linux16 mydb-ref
+./mydb-ref
+```
+
+## 5. Testing
+
+Compare to reference program
+```
+./cmdReader-ref.16.linux -f hw2.test1 > log_ref.txt
+./cmdReader -f hw2.test1 > log.txt
+diff log.txt log_ref.txt
+```
+SelfCheck of homework upload
+```
+mkdir r07921001_hw2
+cp {cmdCharDef.cpp,cmdCharDef.h,cmdReader.cpp} ./r07921001_hw2
+tar zcvf r07921001_hw2.tgz r07921001_hw2
+./SelfCheck r07921001_hw2.tgz
+```
