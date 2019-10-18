@@ -23,6 +23,7 @@ using namespace std;
 /*****************************************/
 /*          Global Functions             */
 /*****************************************/
+// print json element
 ostream&
 operator << (ostream& os, const DBJsonElem& j)
 {
@@ -32,7 +33,7 @@ operator << (ostream& os, const DBJsonElem& j)
 
 istream& operator >> (istream& is, DBJson& j)
 {
-   // TODO: to read in data from Json file and store them in a DB 
+   // TODO: to read in data from Json file and store them in a DB
    // - You can assume the input file is with correct JSON file format
    // - NO NEED to handle error file format
    assert(j._obj.empty());
