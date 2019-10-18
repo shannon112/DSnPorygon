@@ -17,6 +17,7 @@
 #include <algorithm>
 #include "dbJson.h"
 #include "util.h"
+#include <regex>
 
 using namespace std;
 
@@ -31,19 +32,42 @@ operator << (ostream& os, const DBJsonElem& j)
    return os;
 }
 
+// TODO:read into json databse
 istream& operator >> (istream& is, DBJson& j)
 {
-   // TODO: to read in data from Json file and store them in a DB
+   // to read in data from Json file and store them in a DB
    // - You can assume the input file is with correct JSON file format
    // - NO NEED to handle error file format
    assert(j._obj.empty());
 
+   // regex pattern
+   regex reg("[ \t\b\r\n]*\"([^ \t\b\r\n]+)\"[ \t\b\r\n]*[ |\t]:[ |\t][ \t\b\r\n]*(-[0-9]*|[0-9]*).*");
+   smatch m;
+
+   // read input file
+   std::string line;
+   while (getline(is, line)){
+     if(regex_match(line, m, reg)) {
+       // save as JsonElem type
+       string key = m[1];
+       string value = m[2];
+       DBJsonElem jsonElem(key,atoi(value.c_str()));
+       // push to database
+       j._obj.push_back(jsonElem);
+     }
+   }
    return is;
 }
 
+// TODO:print out json database content
 ostream& operator << (ostream& os, const DBJson& j)
 {
-   // TODO
+   cout<<"{"<<endl;
+   for(unsigned int i=0; i<j.size(); i++){
+     if( i == j.size()-1 ) cout<<"  "<<j._obj[i]<<endl;
+     else cout<<"  "<<j._obj[i]<<","<<endl;
+   }
+   cout<<"}"<<endl;
    return os;
 }
 
