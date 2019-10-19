@@ -63,7 +63,7 @@ istream& operator >> (istream& is, DBJson& j)
 ostream& operator << (ostream& os, const DBJson& j)
 {
    cout<<"{"<<endl;
-   for(unsigned int i=0; i<j.size(); i++){
+   for(size_t i=0; i<j.size(); i++){
      if( i == j.size()-1 ) cout<<"  "<<j._obj[i]<<endl;
      else cout<<"  "<<j._obj[i]<<","<<endl;
    }
@@ -80,7 +80,9 @@ ostream& operator << (ostream& os, const DBJson& j)
 void
 DBJson::reset()
 {
-   // TODO
+  // TODO
+   vector<DBJsonElem> _new_obj;
+   _new_obj.swap(_obj);
 }
 
 // return false if key is repeated
@@ -88,6 +90,7 @@ bool
 DBJson::add(const DBJsonElem& elm)
 {
    // TODO
+   _obj.push_back(elm);
    return true;
 }
 
@@ -96,7 +99,7 @@ float
 DBJson::ave() const
 {
    // TODO
-   return 0.0;
+   return (float)(this->sum()) / this->size();
 }
 
 // If DBJson is empty, set idx to size() and return INT_MIN
@@ -104,8 +107,23 @@ int
 DBJson::max(size_t& idx) const
 {
    // TODO
-   int maxN = INT_MIN;
-   return  maxN;
+   if (this->empty()){
+     idx = this->size();
+     return INT_MIN;
+   }
+   else{
+     int max_index = 0;
+     int max_value = INT_MIN;
+
+     for(size_t i=0; i<this->size(); i++){
+       int value_now = _obj[i].value();
+       if( value_now > max_value ){
+         max_value = value_now;
+         max_index = i;
+       }
+     }
+     return max_value;
+   }
 }
 
 // If DBJson is empty, set idx to size() and return INT_MAX
@@ -113,8 +131,23 @@ int
 DBJson::min(size_t& idx) const
 {
    // TODO
-   int minN = INT_MAX;
-   return  minN;
+   if (this->empty()){
+     idx = this->size();
+     return INT_MAX;
+   }
+   else{
+     int min_index = 0;
+     int min_value = INT_MAX;
+
+     for(size_t i=0; i<this->size(); i++){
+       int value_now = _obj[i].value();
+       if( value_now < min_value ){
+         min_value = value_now;
+         min_index = i;
+       }
+     }
+     return min_value;
+   }
 }
 
 void
@@ -136,6 +169,9 @@ int
 DBJson::sum() const
 {
    // TODO
-   int s = 0;
-   return s;
+   int sum = 0;
+   for(size_t i=0; i<this->size(); i++){
+     sum += _obj[i].value();
+   }
+   return sum;
 }

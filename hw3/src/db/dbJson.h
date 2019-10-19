@@ -56,11 +56,11 @@ public:
    DBJsonElem& operator [] (size_t i) { return _obj[i]; }
    const DBJsonElem& operator [] (size_t i) const { return _obj[i]; }
 
-   // TODO modify these two functions according to the comments
-   // return true if JSON file hasn't been read in
-   bool operator !() { return false; }
-   // return this if JSON file has been read in; return NLL if not.
-   operator void* () const { return NULL; }
+
+   // TODO//operator overloading// return true if JSON file hasn't been read in
+   bool operator !() { return _obj.empty(); }
+   // TODO//type casting// return this if JSON file has been read in; return NLL if not.
+   operator void* () const { return  _obj.empty()?NULL:(void*)this; }
 
    // Read DBJson
    friend istream& operator >> (istream& is, DBJson& j);
