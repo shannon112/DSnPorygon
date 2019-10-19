@@ -43,28 +43,33 @@ initDbCmd()
 CmdExecStatus
 DBAppendCmd::exec(const string& option)
 {
-   // TODO...
+   // TODO
    // check option
-   if (!CmdExec::lexNoOption(option))
+   vector<string> options;
+   if (!CmdExec::lexOptions(option, options))
       return CMD_EXEC_ERROR;
 
-   string k;
-   int v;
-   DBJsonElem jsonElem(k,v);
-   cout << option <<endl;
-   //float a = dbjson.add();
+   if (options.empty())
+      return CmdExec::errorOption(CMD_OPT_MISSING, "");
 
-   /*
-   if (isnan(a)) {
-      cerr << "Error: The average of the DB is nan." << endl;
-      return CMD_EXEC_ERROR;
+   if (options.size()>2)
+      return CmdExec::errorOption(CMD_OPT_EXTRA, "");
+
+   //check key
+   string key;
+   if (isValidVarName(options[0])) key = options[0];
+   else return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
+
+   //check value
+   int value;
+   if (int(options[1])) value = int(options[1]);
+   else return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+
+   //check if key exist, and append
+   if (!(dbjson.add(jsonElem))){
+     cerr<<"Error: Element with key \""<<key<<"\" already exists!!"<<endl;
+     return CMD_EXEC_ERROR;
    }
-   ios_base::fmtflags origFlags = cout.flags();
-   cout << "The average of the DB is " << fixed
-        << setprecision(2) << a << ".\n";
-   cout.flags(origFlags);
-   */
-
    return CMD_EXEC_DONE;
 }
 
@@ -231,6 +236,11 @@ CmdExecStatus
 DBPrintCmd::exec(const string& option)
 {
    // TODO...
+   // check option
+   if (!CmdExec::lexNoOption(option))
+      return CMD_EXEC_ERROR;
+
+   cout << dbjson;
 
    return CMD_EXEC_DONE;
 }
