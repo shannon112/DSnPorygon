@@ -112,14 +112,11 @@ DBJson::max(size_t& idx) const
      return INT_MIN;
    }
    else{
-     int max_index = 0;
      int max_value = INT_MIN;
-
      for(size_t i=0; i<this->size(); i++){
-       int value_now = _obj[i].value();
-       if( value_now > max_value ){
-         max_value = value_now;
-         max_index = i;
+       if( _obj[i].value() > max_value ){
+         max_value = _obj[i].value();
+         idx = i;
        }
      }
      return max_value;
@@ -136,14 +133,11 @@ DBJson::min(size_t& idx) const
      return INT_MAX;
    }
    else{
-     int min_index = 0;
      int min_value = INT_MAX;
-
      for(size_t i=0; i<this->size(); i++){
-       int value_now = _obj[i].value();
-       if( value_now < min_value ){
-         min_value = value_now;
-         min_index = i;
+       if( _obj[i].value() < min_value ){
+         min_value = _obj[i].value();
+         idx = i;
        }
      }
      return min_value;
