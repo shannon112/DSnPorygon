@@ -118,14 +118,15 @@ ln -sf mydb-linux16 mydb-ref
 
 Compare to reference program
 ```
-./cmdReader-ref.16.linux -f hw2.test1 > log_ref.txt
-./cmdReader -f hw2.test1 > log.txt
-diff log.txt log_ref.txt
+cd dofiles
+../ref/mydb-ref -f do1 > log1_ref.txt 2>&1
+../mydb -f do1 > log1.txt 2>&1
+diff log1.txt log1_ref.txt
 ```
 SelfCheck of homework upload
 ```
-mkdir r07921001_hw2
-cp {cmdCharDef.cpp,cmdCharDef.h,cmdReader.cpp} ./r07921001_hw2
-tar zcvf r07921001_hw2.tgz r07921001_hw2
-./SelfCheck r07921001_hw2.tgz
+mkdir r07921001_hw3
+cp {...MustExist} ./r07921001_hw3
+tar zcvf r07921001_hw3.tgz r07921001_hw3
+./SelfCheck r07921001_hw3.tgz
 ```
