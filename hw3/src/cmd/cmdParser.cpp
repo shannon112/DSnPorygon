@@ -28,8 +28,13 @@ void mybeep();
 bool
 CmdParser::openDofile(const string& dof)
 {
-   // TODO...
-   _dofile = new ifstream(dof.c_str());
+   // TODO
+   _dofileStack.push(_dofile); // store old _dofile
+   _dofile = new ifstream(dof.c_str()); // open new dofile
+   if (!(*_dofile)){ // check if work or not, if not undo
+     this->closeDofile();
+     return false;
+   }
    return true;
 }
 
@@ -37,12 +42,17 @@ CmdParser::openDofile(const string& dof)
 void
 CmdParser::closeDofile()
 {
+  // TODO
    assert(_dofile != 0);
-   // TODO...
-   delete _dofile;
+   delete _dofile; // delete current
+   _dofile = _dofileStack.top(); // restore previous one
+   _dofileStack.pop(); // delete it in storage
 }
 
 // Return false if registration fails
+// cmd = raw input. e.g. DBAppendCmd
+// mandCmd = stored in _cmdMap.first. e.g. DBAP
+// e->_string = stored in CmdExec private member e.g.pendCmd
 bool
 CmdParser::regCmd(const string& cmd, unsigned nCmp, CmdExec* e)
 {
@@ -61,7 +71,7 @@ CmdParser::regCmd(const string& cmd, unsigned nCmp, CmdExec* e)
    // The strings stored in _cmdMap are all upper case
    //
    assert(str.size() == nCmp);  // str is now mandCmd
-   string& mandCmd = str;
+   string& mandCmd = str; //long standard form (first n with upper)
    for (unsigned i = 0; i < nCmp; ++i)
       mandCmd[i] = toupper(mandCmd[i]);
    string optCmd = cmd.substr(nCmp);
@@ -97,7 +107,12 @@ CmdParser::execOneCmd()
 void
 CmdParser::printHelps() const
 {
-   // TODO...
+   // TODO
+   //CmdMap _cmdMap;
+   CmdMap::const_iterator cmdMap_iter;
+   for (cmdMap_iter=_cmdMap.begin(); cmdMap_iter!=_cmdMap.end(); cmdMap_iter++ )
+       cmdMap_iter->second->help();
+   cout<<endl;
 }
 
 void
@@ -131,23 +146,31 @@ CmdParser::printHistory(int nPrint) const
 // 3. Get the command options from the trailing part of str (i.e. second
 //    words and beyond) and store them in "option"
 //
+// parsing user raw input to main command and options
+//
 CmdExec*
 CmdParser::parseCmd(string& option)
 {
+  // TODO
    assert(_tempCmdStored == false);
    assert(!_history.empty());
-   string str = _history.back();
+   string str_raw = _history.back();
+   string cmd_main;
+   size_t space_pos = myStrGetTok(str_raw, cmd_main);
+   CmdExec* e = getCmd(cmd_main);
 
-   // TODO...
-   assert(str[0] != 0 && str[0] != ' ');
-   return NULL;
+   if (e == 0) cerr << "Illegal command!! \"" << cmd_main << "\"" << endl;
+   else if (space_pos!=string::npos) option = str_raw.substr(space_pos+1);
+   assert(str_raw[0] != 0 && str_raw[0] != ' ');
+
+   return e;
 }
 
 // Remove this function for TODO...
 //
 // This function is called by pressing 'Tab'.
 // It is to list the partially matched commands.
-// "str" is the partial string before current cursor position. It can be 
+// "str" is the partial string before current cursor position. It can be
 // a null string, or begin with ' '. The beginning ' ' will be ignored.
 //
 // Several possibilities after pressing 'Tab'
@@ -253,7 +276,7 @@ CmdParser::parseCmd(string& option)
 //    [After] print out the single file name followed by a ' '
 //    // e.g. in hw3/bin
 //    cmd> help mydb $
-//    ==> If "tab" is pressed again, make a beep sound and DO NOT re-print 
+//    ==> If "tab" is pressed again, make a beep sound and DO NOT re-print
 //        the singly-matched file
 //    --- 6.2 ---
 //    [Before] with a prefix and with mutiple matched files
@@ -274,7 +297,7 @@ CmdParser::parseCmd(string& option)
 //    cmd> help MustE$aa
 //    [After] insert the remaining of the matched file name followed by a ' '
 //    cmd> help MustExist.txt $aa
-//    ==> If "tab" is pressed again, make a beep sound and DO NOT re-print 
+//    ==> If "tab" is pressed again, make a beep sound and DO NOT re-print
 //        the singly-matched file
 //    --- 6.5 ---
 //    [Before] with a prefix and NO matched file
@@ -310,8 +333,14 @@ CmdParser::listCmd(const string& str)
 CmdExec*
 CmdParser::getCmd(string cmd)
 {
+   // TODO
    CmdExec* e = 0;
-   // TODO...
+   //CmdMap::iterator iter = _cmdMap.find(cmd)
+   CmdMap::const_iterator cmdMap_iter;
+   for (cmdMap_iter=_cmdMap.begin(); cmdMap_iter!=_cmdMap.end(); cmdMap_iter++ ){
+     if (myStrNCmp(cmdMap_iter->first + cmdMap_iter->second->getOptCmd(), cmd, cmdMap_iter->first.size()) == 0)
+        e = cmdMap_iter->second;
+   }
    return e;
 }
 
@@ -404,4 +433,3 @@ CmdExec::errorOption(CmdOptionError err, const string& opt) const
    }
    return CMD_EXEC_ERROR;
 }
-

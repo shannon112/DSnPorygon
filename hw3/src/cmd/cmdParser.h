@@ -84,8 +84,11 @@ public:
    const string& getOptCmd() const { return _optCmd; }
 
 protected:
+   //max, min, sum, ave, count
    bool lexNoOption(const string&) const;
+   //sort, print
    bool lexSingleOption(const string&, string&, bool optional = true) const;
+   //read, append
    bool lexOptions(const string&, vector<string>&, size_t nOpts = 0) const;
    CmdExecStatus errorOption(CmdOptionError err, const string& opt) const;
 

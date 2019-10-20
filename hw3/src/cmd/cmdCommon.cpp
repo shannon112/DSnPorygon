@@ -21,7 +21,7 @@ initCommonCmd()
          cmdMgr->regCmd("HELp", 3, new HelpCmd) &&
          cmdMgr->regCmd("DOfile", 2, new DofileCmd)
       )) {
-      cerr << "Registering \"init\" commands fails... exiting" << endl;
+      cerr << "Registering \"init\" Cmd commands fails... exiting" << endl;
       return false;
    }
    return true;

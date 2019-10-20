@@ -9,6 +9,7 @@
 #include <ctype.h>
 #include <cstring>
 #include <cassert>
+#include <iostream>
 
 using namespace std;
 
@@ -21,6 +22,7 @@ using namespace std;
 //
 // target str, input str, at least similar char (regardless lower or upper case)
 //
+// s1 for standard form, s2 for user input
 int
 myStrNCmp(const string& s1, const string& s2, unsigned n)
 {
@@ -31,7 +33,7 @@ myStrNCmp(const string& s1, const string& s2, unsigned n)
    assert(n1 >= n);
    for (unsigned i = 0; i < n1; ++i) {
       if (i == n2)
-         return (i < n)? 1 : 0;
+         return (i < n)? 1 : 0; //correct return 0
       char ch1 = (isupper(s1[i]))? tolower(s1[i]) : s1[i];
       char ch2 = (isupper(s2[i]))? tolower(s2[i]) : s2[i];
       if (ch1 != ch2)
@@ -51,8 +53,10 @@ myStrGetTok(const string& str, string& tok, size_t pos = 0,
             const char del = ' ')
 {
    size_t begin = str.find_first_not_of(del, pos);
+   //cout<<"begin "<<begin<<endl;
    if (begin == string::npos) { tok = ""; return begin; }
    size_t end = str.find_first_of(del, begin);
+   //cout<<"end "<<end<<endl;
    tok = str.substr(begin, end - begin);
    return end;
 }

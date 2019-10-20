@@ -38,7 +38,7 @@ main(int argc, char** argv)
    }
    if (!(inf >> dbjson)) {
       cerr << "Error in reading JSON file!!" << endl;
-      exit(-1);
+      //exit(-1);
    }
 
    cout << "========================" << endl;

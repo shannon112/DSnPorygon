@@ -81,8 +81,7 @@ void
 DBJson::reset()
 {
   // TODO
-   vector<DBJsonElem> _new_obj;
-   _new_obj.swap(_obj);
+   vector<DBJsonElem>().swap(_obj);
 }
 
 // return false if key is repeated
@@ -90,6 +89,9 @@ bool
 DBJson::add(const DBJsonElem& elm)
 {
    // TODO
+   for (size_t i = 0; i<this->size(); i++){
+     if(_obj[i].key() == elm.key()) return false;
+   }
    _obj.push_back(elm);
    return true;
 }

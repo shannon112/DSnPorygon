@@ -46,14 +46,20 @@ DBAppendCmd::exec(const string& option)
    // TODO
    // check option
    vector<string> options;
+
+   if (dbjson.empty()){
+     cerr<<"Error: DB is not created yet!!"<<endl;
+     return CMD_EXEC_ERROR;
+   }
+
    if (!CmdExec::lexOptions(option, options))
       return CMD_EXEC_ERROR;
 
-   if (options.empty())
+   if ((options.empty())||(options.size()==1))
       return CmdExec::errorOption(CMD_OPT_MISSING, "");
 
    if (options.size()>2)
-      return CmdExec::errorOption(CMD_OPT_EXTRA, "");
+      return CmdExec::errorOption(CMD_OPT_EXTRA, options[2]);
 
    //check key
    string key;
@@ -61,11 +67,15 @@ DBAppendCmd::exec(const string& option)
    else return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
 
    //check value
-   int value;
-   if (int(options[1])) value = int(options[1]);
-   else return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+   if ((!isdigit(options[1][0]))&&(options[1][0]!='-')) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+   for (size_t i=1; i<options[1].length(); i++)
+   {
+     if (!isdigit(options[1][i])) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+   }
+   int value = atoi(options[1].c_str());
 
    //check if key exist, and append
+   DBJsonElem jsonElem(key,value);
    if (!(dbjson.add(jsonElem))){
      cerr<<"Error: Element with key \""<<key<<"\" already exists!!"<<endl;
      return CMD_EXEC_ERROR;
@@ -94,6 +104,11 @@ CmdExecStatus
 DBAveCmd::exec(const string& option)
 {
    // check option
+   if (dbjson.empty()){
+     cerr<<"Error: DB is not created yet!!"<<endl;
+     return CMD_EXEC_ERROR;
+   }
+
    if (!CmdExec::lexNoOption(option))
       return CMD_EXEC_ERROR;
 
@@ -166,6 +181,11 @@ CmdExecStatus
 DBMaxCmd::exec(const string& option)
 {
    // check option
+   if (dbjson.empty()){
+     cerr<<"Error: DB is not created yet!!"<<endl;
+     return CMD_EXEC_ERROR;
+   }
+
    if (!CmdExec::lexNoOption(option))
       return CMD_EXEC_ERROR;
 
@@ -201,6 +221,11 @@ CmdExecStatus
 DBMinCmd::exec(const string& option)
 {
    // check option
+   if (dbjson.empty()){
+     cerr<<"Error: DB is not created yet!!"<<endl;
+     return CMD_EXEC_ERROR;
+   }
+
    if (!CmdExec::lexNoOption(option))
       return CMD_EXEC_ERROR;
 
@@ -237,10 +262,28 @@ DBPrintCmd::exec(const string& option)
 {
    // TODO...
    // check option
-   if (!CmdExec::lexNoOption(option))
-      return CMD_EXEC_ERROR;
+   if (dbjson.empty()){
+     cerr<<"Error: DB is not created yet!!"<<endl;
+     return CMD_EXEC_ERROR;
+   }
 
-   cout << dbjson;
+   string token;
+   if (!CmdExec::lexSingleOption(option, token, true))
+     return CMD_EXEC_ERROR;
+
+   if (token.empty()){
+     cout << dbjson;
+     cout << "Total JSON elements: " << dbjson.size() << endl;
+   }
+   else{
+     for (size_t i = 0; i<=dbjson.size(); i++){
+        if (i==dbjson.size()) cout<<"Error: No JSON element with key \""<<token<<"\" is found."<<endl;
+        if (dbjson[i].key()==token){
+          cout<<"{ "<<dbjson[i]<<" }"<<endl;
+          break;
+        }
+     }
+   }
 
    return CMD_EXEC_DONE;
 }
@@ -331,6 +374,11 @@ DBSortCmd::exec(const string& option)
 {
    // check option
    string token;
+   if (dbjson.empty()){
+     cerr<<"Error: DB is not created yet!!"<<endl;
+     return CMD_EXEC_ERROR;
+   }
+
    if (!CmdExec::lexSingleOption(option, token, false))
       return CMD_EXEC_ERROR;
 
@@ -362,6 +410,11 @@ CmdExecStatus
 DBSumCmd::exec(const string& option)
 {
    // check option
+   if (dbjson.empty()){
+     cerr<<"Error: DB is not created yet!!"<<endl;
+     return CMD_EXEC_ERROR;
+   }
+
    if (!CmdExec::lexNoOption(option))
       return CMD_EXEC_ERROR;
 
