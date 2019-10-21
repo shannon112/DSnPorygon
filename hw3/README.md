@@ -130,3 +130,5 @@ cp {...MustExist} ./r07921001_hw3
 tar zcvf r07921001_hw3.tgz r07921001_hw3
 ./SelfCheck r07921001_hw3.tgz
 ```
+
+<img src="https://raw.githubusercontent.com/shannon112/DSnPorygon/master/hw3/flowchart.JPG" width=840/>
