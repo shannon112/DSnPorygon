@@ -127,7 +127,7 @@ typedef pair<const string, CmdExec*>  CmdRegPair;
 public:
    CmdParser(const string& p) : _prompt(p), _dofile(0),
         _readBufPtr(_readBuf), _readBufEnd(_readBuf),
-        _historyIdx(0), _tabPressCount(0), _tempCmdStored(false) {}
+        _historyIdx(0), _tabPressCount(0), _tabUsagePrinted(false), _tempCmdStored(false) {}
    virtual ~CmdParser() {}
 
    bool openDofile(const string& dof);
@@ -183,6 +183,8 @@ private:
                                      // (2) When up/down/pgUp/pgDn is pressed,
                                      //     position to history to retrieve
    size_t    _tabPressCount;         // The number of tab pressed
+   bool      _tabUsagePrinted;       // The boolean of if exe usage was printed or not
+
    bool      _tempCmdStored;         // When up/pgUp is pressed, current line
                                      // will be stored in _history and
                                      // _tempCmdStored will be true.

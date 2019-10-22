@@ -316,7 +316,126 @@ CmdParser::parseCmd(string& option)
 void
 CmdParser::listCmd(const string& str)
 {
-   // TODO...
+   // TODO
+   string cmd_main;
+   size_t first_not_space_idx = str.find_first_not_of(' ');
+   size_t first_space_idx = myStrGetTok(str,cmd_main);
+
+   //Empty input
+   if (first_not_space_idx==string::npos){
+     //list commands in _cmdMap
+     _tabUsagePrinted = false;
+     CmdMap::const_iterator cmdMap_iter;
+     size_t num = 0;
+     for (cmdMap_iter=_cmdMap.begin(); cmdMap_iter!=_cmdMap.end(); cmdMap_iter++,num++ ){
+       if(num%5==0) cout << endl;
+       cout << setw(12) << left << (cmdMap_iter->first) + cmdMap_iter->second->getOptCmd();
+     }
+   }
+
+   //Semi finished command
+   else if (first_space_idx==string::npos){
+     //matching input to cmd database
+     _tabUsagePrinted = false;
+     vector<string> cmd_matches;
+     CmdMap::const_iterator cmdMap_iter;
+     for (cmdMap_iter=_cmdMap.begin(); cmdMap_iter!=_cmdMap.end(); cmdMap_iter++ ){
+       if ((cmdMap_iter->first + cmdMap_iter->second->getOptCmd()).size() < cmd_main.size()) continue;
+       if (myStrNCmp(cmdMap_iter->first + cmdMap_iter->second->getOptCmd(), cmd_main, cmd_main.size()) == 0)
+          cmd_matches.push_back(cmdMap_iter->first + cmdMap_iter->second->getOptCmd());
+     }
+
+     //no commnand match, beep for it
+     if (cmd_matches.empty()){
+       mybeep();
+       return;
+     }
+
+     //one matching, fill the rest part of matching command
+     else if (cmd_matches.size()==1){
+       for (size_t i = cmd_main.size(); i<cmd_matches[0].size(); i++) insertChar(cmd_matches[0][i]);
+       insertChar(' ');
+       return;
+     }
+
+     //multiple matching, list the similar matching commands
+     else if (cmd_matches.size()>1){
+       for (int i = 0; i<int(cmd_matches.size()); i++){
+         if(i%5==0) cout << endl;
+         cout << setw(12) << left << cmd_matches[i];
+       }
+     }
+   }
+
+   //Finished command, and unknown options
+   else{
+     CmdExec* e = getCmd(cmd_main);
+
+     //beep for wrong commnand match
+     if(e==0){
+       mybeep();
+       return;
+     }
+
+     //print usage of that command
+     else if(!(_tabUsagePrinted)){
+       cout<<endl;
+       e->usage(cout);
+       _tabUsagePrinted = true;
+     }
+
+     //print files
+     else if(_tabUsagePrinted){
+       string cmd_rest;
+       myStrGetTok(str.substr(first_space_idx),cmd_rest);
+       vector<string> files;
+
+       //do not have prefix
+       if (first_space_idx==(str.size()-1)){
+         listDir(files,"",".");
+         //multiple files under dir
+         if (files.size()>1){
+           for (int i = 0; i<int(files.size()); i++){
+             if(i%5==0) cout << endl;
+             cout << setw(16) << left << files[i];
+           }
+         }
+         //only one file under dir
+         else if (files.size()==1){
+           for (size_t i = 0; i<files[0].size(); i++) insertChar(files[0][i]);
+           return;
+         }
+       }
+       //do have prefix
+       else{
+         listDir(files,cmd_rest,".");
+         //multiple files under dir
+         if (files.size()>1){
+           for (int i = 0; i<int(files.size()); i++){
+             if(i%5==0) cout << endl;
+             cout << setw(16) << left << files[i];
+           }
+         }
+         //file matched exactly
+         else if (files[0] == cmd_rest){
+           mybeep();
+           return;
+         }
+         //only one file under dir, fill it
+         else if (files.size()==1){
+           for (size_t i = cmd_rest.size(); i<files[0].size(); i++) insertChar(files[0][i]);
+           insertChar(' ');
+         }
+         //no file matched
+         else{
+           mybeep();
+           return;
+         }
+       }//do have prefix
+     }//print files
+   }//Finished command, and unknown options
+   reprintCmd();
+   return;
 }
 
 // cmd is a copy of the original input
