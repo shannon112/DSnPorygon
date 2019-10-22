@@ -416,13 +416,10 @@ CmdParser::listCmd(const string& str)
              cout << setw(16) << left << files[i];
            }
          }
-         //file matched exactly
-         else if (files[0] == cmd_rest){
-           mybeep();
-           return;
-         }
          //only one file under dir, fill it
          else if (files.size()==1){
+           //file matched exactly
+           if (files[0] == cmd_rest){mybeep(); return;}
            for (size_t i = cmd_rest.size(); i<files[0].size(); i++) insertChar(files[0][i]);
            insertChar(' ');
          }
