@@ -18,6 +18,8 @@ USAGE #: report the runtime and/or memory usage
 
 make linux16 ( mac, or linux18 
 ```
+ref/memTest -> ref/memTest-linux16
+ref/memTest.debug -> ref/memTest-linux16.debug
 ```
 make (or make all  
 ```
