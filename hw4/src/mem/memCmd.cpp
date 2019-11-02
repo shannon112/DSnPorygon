@@ -104,16 +104,14 @@ MTNewCmd::exec(const string& option)
       if (!(array_len>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
    }
 
-   // multiple object
-   if(array_len ==NULL){
-
+   // object list 
+   if(array_len ==NULL) {
+      mtest.newObjs(number);
    }
-
-   // multiple object array
-   else{
-
+   // array list
+   else {
+      mtest.newArrs(number,array_len);
    }
-
    return CMD_EXEC_DONE;
 
    // Use try-catch to catch the bad_alloc exception
@@ -200,16 +198,22 @@ MTDeleteCmd::exec(const string& option)
       }
    }
 
-
-   // multiple object
+   // by Random
    if(isRandom){
-
+   	RandomNumGen rnGen(0);
+      for(int i=0; i<number; ++i){
+         index_now = rnGen(list_size);
+         if(isArray) deleteArr(index_now);
+         else deleteObj(index_now);
+      }
    }
 
-   // multiple object array
+   // by index
    else{
-
+      if(isArray) deleteArr(number);
+      else deleteObj(number);
    }
+
    return CMD_EXEC_DONE;
 }
 
