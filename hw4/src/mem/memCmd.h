@@ -10,9 +10,9 @@
 
 #include "cmdParser.h"
 
-CmdClass(MTResetCmd);
-CmdClass(MTNewCmd);
-CmdClass(MTDeleteCmd);
-CmdClass(MTPrintCmd);
+CmdClass(MTResetCmd);  //finished, TODO in MGR
+CmdClass(MTNewCmd);    //blank, TODO
+CmdClass(MTDeleteCmd); //blank, TODO
+CmdClass(MTPrintCmd);  //finished
 
 #endif // MEM_CMD_H

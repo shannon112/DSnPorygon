@@ -79,9 +79,44 @@ CmdExecStatus
 MTNewCmd::exec(const string& option)
 {
    // TODO
+   vector<string> options;
+
+   //must with options
+   if (!CmdExec::lexOptions(option, options))
+      return CMD_EXEC_ERROR;
+
+   //single option as object number   
+   if ((options.empty())||(options.size()==2))
+      return CmdExec::errorOption(CMD_OPT_MISSING, "");
+
+   //triple options as object array number and its size
+   if (options.size()>3)
+      return CmdExec::errorOption(CMD_OPT_EXTRA, options[3]);
+
+   //check if valid and extract value
+   int number;
+   int array_len;
+   if (!(myStr2Int(options[0], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
+   if (!(number>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
+   if (options.size()==3){
+      if (myStrNCmp("-Array", options[1], 1) != 0) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+      if (!(myStr2Int(options[2], array_len))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+      if (!(array_len>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+   }
+
+   // multiple object
+   if(array_len ==NULL){
+
+   }
+
+   // multiple object array
+   else{
+
+   }
+
+   return CMD_EXEC_DONE;
 
    // Use try-catch to catch the bad_alloc exception
-   return CMD_EXEC_DONE;
 }
 
 void
@@ -105,7 +140,76 @@ CmdExecStatus
 MTDeleteCmd::exec(const string& option)
 {
    // TODO
+   vector<string> options;
 
+   //must with options
+   if (!CmdExec::lexOptions(option, options))
+      return CMD_EXEC_ERROR;
+
+   //double option treat as object    
+   if ((options.empty())||(options.size()<2))
+      return CmdExec::errorOption(CMD_OPT_MISSING, "");
+
+   //triple options treat as object array 
+   if (options.size()>3)
+      return CmdExec::errorOption(CMD_OPT_EXTRA, options[3]);
+
+   //check if valid and extract value
+   int number;
+   bool isRandom;
+   bool isArray;
+   int list_size;
+
+   //check option[2] and empty or not
+   if (options.size()==3){
+      if (myStrNCmp("-Array", options[2], 1) != 0) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+      isArray = true;
+      list_size = mtest.getArrListSize();
+      if(list_size==0){
+         cerr<<"Size of object list is 0!!"<<endl;
+         return CMD_EXEC_ERROR;
+      }
+   }else{ 
+      isArray = false;
+      list_size = mtest.getObjListSize();
+      if(list_size==0){ 
+         cerr<<"Size of array list is 0!!"<<endl;
+         return CMD_EXEC_ERROR;
+      }
+   }
+
+   //check option[0]
+   if ((myStrNCmp("-Index", options[0], 1) != 0)){
+      if (myStrNCmp("-Random", options[0], 1) != 0)
+         return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
+      else{
+         isRandom = true;
+         //check option[1]
+         if (!(myStr2Int(options[1], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+         if (!(number>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+      }
+   }
+   else{
+      isRandom = false;
+      //check option[1]
+      string list_name = (isArray) ? "array" : "object";
+      if (!(myStr2Int(options[1], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+      if (!((number>=0) && (number<list_size))) {
+         cerr << "Size of "<<list_name<<" list ("<<list_size<<") is <= "<<number<<"!!" << endl;
+         return CMD_EXEC_ERROR;
+      }
+   }
+
+
+   // multiple object
+   if(isRandom){
+
+   }
+
+   // multiple object array
+   else{
+
+   }
    return CMD_EXEC_DONE;
 }
 
