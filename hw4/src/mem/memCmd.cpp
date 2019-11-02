@@ -202,16 +202,16 @@ MTDeleteCmd::exec(const string& option)
    if(isRandom){
    	RandomNumGen rnGen(0);
       for(int i=0; i<number; ++i){
-         index_now = rnGen(list_size);
-         if(isArray) deleteArr(index_now);
-         else deleteObj(index_now);
+         int index_now = rnGen(list_size);
+         if(isArray) mtest.deleteArr(index_now);
+         else mtest.deleteObj(index_now);
       }
    }
 
    // by index
    else{
-      if(isArray) deleteArr(number);
-      else deleteObj(number);
+      if(isArray) mtest.deleteArr(number);
+      else mtest.deleteObj(number);
    }
 
    return CMD_EXEC_DONE;
