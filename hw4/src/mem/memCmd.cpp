@@ -106,14 +106,21 @@ MTNewCmd::exec(const string& option)
 
    // object list 
    if(array_len ==NULL) {
-      mtest.newObjs(number);
+      try{
+         mtest.newObjs(number);
+      }catch (std::bad_alloc& ba){
+         return CMD_EXEC_DONE;
+      }
    }
    // array list
    else {
-      mtest.newArrs(number,array_len);
+      try{
+         mtest.newArrs(number,array_len);
+      }catch (std::bad_alloc& ba){
+         return CMD_EXEC_DONE;
+      }
    }
    return CMD_EXEC_DONE;
-
    // Use try-catch to catch the bad_alloc exception
 }
 
