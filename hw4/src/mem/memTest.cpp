@@ -11,7 +11,9 @@ using namespace std;
 
 #ifdef MEM_MGR_H
 MEM_MGR_INIT(MemTestObj);
+//MemMgr<MemTestObj>* const MemTestObj::_memMgr = new MemMgr<MemTestObj>
+//new MemMgr in MemTestObj. MemTestObj used by MemTest
 #endif // MEM_MGR_H
 
-MemTest mtest;
+MemTest mtest; // global var //core object
 

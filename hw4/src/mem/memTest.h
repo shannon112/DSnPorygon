@@ -19,12 +19,15 @@ using namespace std;
 //    Classes for memory test objects
 //----------------------------------------------------------------------
 // Private class, only friend to class MemTest
-//
+
+// object and memory related
 class MemTestObj
 {
 friend class MemTest;
 #ifdef MEM_MGR_H
    USE_MEM_MGR(MemTestObj);
+   //public: new, new[], delete, delete[], memReset, memPrint
+   //static,private,const: _memMgr
 #endif // MEM_MGR_H
 
 public:
@@ -41,6 +44,7 @@ private:
 };              // Total: 4*21 = 84 Bytes
 
 
+// array and operation functions
 class MemTest
 {
 public:
