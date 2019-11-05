@@ -96,12 +96,30 @@ MTNewCmd::exec(const string& option)
    //check if valid and extract value
    int number;
    int array_len;
-   if (!(myStr2Int(options[0], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
-   if (!(number>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
-   if (options.size()==3){
-      if (myStrNCmp("-Array", options[1], 1) != 0) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
-      if (!(myStr2Int(options[2], array_len))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
-      if (!(array_len>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+   bool a_forward = false;
+
+   if (options.size()==1){
+      if (!(myStr2Int(options[0], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
+      if (!(number>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
+   }
+   else if (options.size()==3){
+      if (myStrNCmp("-Array", options[1], 1) != 0){
+         a_forward = true;
+         if (myStrNCmp("-Array", options[0], 1) != 0) 
+            return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+      }
+      if (a_forward == false){ //mtn 20 -a 5
+         if (!(myStr2Int(options[0], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
+         if (!(number>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
+         if (!(myStr2Int(options[2], array_len))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+         if (!(array_len>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+      } 
+      else{ //mtn -a 5 20
+         if (!(myStr2Int(options[2], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+         if (!(number>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+         if (!(myStr2Int(options[1], array_len))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+         if (!(array_len>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+      }
    }
 
    // object list 
@@ -164,54 +182,81 @@ MTDeleteCmd::exec(const string& option)
    bool isRandom;
    bool isArray;
    int list_size;
+   bool a_forward= false;;
 
    //check option[2] and empty or not
    if (options.size()==3){
-      if (myStrNCmp("-Array", options[2], 1) != 0) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+      if (myStrNCmp("-Array", options[2], 1) != 0){
+         a_forward = true;
+         if (myStrNCmp("-Array", options[0], 1) != 0) 
+            return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]); // -a -i 3 or -i 3 -a
+      }
       isArray = true;
       list_size = mtest.getArrListSize();
       if(list_size==0){
-         cerr<<"Size of object list is 0!!"<<endl;
+         cerr<<"Size of array list is 0!!"<<endl;
          return CMD_EXEC_ERROR;
       }
    }else{ 
       isArray = false;
       list_size = mtest.getObjListSize();
       if(list_size==0){ 
-         cerr<<"Size of array list is 0!!"<<endl;
+         cerr<<"Size of object list is 0!!"<<endl;
          return CMD_EXEC_ERROR;
       }
    }
 
    //check option[0]
-   if ((myStrNCmp("-Index", options[0], 1) != 0)){
-      if (myStrNCmp("-Random", options[0], 1) != 0)
-         return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
-      else{
-         isRandom = true;
-         //check option[1]
-         if (!(myStr2Int(options[1], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
-         if (!(number>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+   if (a_forward==0){ //-i 3 a
+      if ((myStrNCmp("-Index", options[0], 1) != 0)){
+         if (myStrNCmp("-Random", options[0], 1) != 0)
+            return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[0]);
+         else{
+            isRandom = true;
+            //check option[1]
+            if (!(myStr2Int(options[1], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+            if (!(number>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+         }
       }
-   }
-   else{
-      isRandom = false;
-      //check option[1]
-      string list_name = (isArray) ? "array" : "object";
-      if (!(myStr2Int(options[1], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
-      if (!((number>=0) && (number<list_size))) {
-         cerr << "Size of "<<list_name<<" list ("<<list_size<<") is <= "<<number<<"!!" << endl;
-         return CMD_EXEC_ERROR;
+      else{
+         isRandom = false;
+         //check option[1]
+         string list_name = (isArray) ? "array" : "object";
+         if (!(myStr2Int(options[1], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+         if (!((number>=0) && (number<list_size))) {
+            cerr << "Size of "<<list_name<<" list ("<<list_size<<") is <= "<<number<<"!!" << endl;
+            return CMD_EXEC_ERROR;
+         }
+      }
+   } 
+   else { //-a -i 3
+      if ((myStrNCmp("-Index", options[1], 1) != 0)){
+         if (myStrNCmp("-Random", options[1], 1) != 0)
+            return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[1]);
+         else{
+            isRandom = true;
+            //check option[1]
+            if (!(myStr2Int(options[2], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+            if (!(number>0)) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+         }
+      }
+      else{
+         isRandom = false;
+         //check option[1]
+         string list_name = (isArray) ? "array" : "object";
+         if (!(myStr2Int(options[2], number))) return CmdExec::errorOption(CMD_OPT_ILLEGAL, options[2]);
+         if (!((number>=0) && (number<list_size))) {
+            cerr << "Size of "<<list_name<<" list ("<<list_size<<") is <= "<<number<<"!!" << endl;
+            return CMD_EXEC_ERROR;
+         }
       }
    }
 
    // by Random
    if(isRandom){
-   	RandomNumGen rnGen(0);
       for(int i=0; i<number; ++i){
-         int index_now = rnGen(list_size);
-         if(isArray) mtest.deleteArr(index_now);
-         else mtest.deleteObj(index_now);
+         if(isArray) mtest.deleteArr(rnGen(list_size));
+         else mtest.deleteObj(rnGen(list_size));
       }
    }
 

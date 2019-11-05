@@ -17,7 +17,7 @@
 using namespace std;
 
 // Turn this on for debugging
-#define MEM_DEBUG
+//#define MEM_DEBUG
 
 //--------------------------------------------------------------------------
 // Define MACROs
@@ -213,7 +213,7 @@ public:
          _recycleList[i].reset();
 
       //resize MemBlock if needed
-      if ((b!=0)||(b!=_blockSize)){
+      if ((b!=0)&&(b!=_blockSize)){
          delete _activeBlock;
          _activeBlock = new MemBlock<T>(0, b);
          _blockSize = b;
@@ -378,7 +378,7 @@ private:
             cout << "Recycling " << ret << " to _recycleList[" << rn << "]\n";
             #endif // MEM_DEBUG
          }
-         MemBlock<T>* _activeBlock = new MemBlock<T>(_activeBlock, _blockSize);
+         _activeBlock = new MemBlock<T>(_activeBlock, _blockSize);
          _activeBlock->getMem(t,ret);
          #ifdef MEM_DEBUG
          cout << "New MemBlock... " << _activeBlock << endl;
