@@ -1,1 +1,1 @@
-adtTest-linux18.bst
+adtTest-linux16.bst

@@ -71,7 +71,7 @@ ctags:
 	@echo "Tagging $(MAIN)..."
 	@cd src; ctags -a $(MAIN)/*.cpp $(MAIN)/*.h
 
-linux18 mac:
+linux16 linux18 mac:
 	@for pkg in $(REFPKGS); \
 	do \
 	        cd lib; ln -sf lib$$pkg-$@.a lib$$pkg.a; cd ..; \
