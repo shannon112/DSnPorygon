@@ -7,12 +7,23 @@ adtTest.dlist [-File <dofile>]
 ```
 Other than the commands in Homework #3, we will support these new commands:
 ```sh
-ADTReset #: (ADT test) reset ADT
-ADTAdd #: (ADT test) add objects
-ADTDelete #: (ADT test) delete objects
-ADTQuery #: (ADT test) Query if an object exists
-ADTSort #: (ADT test) sort ADT
-ADTPrint #: (ADT test) print ADT
+# ADTReset : (ADT test) reset ADT
+ADTReset <(size_t strLen)>
+
+# ADTAdd : (ADT test) add objects
+ADTAdd <-String (string str) | -Random (size_t repeats)>
+
+# ADTDelete : (ADT test) delete objects
+ADTDelete < -All | -String (stirng str) | < < -Front | -Back | -Random> (size_t repeats) > >
+
+# ADTQuery : (ADT test) Query if an object exists
+ADTQuery <(stirng str)>
+
+# ADTSort : (ADT test) sort ADT
+ADTSort
+
+# ADTPrint : (ADT test) print ADT
+ADTPrint [-Reversed | (int n)]
 ```
 
 ## 2. Compile & Execution
