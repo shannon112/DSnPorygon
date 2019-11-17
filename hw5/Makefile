@@ -9,19 +9,21 @@ SRCLIBS  = $(addsuffix .a, $(addprefix lib, $(SRCPKGS)))
 dummy:
 	@echo "Error: please use make <d | a | b | linux16 | linux18 | clean | cleanall | ctags>"
 
-.PHONY : d a b
+.PHONY : d a b #do not check if 'd', 'a', 'b' are files
 
+# exe file name
 d: ADT   = dlist
 a: ADT   = array
 b: ADT   = bst
+EXEC     = adtTest.$(ADT)
 
+# compile flag, "#ifdef TEST_DLIST/TEST_ARRAY/TEST_BST #endif" will work
 d: ADTFLAG = -DTEST_DLIST
 a: ADTFLAG = -DTEST_ARRAY
 b: ADTFLAG = -DTEST_BST
 
+# cleaning and compiling
 d a b: clean clean all
-
-EXEC     = adtTest.$(ADT)
 
 all: libs main
 
