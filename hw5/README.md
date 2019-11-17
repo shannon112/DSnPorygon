@@ -34,6 +34,7 @@ make linux16 (or mac or linux18)
 #adtTest.array -> adtTest-linux16.array
 #adtTest.bst -> adtTest-linux16.bst
 #adtTest.dlist -> adtTest-linux16.dlist
+#libcmd.a -> libcmd-linux16.a
 ```
 make 
 ```sh
