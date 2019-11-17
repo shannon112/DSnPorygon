@@ -14,7 +14,7 @@ ADTReset <(size_t strLen)>
 ADTAdd <-String (string str) | -Random (size_t repeats)>
 
 # ADTDelete : (ADT test) delete objects
-ADTDelete < -All | -String (stirng str) | < < -Front | -Back | -Random> (size_t repeats) > >
+ADTDelete < -All | -String (stirng str) | -Front (size_t repeats) | -Back (size_t repeats) | -Random (size_t repeats) >
 
 # ADTQuery : (ADT test) Query if an object exists
 ADTQuery <(stirng str)>
