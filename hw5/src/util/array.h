@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <algorithm>
+#include <iostream>
 
 using namespace std;
 
@@ -33,53 +34,123 @@ public:
       iterator(T* n= 0): _node(n) {}
       iterator(const iterator& i): _node(i._node) {}
       ~iterator() {} // Should NOT delete _node
-
       // TODO: implement these overloaded operators
-      const T& operator * () const { return (*this); }
+
+      //dereference operator
+      const T& operator * () const { return (*_node); }
       T& operator * () { return (*_node); }
-      iterator& operator ++ () { return (*this); }
-      iterator operator ++ (int) { return (*this); }
-      iterator& operator -- () { return (*this); }
-      iterator operator -- (int) { return (*this); }
 
-      iterator operator + (int i) const { return (*this); }
-      iterator& operator += (int i) { return (*this); }
+      //prefix increment operator ++i --i
+      iterator& operator ++ () { 
+         ++_node;
+         return (*this); 
+      }
+      iterator& operator -- () { 
+         --_node;
+         return (*this); 
+      }
 
-      iterator& operator = (const iterator& i) { return (*this); }
+      //post increment operator i++ i--
+      iterator operator ++ (int) { 
+         iterator temp = *this;
+         ++_node;
+         return temp; 
+      }
+      iterator operator -- (int) { 
+         iterator temp = *this;
+         --_node;
+         return temp; 
+      }
 
-      bool operator != (const iterator& i) const { return false; }
-      bool operator == (const iterator& i) const { return false; }
+      //binary addition operator
+      iterator operator + (int i) const { 
+         iterator temp = *this;
+         temp+=i;
+         return temp;
+      }
+
+      //binary addition assignment operator
+      iterator& operator += (int i) { 
+         _node+=i;
+         return (*this); 
+      }
+
+      //assigment operator
+      iterator& operator = (const iterator& i) { 
+         _node = i._node;
+         return (*this); 
+      }
+
+      bool operator != (const iterator& i) const { return ((_node==i._node) ? false:true) ; }
+      bool operator == (const iterator& i) const { return ((_node==i._node) ? true:false) ; }
 
    private:
       T*    _node;
    };
 
    // TODO: implement these functions
-   iterator begin() const { return 0; }
-   iterator end() const { return 0; }
-   bool empty() const { return false; }
-   size_t size() const { return 0; }
+   iterator begin() const { return iterator(_data); }
+   iterator end() const { return iterator(_data+_size); }
+   bool empty() const { return !_size; }
+   size_t size() const { return _size; }
 
-   T& operator [] (size_t i) { return _data[0]; }
-   const T& operator [] (size_t i) const { return _data[0]; }
+   T& operator [] (size_t i) { return _data[i]; }
+   const T& operator [] (size_t i) const { return _data[i]; }
 
-   void push_back(const T& x) { }
-   void pop_front() { }
-   void pop_back() { }
+   void push_back(const T& x) { 
+      dynamicExpand();
+      _data[_size++]=x;
+   }
 
-   bool erase(iterator pos) { return false; }
-   bool erase(const T& x) { return false; }
+   void pop_front() { 
+      swap(_data[0],_data[_size-1]);
+      --_size;
+   }
 
-   iterator find(const T& x) { return end(); }
+   void pop_back() { 
+      if (!empty())
+         --_size;
+   }
 
-   void clear() { }
+   bool erase(iterator pos) { 
+      if (pos._node<end()._node && pos._node>=begin()._node){
+         swap(_data[_size-1], *pos);
+         --_size;
+         return true;
+      }else return false; 
+   }
+
+   bool erase(const T& x) { 
+      iterator findResult = find(x);
+      if (findResult!=end()) 
+         if (erase(findResult))
+            return true;
+      return false; 
+   }
+
+   iterator find(const T& x) { 
+      iterator counter = begin();
+      for (size_t i = 0; i<_size; ++i,++counter)
+         if (x == _data[i]) 
+            return counter;
+      return end(); 
+   }
+
+   void clear() { _size = 0; }
 
    // [Optional TODO] Feel free to change, but DO NOT change ::sort()
    void sort() const { if (!empty()) ::sort(_data, _data+_size); }
 
    // Nice to have, but not required in this homework...
-   // void reserve(size_t n) { ... }
-   // void resize(size_t n) { ... }
+   void reserve(size_t n) { 
+      assert(n>_capacity);
+      _capacity = n;
+   }
+  
+   void resize(size_t n) { 
+      assert(n>-1);
+      _size = n;
+   }
 
 private:
    // [NOTE] DO NOT ADD or REMOVE any data member
@@ -89,6 +160,17 @@ private:
    mutable bool  _isSorted;   // (optionally) to indicate the array is sorted
 
    // [OPTIONAL TODO] Helper functions; called by public member functions
+   bool dynamicExpand(){
+      if (_size==_capacity) {
+         if(_capacity==0) _capacity = 1;
+         else _capacity = _capacity*2;
+         T* orig = _data;
+         _data = new T[_capacity];
+         for(size_t i=0; i<_size;i++) _data[i] = orig[i];
+         delete[] orig;
+         return true;
+      }else return false;
+   }
 };
 
 #endif // ARRAY_H
