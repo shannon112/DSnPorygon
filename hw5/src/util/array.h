@@ -22,7 +22,7 @@ class Array
 {
 public:
    // TODO: decide the initial value for _isSorted
-   Array() : _data(0), _size(0), _capacity(0) {}
+   Array() : _data(0), _size(0), _capacity(0), _isSorted(false) {}
    ~Array() { delete []_data; }
 
    // DO NOT add any more data member or function for class iterator
@@ -100,11 +100,13 @@ public:
    void push_back(const T& x) { 
       dynamicExpand();
       _data[_size++]=x;
+      _isSorted=false;
    }
 
    void pop_front() { 
       swap(_data[0],_data[_size-1]);
       --_size;
+      _isSorted = false;
    }
 
    void pop_back() { 
@@ -116,6 +118,7 @@ public:
       if (pos._node<end()._node && pos._node>=begin()._node){
          swap(_data[_size-1], *pos);
          --_size;
+         _isSorted = false;
          return true;
       }else return false; 
    }
@@ -129,17 +132,29 @@ public:
    }
 
    iterator find(const T& x) { 
-      iterator counter = begin();
-      for (size_t i = 0; i<_size; ++i,++counter)
-         if (x == _data[i]) 
-            return counter;
-      return end(); 
+      if (!_isSorted){ //O(n)
+         iterator counter = begin();
+         for (size_t i = 0; i<_size; ++i,++counter)
+            if (x == _data[i]) 
+               return counter;
+         return end(); 
+      }
+      else{ //binary search O(lgn)
+         int index = binarySearch(0,_size-1,x);
+         if (index==-1) return end();
+         else return iterator(&_data[index]);
+      }
    }
 
-   void clear() { _size = 0; }
+   void clear() { _isSorted=false; _size = 0; }
 
    // [Optional TODO] Feel free to change, but DO NOT change ::sort()
-   void sort() const { if (!empty()) ::sort(_data, _data+_size); }
+   void sort() const { 
+      if (!empty() && !_isSorted){
+         ::sort(_data, _data+_size); 
+         _isSorted=true; 
+      }
+   }
 
    // Nice to have, but not required in this homework...
    void reserve(size_t n) { 
@@ -149,6 +164,7 @@ public:
   
    void resize(size_t n) { 
       assert(n>-1);
+      assert(_size>=n);
       _size = n;
    }
 
@@ -170,6 +186,15 @@ private:
          delete[] orig;
          return true;
       }else return false;
+   }
+
+   int binarySearch(int l, int r, const T& x) { 
+      if (r >= l) { 
+         int mid = l + (r - l) / 2; 
+         if (_data[mid] == x) return mid; 
+         else if (_data[mid] > x) return binarySearch(l, mid - 1, x); 
+         else return binarySearch(mid + 1, r, x); 
+      } else return -1; //not found
    }
 };
 
