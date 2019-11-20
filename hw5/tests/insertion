@@ -1,0 +1,14 @@
+adta -s aaaaa
+adta -r 500000
+adta -s fffff
+usage
+adta -r 500000
+adta -s mmmmm
+usage
+adta -r 500000
+adta -s rrrrr
+usage
+adta -r 500000
+adta -s zzzzz
+usage
+q -f

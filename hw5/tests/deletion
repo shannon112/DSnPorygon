@@ -1,0 +1,11 @@
+adta -r 2000000
+adtd -f 10
+usage
+adtd -f 10
+usage
+adtd -b 10
+usage
+adtd -b 10
+usage
+
+q -f
