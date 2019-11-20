@@ -112,10 +112,6 @@ public:
       DListNode<T>* temp = new DListNode<T>(x, _head->_prev, _head);
       temp->_prev->_next = temp;
       temp->_next->_prev = temp;
-      //cout<<"pushback "<<x<<endl;
-      //cout<<"tmp_next "<<temp->_next->_data<<endl;
-      //cout<<"tmp_previous "<<temp->_prev->_data<<endl;
-      //cout<<"tmp "<<temp->_data<<endl;
    }
 
    void pop_front() { 
@@ -164,7 +160,7 @@ public:
       _head->_prev = _head->_next = _head;
    }  
 
-   typedef pair<int, iterator>  IteratorPair;
+   typedef pair<size_t, iterator>  IteratorPair;
    void sort() const{ 
       QuickSort();
    }
@@ -183,43 +179,48 @@ private:
 
    /* Quick sort method */
    void QuickSort() const{
-      QuickSortSubVector(IteratorPair( 0, begin() ), 
-                           IteratorPair( size()-1, --end() ));
+      IteratorPair* low = new IteratorPair( 1, begin() );
+      IteratorPair* high = new IteratorPair( size(), --end() );
+      QuickSortSubVector(low , high); 
+      delete low; delete high;
    }
 
    // Sort subvector (Quick sort)
-   void QuickSortSubVector(IteratorPair low, IteratorPair high) const{
-      iterator li = begin();
-      if (low.first < high.first){
-         IteratorPair q = Partition(low, high);
-         IteratorPair q_next = IteratorPair(q); ++(q_next.first); ++(q_next.second);
-         QuickSortSubVector(q_next, high);
+   void QuickSortSubVector(IteratorPair*& low, IteratorPair*& high) const{
+      if (low->first < high->first){
+         IteratorPair* q;
+         Partition(low, high, q);
          QuickSortSubVector(low, q);
+         ++(q->first); ++(q->second);
+         QuickSortSubVector(q, high);
+         delete q;
       }
    }
 
    // Partition
-   IteratorPair Partition(IteratorPair low, IteratorPair high) const{ 
-      T key = T(*(low.second));
-      IteratorPair i = IteratorPair(--(low.first), --(low.second));
-      IteratorPair j = IteratorPair(++(high.first), ++(high.second));
+   void Partition(IteratorPair*& low, IteratorPair*& high, IteratorPair*& j) const{ 
+      T key = T(*(low->second));
+      IteratorPair* i = new IteratorPair (low->first, low->second);
+      j = new IteratorPair (high->first, high->second);
+      --(i->first); --(i->second);
+      ++(j->first); ++(j->second);
       while(1){
-         while(1) {--(j.first); --(j.second); if(*(j.second) <= key) break;}
-         while(1) {++(i.first); ++(i.second); if(*(i.second) >= key) break;}
-         if( i.first < j.first ){
-            iteratorSwap(i.second._node, j.second._node);
-         } else {
-            return j;
-         }
+         while(1) {--(j->first); --(j->second); if(*(j->second) <= key) break;}
+         while(1) {++(i->first); ++(i->second); if(*(i->second) >= key) break;}
+         if( i->first < j->first ) iteratorSwap(i->second._node, j->second._node);
+         else { delete i; return; }
       }
    }
 
    //swap two iterator i, j (i<j)
-   void iteratorSwap(DListNode<T>* i, DListNode<T>* j)const{
+   void iteratorSwap(DListNode<T>*& i, DListNode<T>*& j)const{
       if (i!=j){
-         T  temp = T(i->_data);
+         swap(i->_data, j->_data);
+         /*
+         T temp = T(i->_data);
          i->_data = j->_data;
          j->_data = temp;
+         */
       }
    }
 

@@ -5044,8 +5044,8 @@ adt> adtp -r
 
 
 adt> usage
-Period time used : 0 seconds
-Total time used  : 0.22 seconds
+Period time used : 0.01 seconds
+Total time used  : 0.23 seconds
 Total memory used: 0 M Bytes
 
 adt> adtr 3
@@ -5053,9 +5053,9 @@ adt> adtr 3
 adt> adta -r 50000
 
 adt> usage
-Period time used : 0.01 seconds
+Period time used : 0 seconds
 Total time used  : 0.23 seconds
-Total memory used: 0.7305 M Bytes
+Total memory used: 0.7422 M Bytes
 
 adt> adtp
 === ADT (dlist) ===
@@ -17564,7 +17564,7 @@ adt> adtp
 adt> usage
 Period time used : 0.01 seconds
 Total time used  : 0.24 seconds
-Total memory used: 0.7305 M Bytes
+Total memory used: 0.7422 M Bytes
 
 adt> adtd -r 10000
 
@@ -27573,16 +27573,16 @@ adt> adtp -r
 
 
 adt> usage
-Period time used : 0.84 seconds
-Total time used  : 1.08 seconds
-Total memory used: 0.7305 M Bytes
+Period time used : 0.82 seconds
+Total time used  : 1.06 seconds
+Total memory used: 0.7422 M Bytes
 
 adt> adts
 
 adt> usage
-Period time used : 11.4 seconds
-Total time used  : 12.48 seconds
-Total memory used: 0.7305 M Bytes
+Period time used : 11.48 seconds
+Total time used  : 12.54 seconds
+Total memory used: 0.7422 M Bytes
 
 adt> adtp
 === ADT (dlist) ===
@@ -37590,22 +37590,22 @@ adt> adtp
 
 adt> usage
 Period time used : 0 seconds
-Total time used  : 12.48 seconds
-Total memory used: 0.7305 M Bytes
+Total time used  : 12.54 seconds
+Total memory used: 0.7422 M Bytes
 
 adt> adtd -r 10000
 
 adt> usage
-Period time used : 0.68 seconds
-Total time used  : 13.16 seconds
-Total memory used: 0.7305 M Bytes
+Period time used : 0.67 seconds
+Total time used  : 13.21 seconds
+Total memory used: 0.7422 M Bytes
 
 adt> adts
 
 adt> usage
 Period time used : 0 seconds
-Total time used  : 13.16 seconds
-Total memory used: 0.7305 M Bytes
+Total time used  : 13.21 seconds
+Total memory used: 0.7422 M Bytes
 
 adt> adtp
 === ADT (dlist) ===
@@ -45112,9 +45112,9 @@ adt> adtp
 
 
 adt> usage
-Period time used : 0 seconds
-Total time used  : 13.16 seconds
-Total memory used: 0.7305 M Bytes
+Period time used : 0.01 seconds
+Total time used  : 13.22 seconds
+Total memory used: 0.7422 M Bytes
 
 adt> q -f
 
