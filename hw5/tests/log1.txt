@@ -1,39 +1,39 @@
 adt> adta -r 20
 
 adt> adtp
-=== ADT (array) ===
-[  0] = vkuux   [  1] = mqjny   [  2] = kdczf   [  3] = ncerx   
-[  4] = jbalb   [  5] = mfyxd   [  6] = wqlqh   [  7] = uhlfe   
-[  8] = hokex   [  9] = ztxzr   [ 10] = mevxc   [ 11] = qgqfs   
-[ 12] = iigbq   [ 13] = fqnzh   [ 14] = oscmp   [ 15] = yliwl   
-[ 16] = aipvg   [ 17] = dppnp   [ 18] = jhxme   [ 19] = pnqpg   
+=== ADT (dlist) ===
+[  0] = vkuux   [  1] = fitho   [  2] = mqjny   [  3] = xqsdp   
+[  4] = agdue   [  5] = kdczf   [  6] = nvphq   [  7] = nmzhu   
+[  8] = nukxh   [  9] = jvxby   [ 10] = ncerx   [ 11] = jbalb   
+[ 12] = gzxwg   [ 13] = ojtnr   [ 14] = nblyy   [ 15] = shtqj   
+[ 16] = relwv   [ 17] = ifxjr   [ 18] = yprwl   [ 19] = ykvrx   
 
 
 adt> adtd -front 3
 
 adt> adtp
-=== ADT (array) ===
-[  0] = dppnp   [  1] = mqjny   [  2] = kdczf   [  3] = ncerx   
-[  4] = jbalb   [  5] = mfyxd   [  6] = wqlqh   [  7] = uhlfe   
-[  8] = hokex   [  9] = ztxzr   [ 10] = mevxc   [ 11] = qgqfs   
-[ 12] = iigbq   [ 13] = fqnzh   [ 14] = oscmp   [ 15] = yliwl   
-[ 16] = aipvg   
+=== ADT (dlist) ===
+[  0] = xqsdp   [  1] = agdue   [  2] = kdczf   [  3] = nvphq   
+[  4] = nmzhu   [  5] = nukxh   [  6] = jvxby   [  7] = ncerx   
+[  8] = jbalb   [  9] = gzxwg   [ 10] = ojtnr   [ 11] = nblyy   
+[ 12] = shtqj   [ 13] = relwv   [ 14] = ifxjr   [ 15] = yprwl   
+[ 16] = ykvrx   
 
 adt> adtd -back 5
 
 adt> adtp
-=== ADT (array) ===
-[  0] = dppnp   [  1] = mqjny   [  2] = kdczf   [  3] = ncerx   
-[  4] = jbalb   [  5] = mfyxd   [  6] = wqlqh   [  7] = uhlfe   
-[  8] = hokex   [  9] = ztxzr   [ 10] = mevxc   [ 11] = qgqfs   
+=== ADT (dlist) ===
+[  0] = xqsdp   [  1] = agdue   [  2] = kdczf   [  3] = nvphq   
+[  4] = nmzhu   [  5] = nukxh   [  6] = jvxby   [  7] = ncerx   
+[  8] = jbalb   [  9] = gzxwg   [ 10] = ojtnr   [ 11] = nblyy   
 
 
 adt> adtd -rand 4
 
 adt> adtp
-=== ADT (array) ===
-[  0] = qgqfs   [  1] = mqjny   [  2] = kdczf   [  3] = ncerx   
-[  4] = jbalb   [  5] = mfyxd   [  6] = wqlqh   [  7] = uhlfe   
+=== ADT (dlist) ===
+[  0] = xqsdp   [  1] = agdue   [  2] = nvphq   [  3] = nmzhu   
+[  4] = jvxby   [  5] = ncerx   [  6] = jbalb   [  7] = gzxwg   
 
 
 adt> q -f
