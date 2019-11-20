@@ -164,7 +164,10 @@ public:
       _head->_prev = _head->_next = _head;
    }  
 
-   void sort() const { }
+   typedef pair<int, iterator>  IteratorPair;
+   void sort() const{ 
+      QuickSort();
+   }
 
 private:
    // [NOTE] DO NOT ADD or REMOVE any data member
@@ -177,6 +180,66 @@ private:
       removeTar->_prev->_next = removeTar->_next;
       delete removeTar;
    }
+
+   /* Quick sort method */
+   void QuickSort() const{
+      QuickSortSubVector(IteratorPair( 0, begin() ), 
+                           IteratorPair( size()-1, --end() ));
+   }
+
+   // Sort subvector (Quick sort)
+   void QuickSortSubVector(IteratorPair low, IteratorPair high) const{
+      iterator li = begin();
+      for (; li != end(); ++li) cout<<*li<<" ";
+      cout<<"QuickSortSubVector"<<low.first<<" "<<high.first<<endl;
+      if (low.first < high.first){
+         IteratorPair q = Partition(low, high);
+         IteratorPair q_next = IteratorPair(q); ++(q_next.first); ++(q_next.second);
+         cout<<"q"<<(q.first)<<" "<<*(q.second)<<endl;
+         cout<<"q_next"<<(q_next.first)<<" "<<*(q_next.second)<<endl;
+
+         cout<<"enter subproblem 1: "<<q_next.first<<high.first<<endl;
+         QuickSortSubVector(q_next, high);
+         cout<<"enter subproblem 2: "<<low.first<<q.first<<endl;
+         cout<<"enter subproblem 2: "<<*(q.second)<<endl;
+         if ((low.second._node)==_head) cout<<"get _head"<<endl;
+         cout<<"enter subproblem 2: "<<*(low.second)<<endl;
+         QuickSortSubVector(low, q);
+
+      }else cout<<"end"<<endl;
+   }
+
+   // Partition
+   IteratorPair Partition(IteratorPair low, IteratorPair high) const{ 
+      cout<<flush;
+      T key = T(*(low.second));
+      cout<<"enter Partition key = "<<key<<endl;
+      IteratorPair i = IteratorPair(--(low.first), --(low.second));
+      IteratorPair j = IteratorPair(++(high.first), ++(high.second));
+      while(1){
+         cout<<"enter Swap while loop"<<endl;
+         while(1) {--(j.first); --(j.second); if(*(j.second) <= key) break;}
+         while(1) {++(i.first); ++(i.second); if(*(i.second) >= key) break;}
+         cout<<(i.first)<<" < "<<(j.first)<<endl;
+         if( i.first < j.first ){
+            iteratorSwap(i.second._node, j.second._node);
+         } else {
+            cout<<"return"<<(j.first)<<" "<<*(j.second)<<endl;
+            return j;
+         }
+      }
+   }
+
+   //swap two iterator i, j (i<j)
+   void iteratorSwap(DListNode<T>* i, DListNode<T>* j)const{
+      cout<<"swap"<<endl;
+      if (i!=j){
+         T  temp = T(i->_data);
+         i->_data = j->_data;
+         j->_data = temp;
+      }
+   }
+
 };
 
 #endif // DLIST_H
