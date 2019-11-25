@@ -14,7 +14,7 @@ CIRRead <(string fileName)> [-Replace]
 CIRPrint [-Summary | -Netlist | -PI | -PO | -FLoating]
 
 # CIRGate: report a gate
-CIRGate <<(int gateId)> [<-FANIn | -FANOut><(int level)>]>
+CIRGate <(int gateId)> [-FANIn (int level) | -FANOut (int level)]
 
 # CIRWrite: write the netlist to an ASCII AIG file (.aag)
 CIRWrite [-Output (string aagFile)]
@@ -25,22 +25,16 @@ CIRWrite [-Output (string aagFile)]
 select version
 ```sh
 make linux16 (or mac or linux18)
-#adtTest.array -> adtTest-linux16.array
-#adtTest.bst -> adtTest-linux16.bst
-#adtTest.dlist -> adtTest-linux16.dlist
+#cirTest-ref -> cirTest-linux16
 #libcmd.a -> libcmd-linux16.a
 ```
 make 
 ```sh
-make d #defines the flag “TEST_DLIST” so that the doubly linked list (class DList) will be created. Accordingly, the generated executable will be “adtTest.dlist”.
-make a #defines the flag “TEST_ARRAY” so that the dynamic array (class Array) will be created. Accordingly, the generated executable will be “adtTest.array”.
-make b #defines the flag “TEST_BST” so that the binary search tree (class BSTree) will be created. Accordingly, the generated executable will be “adTst.bst”.
+make
 ```
 execution
 ```
-./adtTest.dlist
-./adtTest.array
-./adtTest.bst
+./cirTest
 ```
 clean
 ```
@@ -50,9 +44,7 @@ make cleanall
 
 ## 3. Reference exe
 ```sh
-./ref/adtTest.dlist
-./ref/adtTest.array
-./ref/adtTest.bst
+./ref/cirTest-ref
 ```
 
 ## 4. Testing
@@ -60,14 +52,14 @@ make cleanall
 Compare to reference program
 ```
 cd tests
-../ref/adtTest.dlist -f do1 > log1_ref.txt 2>&1
-../adtTest.dlist -f do1 > log1.txt 2>&1
+../ref/cirTest-ref -f do1 > log1_ref.txt 2>&1
+../cirTest -f do1 > log1.txt 2>&1
 diff log1.txt log1_ref.txt
 ```
 SelfCheck of homework upload
 ```
-mkdir r07921001_hw5
-cp {...MustExist} ./r07921001_hw5
-tar zcvf r07921001_hw5.tgz r07921001_hw5
-./SelfCheck r07921001_hw5.tgz
+mkdir r07921001_hw6
+cp {...MustExist} ./r07921001_hw6
+tar zcvf r07921001_hw6.tgz r07921001_hw6
+./SelfCheck r07921001_hw6.tgz
 ```
