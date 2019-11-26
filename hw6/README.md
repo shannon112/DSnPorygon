@@ -48,7 +48,71 @@ make cleanall
 ```
 
 ## 4. Testing
+Output demo  
+<img src="https://raw.githubusercontent.com/shannon112/DSnPorygon/master/hw6/demo.png" />
+```
+➜  hw6 git:(master) ✗ ./ref/cirTest-ref
+cir> cirr ok
+Usage: CIRRead <(string fileName)> [-Replace]
 
+cir> cirr ok.agg 
+
+cir> cirp -s
+
+Circuit Statistics
+==================
+  PI           2
+  PO           1
+  AIG          6
+------------------
+  Total        9
+
+cir> cirp -n
+
+[0] PI  1 (x)
+[1] PI  2 (y)
+[2] AIG 3 1 2
+[3] PO  11 3 (s)
+
+cir> cirp -pi
+PIs of the circuit: 1 2
+
+cir> cirp -po
+POs of the circuit: 11
+
+cir> cirp -flo
+Gates with floating fanin(s): 7
+Gates defined but not used  : 9 10
+
+cir> cirg 3
+==================================================
+= AIG(3), line 5                                 =
+==================================================
+
+cir> cirg 3 -fani 3
+AIG 3
+  PI 1
+  PI 2
+
+cir> cirg 3 -fano 3
+AIG 3
+  AIG 8
+    AIG 9
+    AIG 10
+  PO 11
+
+cir> cirw
+aag 10 2 0 1 1
+2
+4
+6
+6 2 4
+i0 x
+i1 y
+o0 s
+c
+AAG output by Chung-Yang (Ric) Huang
+```
 Compare to reference program
 ```
 cd tests
