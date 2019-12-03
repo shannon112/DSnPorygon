@@ -9,7 +9,6 @@
 #ifndef CIR_MGR_H
 #define CIR_MGR_H
 
-#include <vector>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -24,7 +23,7 @@ extern CirMgr *cirMgr;
 class CirMgr
 {
 public:
-   CirMgr(){}
+   CirMgr():_lineNo(0){}
    ~CirMgr() {}
 
    // Access functions
@@ -43,6 +42,20 @@ public:
    void writeAag(ostream&) const;
 
 private:
+   bool readHeader(fstream&);
+   bool readInput(fstream&);
+   bool readOutput(fstream&);
+   bool readAIGs(fstream&);
+   bool readSymbols(fstream&);
+   bool readComments(fstream&);
+   void connect();
+   int _MaxVaIdx, _PI, _LA, _PO, _AIG; //header
+   int _lineNo;
+   GateMap _gateList;
+   GateList _piList;
+   GateList _poList;
+   GateIntList _floList;
+   GateIntList _notuList;
 };
 
 #endif // CIR_MGR_H

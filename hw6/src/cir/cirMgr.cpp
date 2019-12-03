@@ -151,51 +151,205 @@ parseError(CirParseError err)
 bool
 CirMgr::readCircuit(const string& fileName)
 {
+   fstream fin;
+   fin.open(fileName,ios::in); 
+   if (!fin){
+      cerr<<"Cannot open design \""<<fileName<<"\"!!"<<endl;
+      return false;
+   }
+   if (!readHeader(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
+   }
+   if (!readInput(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
+   }
+   if (_LA){ //assume no latch is defined
+      parseError(ILLEGAL_SYMBOL_NAME);
+   }
+   if (!readOutput(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
+   }
+   if (!readAIGs(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
+   }
+   if (!readSymbols(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
+   }
+   if (!readComments(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
+   }
+   connect();
    return true;
+}
+
+bool
+CirMgr::readHeader(fstream& fin){
+   string temp;
+   //add const = 0
+   CirGate* const0 = new CirPiGate(0, 0);
+   _gateList.insert(GatePair(0,const0));
+   //start at lineNo 0;
+   if(fin>>temp>> _MaxVaIdx >> _PI >> _LA >> _PO >> _AIG ) return true;
+   else return false;
+}
+
+bool
+CirMgr::readInput(fstream& fin){
+   int temp;
+   for(int i=0; i<_PI; ++i){
+      //start at line 1;
+      if (fin>>temp){
+         CirGate* pi = new CirPiGate(temp/2, ++_lineNo);
+
+         //put into Mgr storage
+         _piList.push_back(pi);
+         _gateList.insert(GatePair(temp/2,pi));
+         _notuList.insert(temp/2);
+      }
+   }
+   return true;
+}
+
+bool
+CirMgr::readOutput(fstream& fin){
+   int temp;
+   for(int i=0; i<_PO; ++i){
+      if (fin>>temp){
+         CirGate* po = new CirPoGate(_MaxVaIdx+i+1, ++_lineNo);
+         po->setFaninId(0,temp/2);
+         po->setInvPhase(0,temp%2);
+
+         //put into Mgr storage
+         _poList.push_back(po);
+         _gateList.insert(GatePair(_MaxVaIdx+i+1, po));
+      }
+   }
+   return true;
+}
+
+bool
+CirMgr::readAIGs(fstream& fin){
+   int gate,fanin0, fanin1;
+   for(int i=0; i<_AIG; ++i){
+      if (fin>>gate>>fanin0>>fanin1){
+         CirGate* aig = new CirAigGate(gate/2, ++_lineNo);
+         aig->setFaninId(0,fanin0/2);
+         aig->setInvPhase(0,fanin0%2);
+         aig->setFaninId(1,fanin1/2);
+         aig->setInvPhase(1,fanin1%2);
+
+         //put into Mgr storage
+         _gateList.insert(GatePair(gate/2, aig));
+         _notuList.insert(gate/2);
+      }
+   }
+   return true;
+}
+
+bool
+CirMgr::readSymbols(fstream& fin){
+   return true;
+}
+
+bool
+CirMgr::readComments(fstream& fin){
+   return true;
+}
+
+void
+CirMgr::connect(){
+   //traversal gates
+   GateMap::iterator iter = _gateList.begin();
+   for (; iter != _gateList.end(); ++iter){
+      CirGate* gateNow = iter->second;
+      //traversal fanins to gate
+      for (size_t i = 0; i<gateNow->getFaninLen(); ++i){
+         int faninId = gateNow->getFaninId(i);
+         GateMap::iterator fanin = _gateList.find(faninId);
+         //connect known, erase used gate from _notuList
+         if(fanin != _gateList.end()){
+            gateNow->setFanin(i,fanin->second); 
+            _notuList.erase(faninId); 
+         }
+         //cannot find, floating
+         else{
+            _floList.insert(gateNow->getGateId()); 
+         }
+      }
+   }
+   return;
 }
 
 /**********************************************************/
 /*   class CirMgr member functions for circuit printing   */
 /**********************************************************/
-/*********************
-Circuit Statistics
-==================
-  PI          20
-  PO          12
-  AIG        130
-------------------
-  Total      162
-*********************/
 void
 CirMgr::printSummary() const
 {
+   cout<<endl;
+   cout<<"Circuit Statistics"<<endl;
+   cout<<"=================="<<endl;
+   cout << setw(15) << left <<"  PI"<<_PI<<endl;
+   cout << setw(15) << left <<"  PO"<<_PO<<endl;
+   cout << setw(15) << left <<"  AIG"<<_AIG<<endl;
+   cout<<"------------------"<<endl;
+   cout << setw(15) << left <<"  Total"<<_PI+_PO+_AIG<<endl;
 }
 
 void
 CirMgr::printNetlist() const
 {
+   cout << endl;
+   //cout<<content<<endl;
+   cout << endl;
 }
 
 void
 CirMgr::printPIs() const
 {
-   cout << "PIs of the circuit:";
+   cout << "PIs of the circuit: ";
+   for(int i = 0; i<_PI; ++i){
+      cout<<_piList[i]->getGateId();
+      if(i!=_PI-1) cout<<" ";
+   }
    cout << endl;
 }
 
 void
 CirMgr::printPOs() const
 {
-   cout << "POs of the circuit:";
+   cout << "POs of the circuit: ";
+   for(int i = 0; i<_PO; ++i){
+      cout<<_poList[i]->getGateId();
+      if(i!=_PO-1) cout<<" ";
+   }
    cout << endl;
 }
 
 void
 CirMgr::printFloatGates() const
 {
+   cout << "Gates with floating fanin(s): ";
+   GateIntList::iterator it = _floList.begin();
+   for(; it != _floList.end(); it++) {
+      cout << *it;
+      if(it!=(--_floList.end())) cout<<" ";
+   } 
+   cout << endl;
+
+   cout << "Gates defined but not used  : ";
+   it = _notuList.begin();
+   for(; it != _notuList.end(); it++) {
+      cout << *it;
+      if(it!=(--_notuList.end())) cout<<" ";
+   } 
+   cout << endl;
+
 }
 
 void
 CirMgr::writeAag(ostream& outfile) const
 {
+   cout<<"c"<<endl;
+   cout<<"AAG output by Shang-Lun (Shannon) Lee"<<endl;
 }

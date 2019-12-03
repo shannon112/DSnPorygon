@@ -9,15 +9,24 @@
 #ifndef CIR_DEF_H
 #define CIR_DEF_H
 
+#include <unordered_map>
 #include <vector>
+#include <set>
 
 using namespace std;
 
 class CirGate;
 class CirMgr;
 
+class CirPiGate;
+class CirPoGate;
+class CirAigGate;
+
+typedef unordered_map<size_t, CirGate*>   GateMap;
+typedef pair<size_t, CirGate*>           GatePair;
+
 typedef vector<CirGate*>           GateList;
-typedef vector<unsigned>           IdList;
+typedef set<unsigned>           GateIntList;
 
 enum GateType
 {
