@@ -1,4 +1,4 @@
-# HW6 And-Inverter Graph with AIGER Format Input
+# HW6 And-Inverter Graph with AIGER Format (.agg reader)
 
 ## 1. Promblem Description
 We are going to implement a special circuit representation, called “AIG” (And-Inverter Graph), from a circuit description file. The generated executable has the following usage:
