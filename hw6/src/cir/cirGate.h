@@ -49,6 +49,7 @@ public:
    virtual void reportNetlist(unsigned) const = 0;
    void reportFanin(int level) const;
    void reportFanout(int level) const;
+   mutable unsigned visitedNo = 0;
 
 protected:
    unsigned _gateID;
@@ -56,7 +57,7 @@ protected:
    string _gateType;
 
 private:
-   void DFSvisit(const int&, int, CirGate*) const;
+   void DFSvisit(const int&, int, bool, CirGate*) const;
 };
 
 

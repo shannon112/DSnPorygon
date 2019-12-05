@@ -24,31 +24,36 @@ extern CirMgr *cirMgr;
 /**************************************/
 /*   class CirGate member functions   */
 /**************************************/
+extern unsigned visitedBase;
+
 void
 CirGate::reportFanin(int level) const
 {
    assert (level >= 0);
-   DFSvisit(level, level, cirMgr->getGate(_gateID));
+   visitedBase++;
+   DFSvisit(level, level, false, cirMgr->getGate(_gateID));
 }
 
 void 
-CirGate::DFSvisit(const int& total_level, int level, CirGate* gate) const {
+CirGate::DFSvisit(const int& total_level, int level, bool inverse, CirGate* gate) const {
    if (level>=0){
-      //
-      cout<<gate->getTypeStr()<<" "<<gate->getGateId()<<endl;
+      const string isInverse = inverse ? "!":"";
+      cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
       level--;
-      for (size_t i = 0; i<gate->getFaninLen(); ++i){
-         CirGate* fanin =  cirMgr->getGate(gate->getFaninId(i));
-         const string isInverse = gate->getInvPhase(i) ? "!":"";
-         if(fanin != 0){
-            cout<<string(2*(total_level-level),' ')<<isInverse;
-            DFSvisit(total_level, level, fanin);
+
+      //already visited, and can be expand, then stop to expand
+      if((gate->visitedNo > visitedBase)&&(gate->getTypeStr()=="AIG")&&(level>-1)) 
+         cout<<" (*)"<<endl;
+      //havent visited yet
+      else {
+         gate->visitedNo = visitedBase+1;
+         cout<<endl;
+         //find fanins and recursively do DFSvisit
+         for (size_t i = 0; i<gate->getFaninLen(); ++i){
+            CirGate* fanin =  cirMgr->getGate(gate->getFaninId(i));
+            if(fanin != 0) DFSvisit(total_level, level, gate->getInvPhase(i), fanin);
          }
       }
-   }
-   else{
-      cout<<string(2*(total_level-level)+1,'\b');
-      return;
    }
 }
 
@@ -91,7 +96,7 @@ CirPiGate::reportNetlist(unsigned idx) const
    int lineNo = getLineNo();
    if(lineNo==0){
       if(gateId==0)
-         cout<<"["<<idx<<"] "<<"= CONST0"<<endl;
+         cout<<"["<<idx<<"] "<<"CONST0"<<endl;
    }
    else{
       cout<<"["<<idx<<"] "<<setw(4)<<left<<"PI "<<gateId<<endl;

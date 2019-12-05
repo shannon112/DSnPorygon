@@ -51,6 +51,7 @@ enum CirParseError {
 /**************************************/
 /*   Static varaibles and functions   */
 /**************************************/
+unsigned visitedBase = 0;
 static unsigned lineNo = 0;  // in printint, lineNo needs to ++
 static unsigned colNo  = 0;  // in printing, colNo needs to ++
 //static char buf[1024];
@@ -302,6 +303,7 @@ void
 CirMgr::printNetlist() const
 {
    lineNo = 0;
+   visitedBase++;
    cout << endl;
    for(size_t i = 0; i<_PO; ++i){
       DFSvisit(_poList[i]);
@@ -311,15 +313,18 @@ CirMgr::printNetlist() const
 void
 CirMgr::DFSvisit(CirGate* gate) const
 {
-   //traversal fanins to gate
-   for (size_t i = 0; i<gate->getFaninLen(); ++i){
-      unsigned faninId = gate->getFaninId(i);
-      //connect known, erase used gate from _notuList
-      if(_gateList.find(faninId) != _gateList.end()){
-         DFSvisit((_gateList.find(faninId))->second);
+   if (gate->visitedNo>visitedBase) return;
+   else{
+      gate->visitedNo = visitedBase+1;
+      //traversal fanins to gate
+      for (size_t i = 0; i<gate->getFaninLen(); ++i){
+         unsigned faninId = gate->getFaninId(i);
+         if(_gateList.find(faninId) != _gateList.end()){
+            DFSvisit((_gateList.find(faninId))->second);
+         }
       }
+      gate->reportNetlist(lineNo++);
    }
-   gate->reportNetlist(lineNo++);
 }
 
 void
@@ -366,8 +371,43 @@ CirMgr::printFloatGates() const
 }
 
 void
-CirMgr::writeAag(ostream& outfile) const
+CirMgr::writeAag(ostream& outfile)
 {
-   cout<<"c"<<endl;
-   cout<<"AAG output by Shang-Lun (Shannon) Lee"<<endl;
+   //header
+   outfile<<"aag "<<_MaxVaIdx<<" "<<_PI<<" "<<_LA<<" "<<_PO<<" "<<_AIG<<endl;
+   //PI
+   for(size_t i = 0; i<_piList.size(); ++i)
+      cout<<2*(_piList[i]->getGateId())<<endl;
+   //PO
+   for(size_t i = 0; i<_poList.size(); ++i)
+      cout<<2*(_poList[i]->getFanin(0)->getGateId())+_poList[i]->getInvPhase(0)<<endl;
+   //AIG
+   visitedBase++;
+   for(size_t i = 0; i<_PO; ++i) 
+      DFSvisitAig(_poList[i]);
+   //Comment
+   outfile<<"c"<<endl;
+   outfile<<"AAG output by Shang-Lun (Shannon) Lee"<<endl;
+}
+
+void
+CirMgr::DFSvisitAig(CirGate* gate)
+{
+   if (gate->visitedNo>visitedBase) return;
+   else{
+      gate->visitedNo = visitedBase+1;
+      //traversal fanins to gate
+      for (size_t i = 0; i<gate->getFaninLen(); ++i){
+         unsigned faninId = gate->getFaninId(i);
+         if(_gateList.find(faninId) != _gateList.end()){
+            DFSvisitAig((_gateList.find(faninId))->second);
+         }
+      }
+      if (gate->getTypeStr()=="AIG"){
+         cout<<2*(gate->getGateId());
+         cout<<" "<<2*(gate->getFaninId(0))+gate->getInvPhase(0);
+         cout<<" "<<2*(gate->getFaninId(1))+gate->getInvPhase(1);
+         cout<<endl;
+      }
+   }
 }

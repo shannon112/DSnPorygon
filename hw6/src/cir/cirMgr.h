@@ -40,7 +40,8 @@ public:
    void printPIs() const;
    void printPOs() const;
    void printFloatGates() const;
-   void writeAag(ostream&) const;
+   void writeAag(ostream&);
+   void DFSvisitAig(CirGate*);
    bool isFloating(unsigned id){return _floList.find(id)!=_floList.end();}
 
 private:

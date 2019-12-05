@@ -23,10 +23,10 @@ class CirPoGate;
 class CirAigGate;
 
 typedef map<unsigned, CirGate*>   GateMap;
-typedef pair<unsigned, CirGate*>           GatePair;
+typedef pair<unsigned, CirGate*>  GatePair;
 
 typedef vector<CirGate*>           GateList;
-typedef set<unsigned>           GateIntSet;
+typedef set<unsigned>            GateIntSet;
 
 enum GateType
 {
