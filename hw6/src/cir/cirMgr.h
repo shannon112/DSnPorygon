@@ -23,12 +23,13 @@ extern CirMgr *cirMgr;
 class CirMgr
 {
 public:
-   CirMgr():_lineNo(0){}
+   CirMgr(){}
    ~CirMgr() {}
 
    // Access functions
    // return '0' if "gid" corresponds to an undefined gate.
-   CirGate* getGate(unsigned gid) const { return 0; }
+   CirGate* getGate(unsigned gid) const { 
+     return ( _gateList.find(gid) != _gateList.end()) ? _gateList.find(gid)->second : 0; }
 
    // Member functions about circuit construction
    bool readCircuit(const string&);
@@ -40,6 +41,7 @@ public:
    void printPOs() const;
    void printFloatGates() const;
    void writeAag(ostream&) const;
+   bool isFloating(unsigned id){return _floList.find(id)!=_floList.end();}
 
 private:
    bool readHeader(fstream&);
@@ -49,13 +51,13 @@ private:
    bool readSymbols(fstream&);
    bool readComments(fstream&);
    void connect();
-   int _MaxVaIdx, _PI, _LA, _PO, _AIG; //header
-   int _lineNo;
+   void DFSvisit(CirGate*) const;
+   unsigned _MaxVaIdx, _PI, _LA, _PO, _AIG; //header
    GateMap _gateList;
    GateList _piList;
    GateList _poList;
-   GateIntList _floList;
-   GateIntList _notuList;
+   GateIntSet _floList;
+   GateIntSet _notuList;
 };
 
 #endif // CIR_MGR_H

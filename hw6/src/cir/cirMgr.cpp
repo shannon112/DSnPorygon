@@ -53,7 +53,7 @@ enum CirParseError {
 /**************************************/
 static unsigned lineNo = 0;  // in printint, lineNo needs to ++
 static unsigned colNo  = 0;  // in printing, colNo needs to ++
-static char buf[1024];
+//static char buf[1024];
 static string errMsg;
 static int errInt;
 static CirGate *errGate;
@@ -185,9 +185,6 @@ CirMgr::readCircuit(const string& fileName)
 bool
 CirMgr::readHeader(fstream& fin){
    string temp;
-   //add const = 0
-   CirGate* const0 = new CirPiGate(0, 0);
-   _gateList.insert(GatePair(0,const0));
    //start at lineNo 0;
    if(fin>>temp>> _MaxVaIdx >> _PI >> _LA >> _PO >> _AIG ) return true;
    else return false;
@@ -195,11 +192,11 @@ CirMgr::readHeader(fstream& fin){
 
 bool
 CirMgr::readInput(fstream& fin){
-   int temp;
-   for(int i=0; i<_PI; ++i){
+   unsigned temp;
+   for(size_t i=0; i<_PI; ++i){
       //start at line 1;
       if (fin>>temp){
-         CirGate* pi = new CirPiGate(temp/2, ++_lineNo);
+         CirGate* pi = new CirPiGate(temp/2, ++lineNo,"PI");
 
          //put into Mgr storage
          _piList.push_back(pi);
@@ -207,15 +204,18 @@ CirMgr::readInput(fstream& fin){
          _notuList.insert(temp/2);
       }
    }
+   CirGate* const0 = new CirPiGate(0, 0,"CONST");
+   _gateList.insert(GatePair(0, const0));
+   _notuList.insert(0);
    return true;
 }
 
 bool
 CirMgr::readOutput(fstream& fin){
-   int temp;
-   for(int i=0; i<_PO; ++i){
+   unsigned temp;
+   for(size_t i=0; i<_PO; ++i){
       if (fin>>temp){
-         CirGate* po = new CirPoGate(_MaxVaIdx+i+1, ++_lineNo);
+         CirGate* po = new CirPoGate(_MaxVaIdx+i+1, ++lineNo,"PO");
          po->setFaninId(0,temp/2);
          po->setInvPhase(0,temp%2);
 
@@ -229,10 +229,10 @@ CirMgr::readOutput(fstream& fin){
 
 bool
 CirMgr::readAIGs(fstream& fin){
-   int gate,fanin0, fanin1;
-   for(int i=0; i<_AIG; ++i){
+   unsigned gate,fanin0, fanin1;
+   for(size_t i=0; i<_AIG; ++i){
       if (fin>>gate>>fanin0>>fanin1){
-         CirGate* aig = new CirAigGate(gate/2, ++_lineNo);
+         CirGate* aig = new CirAigGate(gate/2, ++lineNo,"AIG");
          aig->setFaninId(0,fanin0/2);
          aig->setInvPhase(0,fanin0%2);
          aig->setFaninId(1,fanin1/2);
@@ -264,7 +264,7 @@ CirMgr::connect(){
       CirGate* gateNow = iter->second;
       //traversal fanins to gate
       for (size_t i = 0; i<gateNow->getFaninLen(); ++i){
-         int faninId = gateNow->getFaninId(i);
+         unsigned faninId = gateNow->getFaninId(i);
          GateMap::iterator fanin = _gateList.find(faninId);
          //connect known, erase used gate from _notuList
          if(fanin != _gateList.end()){
@@ -274,6 +274,8 @@ CirMgr::connect(){
          //cannot find, floating
          else{
             _floList.insert(gateNow->getGateId()); 
+            CirGate* pi = new CirPiGate(faninId, 0, "UNDEF");
+            _gateList.insert(GatePair(faninId,pi));
          }
       }
    }
@@ -299,16 +301,32 @@ CirMgr::printSummary() const
 void
 CirMgr::printNetlist() const
 {
+   lineNo = 0;
    cout << endl;
-   //cout<<content<<endl;
-   cout << endl;
+   for(size_t i = 0; i<_PO; ++i){
+      DFSvisit(_poList[i]);
+   }
+}
+
+void
+CirMgr::DFSvisit(CirGate* gate) const
+{
+   //traversal fanins to gate
+   for (size_t i = 0; i<gate->getFaninLen(); ++i){
+      unsigned faninId = gate->getFaninId(i);
+      //connect known, erase used gate from _notuList
+      if(_gateList.find(faninId) != _gateList.end()){
+         DFSvisit((_gateList.find(faninId))->second);
+      }
+   }
+   gate->reportNetlist(lineNo++);
 }
 
 void
 CirMgr::printPIs() const
 {
    cout << "PIs of the circuit: ";
-   for(int i = 0; i<_PI; ++i){
+   for(size_t i = 0; i<_PI; ++i){
       cout<<_piList[i]->getGateId();
       if(i!=_PI-1) cout<<" ";
    }
@@ -319,7 +337,7 @@ void
 CirMgr::printPOs() const
 {
    cout << "POs of the circuit: ";
-   for(int i = 0; i<_PO; ++i){
+   for(size_t i = 0; i<_PO; ++i){
       cout<<_poList[i]->getGateId();
       if(i!=_PO-1) cout<<" ";
    }
@@ -330,7 +348,7 @@ void
 CirMgr::printFloatGates() const
 {
    cout << "Gates with floating fanin(s): ";
-   GateIntList::iterator it = _floList.begin();
+   GateIntSet::iterator it = _floList.begin();
    for(; it != _floList.end(); it++) {
       cout << *it;
       if(it!=(--_floList.end())) cout<<" ";

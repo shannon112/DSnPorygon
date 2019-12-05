@@ -24,69 +24,74 @@ using namespace std;
 class CirGate
 {
 public:
-   CirGate(unsigned gateID, unsigned lineNo) 
-   :_gateID(gateID),_lineNo(lineNo){} 
+   CirGate(unsigned gateID, unsigned lineNo, string gateType) 
+   :_gateID(gateID),_lineNo(lineNo),_gateType(gateType){} 
    virtual ~CirGate() {}
 
    // Basic access methods
-   string getTypeStr() const { return ""; }
-   virtual unsigned getGateId() const = 0;
-   virtual unsigned getLineNo() const = 0;
+   string getTypeStr() const { return _gateType; }
+   unsigned getGateId() const {return _gateID;}
+   unsigned getLineNo() const {return _lineNo;}
 
    // id list I/O
-   virtual void setFaninId(const int, const int){} 
-   virtual void setInvPhase(const int, const bool){}   
-   virtual int getFaninId(const int&) const {return 0;}
-   virtual bool getInvPhase(const int&) const {return false;}
+   virtual void setFaninId(const size_t, const unsigned){} 
+   virtual void setInvPhase(const size_t, const bool){}   
+   virtual unsigned getFaninId(const size_t&) const {return 0;}
+   virtual bool getInvPhase(const size_t&) const {return false;}
    virtual size_t getFaninLen(){return 0;}
 
    // CirGate list I/O
-   virtual void setFanin(const int, CirGate*){}
-   virtual CirGate* getFanin(const int&) const {return 0;} 
+   virtual void setFanin(const size_t, CirGate*){}
+   virtual CirGate* getFanin(const size_t&) const {return 0;} 
 
    //default
-   void reportGate() const;
+   virtual void reportGate() const = 0;
+   virtual void reportNetlist(unsigned) const = 0;
    void reportFanin(int level) const;
    void reportFanout(int level) const;
 
 protected:
    unsigned _gateID;
    unsigned _lineNo;
+   string _gateType;
+
+private:
+   void DFSvisit(const int&, int, CirGate*) const;
 };
 
 
 class CirPiGate: public CirGate
 {
 public:
-   CirPiGate(unsigned gateID, unsigned lineNo):CirGate(gateID,lineNo){}
+   CirPiGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){}
    ~CirPiGate() {}
-   unsigned getGateId() const {return _gateID;}
-   unsigned getLineNo() const {return _lineNo;}
+   void reportGate() const;
+   void reportNetlist(unsigned) const;
 };
 
 
 class CirPoGate: public CirGate
 {
 public:
-   CirPoGate(unsigned gateID, unsigned lineNo):CirGate(gateID,lineNo){
+   CirPoGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){
      _faninList = new CirGate*[1];
    }
    ~CirPoGate() {}
 
    // Basic access methods
-   unsigned getGateId() const {return _gateID;}
-   unsigned getLineNo() const {return _lineNo;}
+   void reportGate() const;
+   void reportNetlist(unsigned) const;
 
    // id list I/O
-   void setFaninId(const int idx, const int val){_faninIdList[idx] = val;} 
-   void setInvPhase(const int idx, const bool val){_invPhase[idx] = val;}
-   int getFaninId(const int& idx) const {return _faninIdList[idx];} 
-   bool getInvPhase(const int& idx) const {return _invPhase[idx];}
+   void setFaninId(const size_t idx, const unsigned val){_faninIdList[idx] = val;} 
+   void setInvPhase(const size_t idx, const bool val){_invPhase[idx] = val;}
+   unsigned getFaninId(const size_t& idx) const {return _faninIdList[idx];} 
+   bool getInvPhase(const size_t& idx) const {return _invPhase[idx];}
    size_t getFaninLen(){return sizeof(_faninIdList)/sizeof(_faninIdList[0]);}
 
    // CirGate list I/O
-   void setFanin(const int idx, CirGate* val){_faninList[idx] = val;}
-   CirGate* getFanin(const int& idx) const {return _faninList[idx];} 
+   void setFanin(const size_t idx, CirGate* val){_faninList[idx] = val;}
+   CirGate* getFanin(const size_t& idx) const {return _faninList[idx];} 
 
 private:
    int _faninIdList[1] = {-1};
@@ -98,24 +103,24 @@ private:
 class CirAigGate: public CirGate
 {
 public:
-   CirAigGate(unsigned gateID, unsigned lineNo):CirGate(gateID,lineNo){
+   CirAigGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){
      _faninList = new CirGate*[2];
    }
    ~CirAigGate() {}
    // Basic access methods
-   unsigned getGateId() const {return _gateID;}
-   unsigned getLineNo() const {return _lineNo;}
+   void reportGate() const;
+   void reportNetlist(unsigned) const;
 
    // id list I/O
-   void setFaninId(const int idx, const int val){_faninIdList[idx] = val;} 
-   void setInvPhase(const int idx, const bool val){_invPhase[idx] = val;}
-   int getFaninId(const int& idx) const {return _faninIdList[idx];} 
-   bool getInvPhase(const int& idx) const {return _invPhase[idx];}
+   void setFaninId(const size_t idx, const unsigned val){_faninIdList[idx] = val;} 
+   void setInvPhase(const size_t idx, const bool val){_invPhase[idx] = val;}
+   unsigned getFaninId(const size_t& idx) const {return _faninIdList[idx];} 
+   bool getInvPhase(const size_t& idx) const {return _invPhase[idx];}
    size_t getFaninLen(){return sizeof(_faninIdList)/sizeof(_faninIdList[0]);}
 
    // CirGate list I/O
-   void setFanin(const int idx, CirGate* val){_faninList[idx] = val;}
-   CirGate* getFanin(const int& idx) const {return _faninList[idx];} 
+   void setFanin(const size_t idx, CirGate* val){_faninList[idx] = val;}
+   CirGate* getFanin(const size_t& idx) const {return _faninList[idx];} 
 
 private:
    int _faninIdList[2] = {-1,-1};
