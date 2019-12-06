@@ -101,8 +101,8 @@ CirPiGate::reportGate() const
          ss<<"= UNDEF("<<getGateId()<<"), line 0";
    }
    else{
-      if (getSymbolName()==0) ss<<"= PO("<<getGateId()<<"), line "<<getLineNo()+1;
-      else ss<<"= PO("<<getGateId()<<")\""<<*getSymbolName()<<"\", line "<<getLineNo()+1;
+      if (getSymbolName()==0) ss<<"= PI("<<getGateId()<<"), line "<<getLineNo()+1;
+      else ss<<"= PI("<<getGateId()<<")\""<<*getSymbolName()<<"\", line "<<getLineNo()+1;
    }
    cout<<"=================================================="<<endl;
    cout<<setw(49)<<left<<ss.str()<<"="<<endl;
@@ -132,8 +132,8 @@ void
 CirPoGate::reportGate() const
 {
    stringstream ss;
-   if (getSymbolName()==0) ss<<"= PI("<<getGateId()<<"), line "<<getLineNo()+1;
-   else ss<<"= PI("<<getGateId()<<")\""<<*getSymbolName()<<"\", line "<<getLineNo()+1;
+   if (getSymbolName()==0) ss<<"= PO("<<getGateId()<<"), line "<<getLineNo()+1;
+   else ss<<"= PO("<<getGateId()<<")\""<<*getSymbolName()<<"\", line "<<getLineNo()+1;
    cout<<"=================================================="<<endl;
    cout<<setw(49)<<left<<ss.str()<<"="<<endl;
    cout<<"=================================================="<<endl;

@@ -207,7 +207,6 @@ CirMgr::readInput(fstream& fin){
    }
    CirGate* const0 = new CirPiGate(0, 0,"CONST");
    _gateList.insert(GatePair(0, const0));
-   _notuList.insert(0);
    return true;
 }
 
@@ -257,7 +256,6 @@ CirMgr::readSymbols(fstream& fin){
       else if(gateid.substr(0,1)=="o"){
          _poList[stoi(gateid.substr(1))]->setSymbolName(name);
       }
-      else return false;
    }
    return true;
 }
@@ -336,12 +334,8 @@ CirMgr::DFSvisit(CirGate* gate) const
    else{
       gate->visitedNo = visitedBase+1;
       //traversal fanins to gate
-      for (size_t i = 0; i<gate->getFaninLen(); ++i){
-         unsigned faninId = gate->getFaninId(i);
-         if(_gateList.find(faninId) != _gateList.end()){
-            DFSvisit((_gateList.find(faninId))->second);
-         }
-      }
+      for (size_t i = 0; i<gate->getFaninLen(); ++i)
+         DFSvisit(gate->getFanin(i));
       gate->reportNetlist(lineNo++);
    }
 }
@@ -392,8 +386,13 @@ CirMgr::printFloatGates() const
 void
 CirMgr::writeAag(ostream& outfile)
 {
+   //DFS
+   GateList aigList;
+   visitedBase++;
+   for(size_t i = 0; i<_PO; ++i) 
+      DFSvisitAig(_poList[i],aigList);
    //header
-   outfile<<"aag "<<_MaxVaIdx<<" "<<_PI<<" "<<_LA<<" "<<_PO<<" "<<_AIG<<endl;
+   outfile<<"aag "<<_MaxVaIdx<<" "<<_PI<<" "<<_LA<<" "<<_PO<<" "<<aigList.size()<<endl;
    //PI
    for(size_t i = 0; i<_piList.size(); ++i)
       cout<<2*(_piList[i]->getGateId())<<endl;
@@ -401,37 +400,29 @@ CirMgr::writeAag(ostream& outfile)
    for(size_t i = 0; i<_poList.size(); ++i)
       cout<<2*(_poList[i]->getFanin(0)->getGateId())+_poList[i]->getFaninInv(0)<<endl;
    //AIG
-   visitedBase++;
-   for(size_t i = 0; i<_PO; ++i) 
-      DFSvisitAig(_poList[i]);
+   for(size_t i = 0; i<aigList.size(); ++i)
+      cout<<2*(aigList[i]->getGateId())
+      <<" "<<2*(aigList[i]->getFaninId(0))+aigList[i]->getFaninInv(0)
+      <<" "<<2*(aigList[i]->getFaninId(1))+aigList[i]->getFaninInv(1)<<endl;
    //Symbol
    for(size_t i = 0; i<_piList.size(); ++i)
       cout<<"i"<<i<<" "<<*(_piList[i]->getSymbolName())<<endl;
    for(size_t i = 0; i<_poList.size(); ++i)
-      cout<<"i"<<i<<" "<<*(_poList[i]->getSymbolName())<<endl;
+      cout<<"o"<<i<<" "<<*(_poList[i]->getSymbolName())<<endl;
    //Comment
    outfile<<"c"<<endl;
    outfile<<"AAG output by Shang-Lun (Shannon) Lee"<<endl;
 }
 
 void
-CirMgr::DFSvisitAig(CirGate* gate)
+CirMgr::DFSvisitAig(CirGate* gate, GateList& aigList)
 {
    if (gate->visitedNo>visitedBase) return;
    else{
       gate->visitedNo = visitedBase+1;
       //traversal fanins to gate
-      for (size_t i = 0; i<gate->getFaninLen(); ++i){
-         unsigned faninId = gate->getFaninId(i);
-         if(_gateList.find(faninId) != _gateList.end()){
-            DFSvisitAig((_gateList.find(faninId))->second);
-         }
-      }
-      if (gate->getTypeStr()=="AIG"){
-         cout<<2*(gate->getGateId());
-         cout<<" "<<2*(gate->getFaninId(0))+gate->getFaninInv(0);
-         cout<<" "<<2*(gate->getFaninId(1))+gate->getFaninInv(1);
-         cout<<endl;
-      }
+      for (size_t i = 0; i<gate->getFaninLen(); ++i)
+         DFSvisitAig(gate->getFanin(i),aigList);
+      if (gate->getTypeStr()=="AIG") aigList.push_back(gate);
    }
 }

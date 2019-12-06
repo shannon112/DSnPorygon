@@ -41,7 +41,6 @@ public:
    void printPOs() const;
    void printFloatGates() const;
    void writeAag(ostream&);
-   void DFSvisitAig(CirGate*);
    bool isFloating(unsigned id){return _floList.find(id)!=_floList.end();}
 
 private:
@@ -53,6 +52,7 @@ private:
    bool readComments(fstream&);
    void connect();
    void DFSvisit(CirGate*) const;
+   void DFSvisitAig(CirGate*,GateList&);
    unsigned _MaxVaIdx, _PI, _LA, _PO, _AIG; //header
    GateMap _gateList;
    GateList _piList;

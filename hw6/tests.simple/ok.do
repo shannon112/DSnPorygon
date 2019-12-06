@@ -25,3 +25,4 @@ cirg 1 -fano 3
 cirg 1 -fano 4
 cirg 1 -fano 5
 cirg 0 -fano 5
+q -f
