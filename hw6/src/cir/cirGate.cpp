@@ -47,19 +47,20 @@ CirGate::DFSvisitIn(const int& total_level, int level, bool inverse, const CirGa
    if (level>=0){
       const string isInverse = inverse ? "!":"";
       cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
-      level--;
 
       //already visited, and can be expand, then stop to expand
-      if((gate->visitedNo > visitedBase)&&(gate->getTypeStr()=="AIG")&&(level>-1)) 
-         cout<<" (*)"<<endl;
-      //havent visited yet
-      else {
-         gate->visitedNo = visitedBase+1;
-         cout<<endl;
-         //find fanins and recursively do DFSvisit
-         for (size_t i = 0; i<gate->getFaninLen(); ++i)
-            DFSvisitIn(total_level, level, gate->getFaninInv(i), gate->getFanin(i));
+      if((gate->visitedNo > visitedBase)&&(gate->getTypeStr()=="AIG")&&(level>0)&&(gate->getFaninLen()>0)) {
+         if (gate->getFanin(0)->visitedNo > visitedBase){
+            cout<<" (*)"<<endl;
+            return;
+         }
       }
+      //havent visited yet
+      gate->visitedNo = visitedBase+1;
+      cout<<endl;
+      //find fanins and recursively do DFSvisit
+      for (size_t i = 0; i<gate->getFaninLen(); ++i)
+         DFSvisitIn(total_level, level-1, gate->getFaninInv(i), gate->getFanin(i));
    }
 }
 
@@ -68,19 +69,20 @@ CirGate::DFSvisitOut(const int& total_level, int level, bool inverse, const CirG
    if (level>=0){
       const string isInverse = inverse ? "!":"";
       cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
-      level--;
 
       //already visited, and can be expand, then stop to expand
-      if((gate->visitedNo > visitedBase)&&(gate->getTypeStr()=="AIG")&&(level>-1)&&(gate->getFanoutLen()>0)) 
-         cout<<" (*)"<<endl;
-      //havent visited yet
-      else {
-         gate->visitedNo = visitedBase+1;
-         cout<<endl;
-         //find fanouts and recursively do DFSvisit
-         for (size_t i = 0; i<gate->getFanoutLen(); ++i)
-            DFSvisitOut(total_level, level, gate->getFanoutInv(i), gate->getFanout(i));
+      if((gate->visitedNo > visitedBase)&&(gate->getTypeStr()=="AIG")&&(level>0)&&(gate->getFanoutLen()>0)){
+         if (gate->getFanout(0)->visitedNo > visitedBase){
+            cout<<" (*)"<<endl;
+            return;
+         }
       }
+      //havent visited yet
+      gate->visitedNo = visitedBase+1;
+      cout<<endl;
+      //find fanouts and recursively do DFSvisit
+      for (size_t i = 0; i<gate->getFanoutLen(); ++i)
+         DFSvisitOut(total_level, level-1, gate->getFanoutInv(i), gate->getFanout(i));
    }
 }
 
@@ -110,13 +112,14 @@ CirPiGate::reportGate() const
 }
 
 void 
-CirPiGate::reportNetlist(unsigned idx) const
+CirPiGate::reportNetlist(unsigned& idx) const
 {
    int gateId = getGateId();
    int lineNo = getLineNo();
    if(lineNo==0){
       if(gateId==0)
          cout<<"["<<idx<<"] "<<"CONST0"<<endl;
+      else --idx;
    }
    else{
       if (getSymbolName()==0) cout<<"["<<idx<<"] "<<setw(4)<<left<<"PI "<<gateId<<endl;
@@ -140,11 +143,11 @@ CirPoGate::reportGate() const
 }
 
 void 
-CirPoGate::reportNetlist(unsigned idx) const
+CirPoGate::reportNetlist(unsigned& idx) const
 {
    int gateId = getGateId();
    int faninId = getFaninId(0);
-   const string isFloating = (cirMgr->isFloating(faninId)) ? "*":"";
+   const string isFloating = (getFanin(0)->getLineNo()==0)&&(getFanin(0)->getGateId()!=0) ? "*":"";
    const string isInverse = getFaninInv(0) ? "!":"";
    if (getSymbolName()==0) cout<<"["<<idx<<"] "<<setw(4)<<left<<"PO "<<gateId<<" "<<isFloating<<isInverse<<faninId<<endl;
    else  cout<<"["<<idx<<"] "<<setw(4)<<left<<"PO "<<gateId<<" "<<isFloating<<isInverse<<faninId<<" ("<<*getSymbolName()<<")"<<endl;
@@ -165,13 +168,13 @@ CirAigGate::reportGate() const
 }
 
 void 
-CirAigGate::reportNetlist(unsigned idx) const
+CirAigGate::reportNetlist(unsigned& idx) const
 {
    int gateId = getGateId();
    int faninId0 = getFaninId(0);
    int faninId1 = getFaninId(1);
-   const string isFloating0 = (cirMgr->isFloating(faninId0)) ? "*":"";
-   const string isFloating1 = (cirMgr->isFloating(faninId1)) ? "*":"";
+   const string isFloating0 = (getFanin(0)->getLineNo()==0)&&(getFanin(0)->getGateId()!=0) ? "*":"";
+   const string isFloating1 = (getFanin(1)->getLineNo()==0)&&(getFanin(1)->getGateId()!=0) ? "*":"";
    const string isInverse0 = getFaninInv(0) ? "!":"";
    const string isInverse1 = getFaninInv(1) ? "!":"";
    cout<<"["<<idx<<"] "<<setw(4)<<left<<"AIG "<<gateId<<" "

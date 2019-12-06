@@ -41,7 +41,6 @@ public:
    void printPOs() const;
    void printFloatGates() const;
    void writeAag(ostream&);
-   bool isFloating(unsigned id){return _floList.find(id)!=_floList.end();}
 
 private:
    bool readHeader(fstream&);

@@ -250,6 +250,7 @@ bool
 CirMgr::readSymbols(fstream& fin){
    string gateid,name;
    while (fin>>gateid>>name){
+      if(gateid=="c") break;
       if(gateid.substr(0,1)=="i"){
          _piList[stoi(gateid.substr(1))]->setSymbolName(name);
       } 
@@ -262,12 +263,7 @@ CirMgr::readSymbols(fstream& fin){
 
 bool
 CirMgr::readComments(fstream& fin){
-   string symbol;
-   if (fin>>symbol){
-      if (symbol=="c") return true;
-      else return false;
-   }
-   else return true;
+   return true;
 }
 
 void
@@ -309,11 +305,11 @@ CirMgr::printSummary() const
    cout<<endl;
    cout<<"Circuit Statistics"<<endl;
    cout<<"=================="<<endl;
-   cout << setw(15) << left <<"  PI"<<_PI<<endl;
-   cout << setw(15) << left <<"  PO"<<_PO<<endl;
-   cout << setw(15) << left <<"  AIG"<<_AIG<<endl;
+   cout<<"  PI"<<setw(12)<<right<<_PI<<endl;
+   cout<<"  PO"<<setw(12)<<right<<_PO<<endl;
+   cout<<"  AIG"<<setw(11)<<right<<_AIG<<endl;
    cout<<"------------------"<<endl;
-   cout << setw(15) << left <<"  Total"<<_PI+_PO+_AIG<<endl;
+   cout<<"  Total"<<setw(9)<<right<<_PI+_PO+_AIG<<endl;
 }
 
 void
@@ -336,7 +332,8 @@ CirMgr::DFSvisit(CirGate* gate) const
       //traversal fanins to gate
       for (size_t i = 0; i<gate->getFaninLen(); ++i)
          DFSvisit(gate->getFanin(i));
-      gate->reportNetlist(lineNo++);
+      gate->reportNetlist(lineNo);
+      ++lineNo;
    }
 }
 
@@ -365,22 +362,24 @@ CirMgr::printPOs() const
 void
 CirMgr::printFloatGates() const
 {
-   cout << "Gates with floating fanin(s): ";
-   GateIntSet::iterator it = _floList.begin();
-   for(; it != _floList.end(); it++) {
-      cout << *it;
-      if(it!=(--_floList.end())) cout<<" ";
-   } 
-   cout << endl;
-
-   cout << "Gates defined but not used  : ";
-   it = _notuList.begin();
-   for(; it != _notuList.end(); it++) {
-      cout << *it;
-      if(it!=(--_notuList.end())) cout<<" ";
-   } 
-   cout << endl;
-
+   if (_floList.size()>0){
+      GateIntSet::iterator it = _floList.begin();
+      cout << "Gates with floating fanin(s): ";
+      for(; it != _floList.end(); it++) {
+         cout << *it;
+         if(it!=(--_floList.end())) cout<<" ";
+      } 
+      cout<<endl;
+   }
+   if (_notuList.size()>0){
+      GateIntSet::iterator it = _notuList.begin();
+      cout << "Gates defined but not used  : ";
+      for(; it != _notuList.end(); it++) {
+         cout << *it;
+         if(it!=(--_notuList.end())) cout<<" ";
+      }
+      cout<<endl;
+   }
 }
 
 void
@@ -405,10 +404,12 @@ CirMgr::writeAag(ostream& outfile)
       <<" "<<2*(aigList[i]->getFaninId(0))+aigList[i]->getFaninInv(0)
       <<" "<<2*(aigList[i]->getFaninId(1))+aigList[i]->getFaninInv(1)<<endl;
    //Symbol
+   size_t idx = 0;
    for(size_t i = 0; i<_piList.size(); ++i)
-      cout<<"i"<<i<<" "<<*(_piList[i]->getSymbolName())<<endl;
+      if (_piList[i]->getSymbolName()!=0) cout<<"i"<<idx++<<" "<<*(_piList[i]->getSymbolName())<<endl;
+   idx = 0;
    for(size_t i = 0; i<_poList.size(); ++i)
-      cout<<"o"<<i<<" "<<*(_poList[i]->getSymbolName())<<endl;
+      if (_poList[i]->getSymbolName()!=0) cout<<"o"<<idx++<<" "<<*(_poList[i]->getSymbolName())<<endl;
    //Comment
    outfile<<"c"<<endl;
    outfile<<"AAG output by Shang-Lun (Shannon) Lee"<<endl;

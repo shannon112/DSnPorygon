@@ -61,7 +61,7 @@ public:
 
    // default
    virtual void reportGate() const = 0;
-   virtual void reportNetlist(unsigned) const = 0;
+   virtual void reportNetlist(unsigned&) const = 0;
    void reportFanin(int level) const;
    void reportFanout(int level) const;
 
@@ -96,7 +96,7 @@ public:
    CirPiGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){}
    ~CirPiGate() {}
    void reportGate() const;
-   void reportNetlist(unsigned) const;
+   void reportNetlist(unsigned&) const;
 };
 
 
@@ -110,7 +110,7 @@ public:
    ~CirPoGate() {}
    // Basic access methods
    void reportGate() const;
-   void reportNetlist(unsigned) const;
+   void reportNetlist(unsigned&) const;
 };
 
 
@@ -124,7 +124,7 @@ public:
    ~CirAigGate() {}
    // Basic access methods
    void reportGate() const;
-   void reportNetlist(unsigned) const;
+   void reportNetlist(unsigned&) const;
 };
 
 #endif // CIR_GATE_H
