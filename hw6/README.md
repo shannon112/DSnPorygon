@@ -114,19 +114,6 @@ cir> cirg 0
 = CONST(0), line 0                               =
 ==================================================
 
-cir> cirg 3 -fani 0
-AIG 3
-
-cir> cirg 3 -fani 1
-AIG 3
-  PI 1
-  PI 2
-
-cir> cirg 3 -fani 2
-AIG 3
-  PI 1
-  PI 2
-
 cir> cirg 9 -fani 0
 AIG 9
 
@@ -182,11 +169,6 @@ o0 s
 c
 AAG output by Chung-Yang (Ric) Huang
 
-cir> cirg 1 -fano 1
-PI 1
-  AIG 3
-  AIG 5
-
 cir> cirg 1 -fano 2
 PI 1
   AIG 3
@@ -197,32 +179,6 @@ PI 1
     AIG 8
 
 cir> cirg 1 -fano 3
-PI 1
-  AIG 3
-    AIG 8
-      AIG 9
-      AIG 10
-    PO 11
-  AIG 5
-    AIG 7
-      AIG 9
-      AIG 10
-    AIG 8 (*)
-
-cir> cirg 1 -fano 4
-PI 1
-  AIG 3
-    AIG 8
-      AIG 9
-      AIG 10
-    PO 11
-  AIG 5
-    AIG 7
-      AIG 9
-      AIG 10
-    AIG 8 (*)
-
-cir> cirg 1 -fano 5
 PI 1
   AIG 3
     AIG 8
@@ -247,7 +203,7 @@ CONST 0
 ```
 Compare to reference program
 ```
-cd tests
+cd tests.fraig
 ../ref/cirTest-ref -f do1 > log1_ref.txt 2>&1
 ../cirTest -f do1 > log1.txt 2>&1
 diff log1.txt log1_ref.txt
