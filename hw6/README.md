@@ -181,6 +181,69 @@ i1 y
 o0 s
 c
 AAG output by Chung-Yang (Ric) Huang
+
+cir> cirg 1 -fano 1
+PI 1
+  AIG 3
+  AIG 5
+
+cir> cirg 1 -fano 2
+PI 1
+  AIG 3
+    AIG 8
+    PO 11
+  AIG 5
+    AIG 7
+    AIG 8
+
+cir> cirg 1 -fano 3
+PI 1
+  AIG 3
+    AIG 8
+      AIG 9
+      AIG 10
+    PO 11
+  AIG 5
+    AIG 7
+      AIG 9
+      AIG 10
+    AIG 8 (*)
+
+cir> cirg 1 -fano 4
+PI 1
+  AIG 3
+    AIG 8
+      AIG 9
+      AIG 10
+    PO 11
+  AIG 5
+    AIG 7
+      AIG 9
+      AIG 10
+    AIG 8 (*)
+
+cir> cirg 1 -fano 5
+PI 1
+  AIG 3
+    AIG 8
+      AIG 9
+      AIG 10
+    PO 11
+  AIG 5
+    AIG 7
+      AIG 9
+      AIG 10
+    AIG 8 (*)
+
+cir> cirg 0 -fano 5
+CONST 0
+  !AIG 5
+    AIG 7
+      AIG 9
+      AIG 10
+    AIG 8
+      AIG 9
+      AIG 10
 ```
 Compare to reference program
 ```
