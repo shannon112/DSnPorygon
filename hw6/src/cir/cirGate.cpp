@@ -31,11 +31,19 @@ CirGate::reportFanin(int level) const
 {
    assert (level >= 0);
    visitedBase++;
-   DFSvisit(level, level, false, cirMgr->getGate(_gateID));
+   DFSvisitIn(level, level, false, this);
+}
+
+void
+CirGate::reportFanout(int level) const
+{
+   assert (level >= 0);
+   visitedBase++;
+   DFSvisitOut(level, level, false, this);
 }
 
 void 
-CirGate::DFSvisit(const int& total_level, int level, bool inverse, CirGate* gate) const {
+CirGate::DFSvisitIn(const int& total_level, int level, bool inverse, const CirGate* gate) const {
    if (level>=0){
       const string isInverse = inverse ? "!":"";
       cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
@@ -49,21 +57,32 @@ CirGate::DFSvisit(const int& total_level, int level, bool inverse, CirGate* gate
          gate->visitedNo = visitedBase+1;
          cout<<endl;
          //find fanins and recursively do DFSvisit
-         for (size_t i = 0; i<gate->getFaninLen(); ++i){
-            CirGate* fanin =  cirMgr->getGate(gate->getFaninId(i));
-            if(fanin != 0) DFSvisit(total_level, level, gate->getInvPhase(i), fanin);
-         }
+         for (size_t i = 0; i<gate->getFaninLen(); ++i)
+            DFSvisitIn(total_level, level, gate->getFaninInv(i), gate->getFanin(i));
       }
    }
 }
 
-void
-CirGate::reportFanout(int level) const
-{
-   assert (level >= 0);
-   cout<<_gateID<<endl;
-}
+void 
+CirGate::DFSvisitOut(const int& total_level, int level, bool inverse, const CirGate* gate) const {
+   if (level>=0){
+      const string isInverse = inverse ? "!":"";
+      cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
+      level--;
 
+      //already visited, and can be expand, then stop to expand
+      if((gate->visitedNo > visitedBase)&&(gate->getTypeStr()=="AIG")&&(level>-1)&&(gate->getFanoutLen()>0)) 
+         cout<<" (*)"<<endl;
+      //havent visited yet
+      else {
+         gate->visitedNo = visitedBase+1;
+         cout<<endl;
+         //find fanouts and recursively do DFSvisit
+         for (size_t i = 0; i<gate->getFanoutLen(); ++i)
+            DFSvisitOut(total_level, level, gate->getFanoutInv(i), gate->getFanout(i));
+      }
+   }
+}
 
 /**************************************/
 /*   class CirPiGate member functions   */
@@ -123,7 +142,7 @@ CirPoGate::reportNetlist(unsigned idx) const
    int gateId = getGateId();
    int faninId = getFaninId(0);
    const string isFloating = (cirMgr->isFloating(faninId)) ? "*":"";
-   const string isInverse = getInvPhase(0) ? "!":"";
+   const string isInverse = getFaninInv(0) ? "!":"";
    cout<<"["<<idx<<"] "<<setw(4)<<left<<"PO "<<gateId<<" "<<isFloating<<isInverse<<faninId<<endl;
 }
 
@@ -149,8 +168,8 @@ CirAigGate::reportNetlist(unsigned idx) const
    int faninId1 = getFaninId(1);
    const string isFloating0 = (cirMgr->isFloating(faninId0)) ? "*":"";
    const string isFloating1 = (cirMgr->isFloating(faninId1)) ? "*":"";
-   const string isInverse0 = getInvPhase(0) ? "!":"";
-   const string isInverse1 = getInvPhase(1) ? "!":"";
+   const string isInverse0 = getFaninInv(0) ? "!":"";
+   const string isInverse1 = getFaninInv(1) ? "!":"";
    cout<<"["<<idx<<"] "<<setw(4)<<left<<"AIG "<<gateId<<" "
    <<isFloating0<<isInverse0<<faninId0<<" "
    <<isFloating1<<isInverse1<<faninId1<<endl;

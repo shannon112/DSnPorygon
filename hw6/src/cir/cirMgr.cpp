@@ -217,8 +217,8 @@ CirMgr::readOutput(fstream& fin){
    for(size_t i=0; i<_PO; ++i){
       if (fin>>temp){
          CirGate* po = new CirPoGate(_MaxVaIdx+i+1, ++lineNo,"PO");
-         po->setFaninId(0,temp/2);
-         po->setInvPhase(0,temp%2);
+         po->setFaninId(temp/2);
+         po->setFaninInv(temp%2);
 
          //put into Mgr storage
          _poList.push_back(po);
@@ -234,10 +234,10 @@ CirMgr::readAIGs(fstream& fin){
    for(size_t i=0; i<_AIG; ++i){
       if (fin>>gate>>fanin0>>fanin1){
          CirGate* aig = new CirAigGate(gate/2, ++lineNo,"AIG");
-         aig->setFaninId(0,fanin0/2);
-         aig->setInvPhase(0,fanin0%2);
-         aig->setFaninId(1,fanin1/2);
-         aig->setInvPhase(1,fanin1%2);
+         aig->setFaninId(fanin0/2);
+         aig->setFaninInv(fanin0%2);
+         aig->setFaninId(fanin1/2);
+         aig->setFaninInv(fanin1%2);
 
          //put into Mgr storage
          _gateList.insert(GatePair(gate/2, aig));
@@ -265,18 +265,22 @@ CirMgr::connect(){
       CirGate* gateNow = iter->second;
       //traversal fanins to gate
       for (size_t i = 0; i<gateNow->getFaninLen(); ++i){
-         unsigned faninId = gateNow->getFaninId(i);
-         GateMap::iterator fanin = _gateList.find(faninId);
+         unsigned gateInId = gateNow->getFaninId(i);
+         GateMap::iterator gateInIter = _gateList.find(gateInId);
+         CirGate* gateIn = gateInIter->second;
          //connect known, erase used gate from _notuList
-         if(fanin != _gateList.end()){
-            gateNow->setFanin(i,fanin->second); 
-            _notuList.erase(faninId); 
+         if(gateInIter != _gateList.end()){
+            gateNow->setFanin(gateIn);
+            gateIn->setFanout(gateNow); 
+            gateIn->setFanoutInv(gateNow->getFaninInv(i)); 
+            _notuList.erase(gateInId); 
          }
          //cannot find, floating
          else{
+            CirGate* pi = new CirPiGate(gateInId, 0, "UNDEF");
             _floList.insert(gateNow->getGateId()); 
-            CirGate* pi = new CirPiGate(faninId, 0, "UNDEF");
-            _gateList.insert(GatePair(faninId,pi));
+            gateNow->setFanin(pi);
+            _gateList.insert(GatePair(gateInId,pi));
          }
       }
    }
@@ -380,7 +384,7 @@ CirMgr::writeAag(ostream& outfile)
       cout<<2*(_piList[i]->getGateId())<<endl;
    //PO
    for(size_t i = 0; i<_poList.size(); ++i)
-      cout<<2*(_poList[i]->getFanin(0)->getGateId())+_poList[i]->getInvPhase(0)<<endl;
+      cout<<2*(_poList[i]->getFanin(0)->getGateId())+_poList[i]->getFaninInv(0)<<endl;
    //AIG
    visitedBase++;
    for(size_t i = 0; i<_PO; ++i) 
@@ -405,8 +409,8 @@ CirMgr::DFSvisitAig(CirGate* gate)
       }
       if (gate->getTypeStr()=="AIG"){
          cout<<2*(gate->getGateId());
-         cout<<" "<<2*(gate->getFaninId(0))+gate->getInvPhase(0);
-         cout<<" "<<2*(gate->getFaninId(1))+gate->getInvPhase(1);
+         cout<<" "<<2*(gate->getFaninId(0))+gate->getFaninInv(0);
+         cout<<" "<<2*(gate->getFaninId(1))+gate->getFaninInv(1);
          cout<<endl;
       }
    }
