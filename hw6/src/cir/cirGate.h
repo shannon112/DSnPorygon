@@ -37,6 +37,8 @@ public:
    string getTypeStr() const { return _gateType; }
    unsigned getGateId() const {return _gateID;}
    unsigned getLineNo() const {return _lineNo;}
+   string* getSymbolName() const { return _symbolName; }
+   void setSymbolName(const string name) { _symbolName=new string(name); }
 
    // fanin id I/O
    void setFaninId(const unsigned faninid){_faninIdList.push_back(faninid);}
@@ -52,12 +54,12 @@ public:
    // fanout inverse I/O
    void setFanoutInv(const unsigned fanoutinv){_fanoutInvList.push_back(fanoutinv);}
    unsigned getFanoutInv (const size_t& idx) const {return _fanoutInvList[idx];} 
-   //fanout list I/O
+   // fanout list I/O
    void setFanout(CirGate* fanout){_fanoutList.push_back(fanout);}
    CirGate* getFanout (const size_t& idx) const {return _fanoutList[idx];} 
    size_t getFanoutLen () const {return _fanoutList.size();} 
 
-   //default
+   // default
    virtual void reportGate() const = 0;
    virtual void reportNetlist(unsigned) const = 0;
    void reportFanin(int level) const;
@@ -70,6 +72,7 @@ protected:
    unsigned _gateID;
    unsigned _lineNo;
    string _gateType;
+   string* _symbolName = 0;
    //fanout
    GateList _fanoutList;
    vector<bool> _fanoutInvList;

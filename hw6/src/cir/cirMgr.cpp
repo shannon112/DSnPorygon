@@ -249,12 +249,27 @@ CirMgr::readAIGs(fstream& fin){
 
 bool
 CirMgr::readSymbols(fstream& fin){
+   string gateid,name;
+   while (fin>>gateid>>name){
+      if(gateid.substr(0,1)=="i"){
+         _piList[stoi(gateid.substr(1))]->setSymbolName(name);
+      } 
+      else if(gateid.substr(0,1)=="o"){
+         _poList[stoi(gateid.substr(1))]->setSymbolName(name);
+      }
+      else return false;
+   }
    return true;
 }
 
 bool
 CirMgr::readComments(fstream& fin){
-   return true;
+   string symbol;
+   if (fin>>symbol){
+      if (symbol=="c") return true;
+      else return false;
+   }
+   else return true;
 }
 
 void
@@ -389,6 +404,11 @@ CirMgr::writeAag(ostream& outfile)
    visitedBase++;
    for(size_t i = 0; i<_PO; ++i) 
       DFSvisitAig(_poList[i]);
+   //Symbol
+   for(size_t i = 0; i<_piList.size(); ++i)
+      cout<<"i"<<i<<" "<<*(_piList[i]->getSymbolName())<<endl;
+   for(size_t i = 0; i<_poList.size(); ++i)
+      cout<<"i"<<i<<" "<<*(_poList[i]->getSymbolName())<<endl;
    //Comment
    outfile<<"c"<<endl;
    outfile<<"AAG output by Shang-Lun (Shannon) Lee"<<endl;

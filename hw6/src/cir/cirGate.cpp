@@ -101,7 +101,8 @@ CirPiGate::reportGate() const
          ss<<"= UNDEF("<<getGateId()<<"), line 0";
    }
    else{
-      ss<<"= PO("<<getGateId()<<"), line "<<getLineNo()+1;
+      if (getSymbolName()==0) ss<<"= PO("<<getGateId()<<"), line "<<getLineNo()+1;
+      else ss<<"= PO("<<getGateId()<<")\""<<*getSymbolName()<<"\", line "<<getLineNo()+1;
    }
    cout<<"=================================================="<<endl;
    cout<<setw(49)<<left<<ss.str()<<"="<<endl;
@@ -118,7 +119,8 @@ CirPiGate::reportNetlist(unsigned idx) const
          cout<<"["<<idx<<"] "<<"CONST0"<<endl;
    }
    else{
-      cout<<"["<<idx<<"] "<<setw(4)<<left<<"PI "<<gateId<<endl;
+      if (getSymbolName()==0) cout<<"["<<idx<<"] "<<setw(4)<<left<<"PI "<<gateId<<endl;
+      else cout<<"["<<idx<<"] "<<setw(4)<<left<<"PI "<<gateId<<" ("<<*getSymbolName()<<")"<<endl;
    }
 }
 
@@ -130,7 +132,8 @@ void
 CirPoGate::reportGate() const
 {
    stringstream ss;
-   ss<<"= PI("<<getGateId()<<"), line "<<getLineNo()+1;
+   if (getSymbolName()==0) ss<<"= PI("<<getGateId()<<"), line "<<getLineNo()+1;
+   else ss<<"= PI("<<getGateId()<<")\""<<*getSymbolName()<<"\", line "<<getLineNo()+1;
    cout<<"=================================================="<<endl;
    cout<<setw(49)<<left<<ss.str()<<"="<<endl;
    cout<<"=================================================="<<endl;
@@ -143,7 +146,8 @@ CirPoGate::reportNetlist(unsigned idx) const
    int faninId = getFaninId(0);
    const string isFloating = (cirMgr->isFloating(faninId)) ? "*":"";
    const string isInverse = getFaninInv(0) ? "!":"";
-   cout<<"["<<idx<<"] "<<setw(4)<<left<<"PO "<<gateId<<" "<<isFloating<<isInverse<<faninId<<endl;
+   if (getSymbolName()==0) cout<<"["<<idx<<"] "<<setw(4)<<left<<"PO "<<gateId<<" "<<isFloating<<isInverse<<faninId<<endl;
+   else  cout<<"["<<idx<<"] "<<setw(4)<<left<<"PO "<<gateId<<" "<<isFloating<<isInverse<<faninId<<" ("<<*getSymbolName()<<")"<<endl;
 }
 
 
