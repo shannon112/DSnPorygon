@@ -1,4 +1,4 @@
-cirr ok.agg
+cirr ok.aag
 cirp
 cirp -pi
 cirp -po

@@ -66,23 +66,25 @@ CirGate::DFSvisitIn(const int& total_level, int level, bool inverse, const CirGa
 
 void 
 CirGate::DFSvisitOut(const int& total_level, int level, bool inverse, const CirGate* gate) const {
-   if (level>=0){
-      const string isInverse = inverse ? "!":"";
-      cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
+   const string isInverse = inverse ? "!":"";
+   cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
 
-      //already visited, and can be expand, then stop to expand
-      if((gate->visitedNo > visitedBase)&&(gate->getTypeStr()=="AIG")&&(level>0)&&(gate->getFanoutLen()>0)){
-         if (gate->getFanout(0)->visitedNo > visitedBase){
-            cout<<" (*)"<<endl;
-            return;
+   //already visited, and can be expand, then stop to expand
+   if((gate->visitedNo > visitedBase)&&(level>0)){
+      cout<<" (*)"<<endl;
+      return;
+   }
+   cout<<endl;
+   //if still have ability to print next
+   if (level-1>=0){
+      //if still have ability to visit next
+      if (gate->getFanoutLen()>0){
+         gate->visitedNo = visitedBase+1;
+         //find fanouts and recursively do DFSvisit
+         for (size_t i = 0; i<gate->getFanoutLen(); ++i){
+            DFSvisitOut(total_level, level-1, gate->getFanoutInv(i), gate->getFanout(i));
          }
       }
-      //havent visited yet
-      gate->visitedNo = visitedBase+1;
-      cout<<endl;
-      //find fanouts and recursively do DFSvisit
-      for (size_t i = 0; i<gate->getFanoutLen(); ++i)
-         DFSvisitOut(total_level, level-1, gate->getFanoutInv(i), gate->getFanout(i));
    }
 }
 

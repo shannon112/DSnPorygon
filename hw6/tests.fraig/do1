@@ -1,18 +1,41 @@
-cirr sim13.aag
+cirr cirp-n.aag
 cirp
 cirp -pi
 cirp -po
 cirp -flo
-cirg 3
 cirg 1
+cirg 2
+cirg 3
+cirg 4
+cirg 5
+cirg 10
 cirg 11
-cirg 6
-cirg 9
+cirg 12
+cirg 13
+cirg 20
+cirg 21
+cirg 22
 cirg 0
 cirp -n
 cirg 3 -fani 0
 cirg 3 -fani 1
 cirg 3 -fani 2
+cirg 5 -fani 5
+cirg 7 -fani 5
+cirg 8 -fani 5
+cirg 10 -fani 5
+cirg 11 -fani 5
+cirg 12 -fani 5
+cirg 13 -fani 5
+cirg 14 -fani 5
+cirg 15 -fani 5
+cirg 16 -fani 5
+cirg 17 -fani 5
+cirg 18 -fani 5
+cirg 21 -fani 5
+cirg 22 -fani 5
+cirg 23 -fani 5
+cirg 24 -fani 5
 cirg 9 -fani 0
 cirg 9 -fani 1
 cirg 9 -fani 2
@@ -24,7 +47,22 @@ cirg 1 -fano 2
 cirg 1 -fano 3
 cirg 1 -fano 4
 cirg 1 -fano 5
+cirg 0 -fano 1
+cirg 0 -fano 2
+cirg 0 -fano 3
+cirg 0 -fano 4
 cirg 0 -fano 5
+cirg 0 -fano 6
+cirg 0 -fano 7
+cirg 0 -fano 8
+cirg 2 -fano 1
+cirg 2 -fano 2
+cirg 2 -fano 3
+cirg 2 -fano 4
+cirg 2 -fano 5
+cirg 2 -fano 6
+cirg 2 -fano 7
+cirg 2 -fano 8
 cirr opt01.aag -r
 cirp
 cirp -n

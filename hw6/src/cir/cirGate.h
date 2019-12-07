@@ -66,6 +66,7 @@ public:
    void reportFanout(int level) const;
 
    mutable unsigned visitedNo = 0;
+   mutable GateIntSet visiterId;
 
 protected:
    //itself
