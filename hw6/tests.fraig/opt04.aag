@@ -4,3 +4,7 @@ aag 2 1 0 1 1
 4 3 2
 c
 PO(3) = CONST(0)
+
+[Known Problem] If a gate g has two inverted fanins f and !f, then reporting
+fanouts from f will not be able to distinguish !g from g. This is a limitation in
+the reference program, and you DO NOT need to handle this.
