@@ -1,0 +1,440 @@
+cir> cirr C17.aag
+
+cir> cirp
+
+Circuit Statistics
+==================
+  PI           5
+  PO           2
+  AIG          7
+------------------
+  Total       14
+
+cir> cirp -pi
+PIs of the circuit: 1 4 2 5 10
+
+cir> cirp -po
+POs of the circuit: 13 14
+
+cir> cirp -flo
+
+cir> cirg 1
+==================================================
+= PI(1), line 2                                  =
+==================================================
+
+cir> cirg 2
+==================================================
+= PI(2), line 4                                  =
+==================================================
+
+cir> cirg 3
+==================================================
+= AIG(3), line 9                                 =
+==================================================
+
+cir> cirg 4
+==================================================
+= PI(4), line 3                                  =
+==================================================
+
+cir> cirg 5
+==================================================
+= PI(5), line 5                                  =
+==================================================
+
+cir> cirg 10
+==================================================
+= PI(10), line 6                                 =
+==================================================
+
+cir> cirg 11
+==================================================
+= AIG(11), line 13                               =
+==================================================
+
+cir> cirg 12
+==================================================
+= AIG(12), line 15                               =
+==================================================
+
+cir> cirg 13
+==================================================
+= PO(13), line 7                                 =
+==================================================
+
+cir> cirg 20
+Error: Gate(20) not found!!
+Error: Illegal option!! (20)
+
+cir> cirg 21
+Error: Gate(21) not found!!
+Error: Illegal option!! (21)
+
+cir> cirg 22
+Error: Gate(22) not found!!
+Error: Illegal option!! (22)
+
+cir> cirg 0
+==================================================
+= CONST(0), line 0                               =
+==================================================
+
+cir> cirp -n
+
+[0] PI  1
+[1] PI  2
+[2] AIG 3 1 2
+[3] PI  4
+[4] PI  5
+[5] AIG 6 2 5
+[6] AIG 7 !6 !6
+[7] AIG 8 4 !7
+[8] AIG 9 !3 !8
+[9] PO  13 !9
+[10] PI  10
+[11] AIG 11 !7 10
+[12] AIG 12 !8 !11
+[13] PO  14 !12
+
+cir> cirg 3 -fani 0
+AIG 3
+
+cir> cirg 3 -fani 1
+AIG 3
+  PI 1
+  PI 2
+
+cir> cirg 3 -fani 2
+AIG 3
+  PI 1
+  PI 2
+
+cir> cirg 5 -fani 5
+PI 5
+
+cir> cirg 7 -fani 5
+AIG 7
+  !AIG 6
+    PI 2
+    PI 5
+  !AIG 6 (*)
+
+cir> cirg 8 -fani 5
+AIG 8
+  PI 4
+  !AIG 7
+    !AIG 6
+      PI 2
+      PI 5
+    !AIG 6 (*)
+
+cir> cirg 10 -fani 5
+PI 10
+
+cir> cirg 11 -fani 5
+AIG 11
+  !AIG 7
+    !AIG 6
+      PI 2
+      PI 5
+    !AIG 6 (*)
+  PI 10
+
+cir> cirg 12 -fani 5
+AIG 12
+  !AIG 8
+    PI 4
+    !AIG 7
+      !AIG 6
+        PI 2
+        PI 5
+      !AIG 6 (*)
+  !AIG 11
+    !AIG 7 (*)
+    PI 10
+
+cir> cirg 13 -fani 5
+PO 13
+  !AIG 9
+    !AIG 3
+      PI 1
+      PI 2
+    !AIG 8
+      PI 4
+      !AIG 7
+        !AIG 6
+          PI 2
+          PI 5
+        !AIG 6 (*)
+
+cir> cirg 14 -fani 5
+PO 14
+  !AIG 12
+    !AIG 8
+      PI 4
+      !AIG 7
+        !AIG 6
+          PI 2
+          PI 5
+        !AIG 6 (*)
+    !AIG 11
+      !AIG 7 (*)
+      PI 10
+
+cir> cirg 15 -fani 5
+Error: Gate(15) not found!!
+Error: Illegal option!! (15)
+
+cir> cirg 16 -fani 5
+Error: Gate(16) not found!!
+Error: Illegal option!! (16)
+
+cir> cirg 17 -fani 5
+Error: Gate(17) not found!!
+Error: Illegal option!! (17)
+
+cir> cirg 18 -fani 5
+Error: Gate(18) not found!!
+Error: Illegal option!! (18)
+
+cir> cirg 21 -fani 5
+Error: Gate(21) not found!!
+Error: Illegal option!! (21)
+
+cir> cirg 22 -fani 5
+Error: Gate(22) not found!!
+Error: Illegal option!! (22)
+
+cir> cirg 23 -fani 5
+Error: Gate(23) not found!!
+Error: Illegal option!! (23)
+
+cir> cirg 24 -fani 5
+Error: Gate(24) not found!!
+Error: Illegal option!! (24)
+
+cir> cirg 9 -fani 0
+AIG 9
+
+cir> cirg 9 -fani 1
+AIG 9
+  !AIG 3
+  !AIG 8
+
+cir> cirg 9 -fani 2
+AIG 9
+  !AIG 3
+    PI 1
+    PI 2
+  !AIG 8
+    PI 4
+    !AIG 7
+
+cir> cirg 9 -fani 3
+AIG 9
+  !AIG 3
+    PI 1
+    PI 2
+  !AIG 8
+    PI 4
+    !AIG 7
+      !AIG 6
+      !AIG 6
+
+cir> cirg 9 -fani 4
+AIG 9
+  !AIG 3
+    PI 1
+    PI 2
+  !AIG 8
+    PI 4
+    !AIG 7
+      !AIG 6
+        PI 2
+        PI 5
+      !AIG 6 (*)
+
+cir> cirw
+aag 12 5 0 2 7
+2
+8
+4
+10
+20
+19
+25
+6 2 4
+12 4 10
+14 13 13
+16 8 15
+18 7 17
+22 15 20
+24 17 23
+c
+AAG output by Shang-Lun (Shannon) Lee
+
+cir> cirg 1 -fano 1
+PI 1
+  AIG 3
+
+cir> cirg 1 -fano 2
+PI 1
+  AIG 3
+    !AIG 9
+
+cir> cirg 1 -fano 3
+PI 1
+  AIG 3
+    !AIG 9
+      !PO 13
+
+cir> cirg 1 -fano 4
+PI 1
+  AIG 3
+    !AIG 9
+      !PO 13
+
+cir> cirg 1 -fano 5
+PI 1
+  AIG 3
+    !AIG 9
+      !PO 13
+
+cir> cirg 0 -fano 1
+CONST 0
+
+cir> cirg 0 -fano 2
+CONST 0
+
+cir> cirg 0 -fano 3
+CONST 0
+
+cir> cirg 0 -fano 4
+CONST 0
+
+cir> cirg 0 -fano 5
+CONST 0
+
+cir> cirg 0 -fano 6
+CONST 0
+
+cir> cirg 0 -fano 7
+CONST 0
+
+cir> cirg 0 -fano 8
+CONST 0
+
+cir> cirg 2 -fano 1
+PI 2
+  AIG 3
+  AIG 6
+
+cir> cirg 2 -fano 2
+PI 2
+  AIG 3
+    !AIG 9
+  AIG 6
+    !AIG 7
+    !AIG 7
+
+cir> cirg 2 -fano 3
+PI 2
+  AIG 3
+    !AIG 9
+      !PO 13
+  AIG 6
+    !AIG 7
+      !AIG 8
+      !AIG 11
+    !AIG 7 (*)
+
+cir> cirg 2 -fano 4
+PI 2
+  AIG 3
+    !AIG 9
+      !PO 13
+  AIG 6
+    !AIG 7
+      !AIG 8
+        !AIG 9
+        !AIG 12
+      !AIG 11
+        !AIG 12
+    !AIG 7 (*)
+
+cir> cirg 2 -fano 5
+PI 2
+  AIG 3
+    !AIG 9
+      !PO 13
+  AIG 6
+    !AIG 7
+      !AIG 8
+        !AIG 9 (*)
+        !AIG 12
+          !PO 14
+      !AIG 11
+        !AIG 12 (*)
+    !AIG 7 (*)
+
+cir> cirg 2 -fano 6
+PI 2
+  AIG 3
+    !AIG 9
+      !PO 13
+  AIG 6
+    !AIG 7
+      !AIG 8
+        !AIG 9 (*)
+        !AIG 12
+          !PO 14
+      !AIG 11
+        !AIG 12 (*)
+    !AIG 7 (*)
+
+cir> cirg 2 -fano 7
+PI 2
+  AIG 3
+    !AIG 9
+      !PO 13
+  AIG 6
+    !AIG 7
+      !AIG 8
+        !AIG 9 (*)
+        !AIG 12
+          !PO 14
+      !AIG 11
+        !AIG 12 (*)
+    !AIG 7 (*)
+
+cir> cirg 2 -fano 8
+PI 2
+  AIG 3
+    !AIG 9
+      !PO 13
+  AIG 6
+    !AIG 7
+      !AIG 8
+        !AIG 9 (*)
+        !AIG 12
+          !PO 14
+      !AIG 11
+        !AIG 12 (*)
+    !AIG 7 (*)
+
+cir> cirr opt01.aag -r
+Note: original circuit is replaced...
+Cannot open design "opt01.aag"!!
+
+cir> cirp
+Error: circuit is not yet constructed!!
+
+cir> cirp -n
+Error: circuit is not yet constructed!!
+
+cir> cirw
+Error: circuit is not yet constructed!!
+
+cir> q -f
+

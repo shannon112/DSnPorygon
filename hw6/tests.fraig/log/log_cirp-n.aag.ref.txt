@@ -1,0 +1,416 @@
+cir> cirr cirp-n.aag
+
+cir> cirp
+
+Circuit Statistics
+==================
+  PI           4
+  PO           2
+  AIG          6
+------------------
+  Total       12
+
+cir> cirp -pi
+PIs of the circuit: 1 2 6 7
+
+cir> cirp -po
+POs of the circuit: 24 25
+
+cir> cirp -flo
+Gates with floating fanin(s): 19
+
+cir> cirg 1
+==================================================
+= PI(1)"1GAT", line 2                            =
+==================================================
+
+cir> cirg 2
+==================================================
+= PI(2)"2GAT", line 3                            =
+==================================================
+
+cir> cirg 3
+Error: Gate(3) not found!!
+Error: Illegal option!! (3)
+
+cir> cirg 4
+Error: Gate(4) not found!!
+Error: Illegal option!! (4)
+
+cir> cirg 5
+Error: Gate(5) not found!!
+Error: Illegal option!! (5)
+
+cir> cirg 10
+==================================================
+= AIG(10), line 8                                =
+==================================================
+
+cir> cirg 11
+==================================================
+= AIG(11), line 9                                =
+==================================================
+
+cir> cirg 12
+Error: Gate(12) not found!!
+Error: Illegal option!! (12)
+
+cir> cirg 13
+Error: Gate(13) not found!!
+Error: Illegal option!! (13)
+
+cir> cirg 20
+Error: Gate(20) not found!!
+Error: Illegal option!! (20)
+
+cir> cirg 21
+Error: Gate(21) not found!!
+Error: Illegal option!! (21)
+
+cir> cirg 22
+==================================================
+= AIG(22), line 11                               =
+==================================================
+
+cir> cirg 0
+==================================================
+= CONST(0), line 0                               =
+==================================================
+
+cir> cirp -n
+
+[0] PI  1 (1GAT)
+[1] CONST0
+[2] AIG 10 1 0
+[3] PI  2 (2GAT)
+[4] PI  6 (6GAT)
+[5] AIG 11 !1 6
+[6] AIG 16 2 !11
+[7] AIG 22 !10 !16
+[8] PO  24 !22 (22GAT$PO)
+[9] PI  7 (7GAT)
+[10] AIG 19 *!15 7
+[11] AIG 23 !16 !19
+[12] PO  25 !23 (23GAT$PO)
+
+cir> cirg 3 -fani 0
+Error: Gate(3) not found!!
+Error: Illegal option!! (3)
+
+cir> cirg 3 -fani 1
+Error: Gate(3) not found!!
+Error: Illegal option!! (3)
+
+cir> cirg 3 -fani 2
+Error: Gate(3) not found!!
+Error: Illegal option!! (3)
+
+cir> cirg 5 -fani 5
+Error: Gate(5) not found!!
+Error: Illegal option!! (5)
+
+cir> cirg 7 -fani 5
+PI 7
+
+cir> cirg 8 -fani 5
+Error: Gate(8) not found!!
+Error: Illegal option!! (8)
+
+cir> cirg 10 -fani 5
+AIG 10
+  PI 1
+  CONST 0
+
+cir> cirg 11 -fani 5
+AIG 11
+  !PI 1
+  PI 6
+
+cir> cirg 12 -fani 5
+Error: Gate(12) not found!!
+Error: Illegal option!! (12)
+
+cir> cirg 13 -fani 5
+Error: Gate(13) not found!!
+Error: Illegal option!! (13)
+
+cir> cirg 14 -fani 5
+Error: Gate(14) not found!!
+Error: Illegal option!! (14)
+
+cir> cirg 15 -fani 5
+UNDEF 15
+
+cir> cirg 16 -fani 5
+AIG 16
+  PI 2
+  !AIG 11
+    !PI 1
+    PI 6
+
+cir> cirg 17 -fani 5
+Error: Gate(17) not found!!
+Error: Illegal option!! (17)
+
+cir> cirg 18 -fani 5
+Error: Gate(18) not found!!
+Error: Illegal option!! (18)
+
+cir> cirg 21 -fani 5
+Error: Gate(21) not found!!
+Error: Illegal option!! (21)
+
+cir> cirg 22 -fani 5
+AIG 22
+  !AIG 10
+    PI 1
+    CONST 0
+  !AIG 16
+    PI 2
+    !AIG 11
+      !PI 1
+      PI 6
+
+cir> cirg 23 -fani 5
+AIG 23
+  !AIG 16
+    PI 2
+    !AIG 11
+      !PI 1
+      PI 6
+  !AIG 19
+    !UNDEF 15
+    PI 7
+
+cir> cirg 24 -fani 5
+PO 24
+  !AIG 22
+    !AIG 10
+      PI 1
+      CONST 0
+    !AIG 16
+      PI 2
+      !AIG 11
+        !PI 1
+        PI 6
+
+cir> cirg 9 -fani 0
+Error: Gate(9) not found!!
+Error: Illegal option!! (9)
+
+cir> cirg 9 -fani 1
+Error: Gate(9) not found!!
+Error: Illegal option!! (9)
+
+cir> cirg 9 -fani 2
+Error: Gate(9) not found!!
+Error: Illegal option!! (9)
+
+cir> cirg 9 -fani 3
+Error: Gate(9) not found!!
+Error: Illegal option!! (9)
+
+cir> cirg 9 -fani 4
+Error: Gate(9) not found!!
+Error: Illegal option!! (9)
+
+cir> cirw
+aag 23 4 0 2 6
+2
+4
+12
+14
+45
+47
+20 2 0
+22 3 12
+32 4 23
+44 21 33
+38 31 14
+46 33 39
+i0 1GAT
+i1 2GAT
+i2 6GAT
+i3 7GAT
+o0 22GAT$PO
+o1 23GAT$PO
+c
+AAG output by Chung-Yang (Ric) Huang
+
+cir> cirg 1 -fano 1
+PI 1
+  AIG 10
+  !AIG 11
+
+cir> cirg 1 -fano 2
+PI 1
+  AIG 10
+    !AIG 22
+  !AIG 11
+    !AIG 16
+
+cir> cirg 1 -fano 3
+PI 1
+  AIG 10
+    !AIG 22
+      !PO 24
+  !AIG 11
+    !AIG 16
+      !AIG 22
+      !AIG 23
+
+cir> cirg 1 -fano 4
+PI 1
+  AIG 10
+    !AIG 22
+      !PO 24
+  !AIG 11
+    !AIG 16
+      !AIG 22 (*)
+      !AIG 23
+        !PO 25
+
+cir> cirg 1 -fano 5
+PI 1
+  AIG 10
+    !AIG 22
+      !PO 24
+  !AIG 11
+    !AIG 16
+      !AIG 22 (*)
+      !AIG 23
+        !PO 25
+
+cir> cirg 0 -fano 1
+CONST 0
+  AIG 10
+
+cir> cirg 0 -fano 2
+CONST 0
+  AIG 10
+    !AIG 22
+
+cir> cirg 0 -fano 3
+CONST 0
+  AIG 10
+    !AIG 22
+      !PO 24
+
+cir> cirg 0 -fano 4
+CONST 0
+  AIG 10
+    !AIG 22
+      !PO 24
+
+cir> cirg 0 -fano 5
+CONST 0
+  AIG 10
+    !AIG 22
+      !PO 24
+
+cir> cirg 0 -fano 6
+CONST 0
+  AIG 10
+    !AIG 22
+      !PO 24
+
+cir> cirg 0 -fano 7
+CONST 0
+  AIG 10
+    !AIG 22
+      !PO 24
+
+cir> cirg 0 -fano 8
+CONST 0
+  AIG 10
+    !AIG 22
+      !PO 24
+
+cir> cirg 2 -fano 1
+PI 2
+  AIG 16
+
+cir> cirg 2 -fano 2
+PI 2
+  AIG 16
+    !AIG 22
+    !AIG 23
+
+cir> cirg 2 -fano 3
+PI 2
+  AIG 16
+    !AIG 22
+      !PO 24
+    !AIG 23
+      !PO 25
+
+cir> cirg 2 -fano 4
+PI 2
+  AIG 16
+    !AIG 22
+      !PO 24
+    !AIG 23
+      !PO 25
+
+cir> cirg 2 -fano 5
+PI 2
+  AIG 16
+    !AIG 22
+      !PO 24
+    !AIG 23
+      !PO 25
+
+cir> cirg 2 -fano 6
+PI 2
+  AIG 16
+    !AIG 22
+      !PO 24
+    !AIG 23
+      !PO 25
+
+cir> cirg 2 -fano 7
+PI 2
+  AIG 16
+    !AIG 22
+      !PO 24
+    !AIG 23
+      !PO 25
+
+cir> cirg 2 -fano 8
+PI 2
+  AIG 16
+    !AIG 22
+      !PO 24
+    !AIG 23
+      !PO 25
+
+cir> cirr opt01.aag -r
+Note: original circuit is replaced...
+
+cir> cirp
+
+Circuit Statistics
+==================
+  PI           1
+  PO           1
+  AIG          1
+------------------
+  Total        3
+
+cir> cirp -n
+
+[0] CONST0
+[1] PI  1
+[2] AIG 2 !0 1
+[3] PO  3 2
+
+cir> cirw
+aag 2 1 0 1 1
+2
+4
+4 1 2
+c
+AAG output by Chung-Yang (Ric) Huang
+
+cir> q -f
+
