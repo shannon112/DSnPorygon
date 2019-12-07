@@ -276,13 +276,14 @@ CirMgr::connect(){
       for (size_t i = 0; i<gateNow->getFaninLen(); ++i){
          unsigned gateInId = gateNow->getFaninId(i);
          GateMap::iterator gateInIter = _gateList.find(gateInId);
-         CirGate* gateIn = gateInIter->second;
          //connect known, erase used gate from _notuList
          if(gateInIter != _gateList.end()){
+            CirGate* gateIn = gateInIter->second;
             gateNow->setFanin(gateIn);
             gateIn->setFanout(gateNow); 
             gateIn->setFanoutInv(gateNow->getFaninInv(i)); 
             _notuList.erase(gateInId); 
+            if (gateIn->getTypeStr()=="UNDEF") _floList.insert(gateNow->getGateId());
          }
          //cannot find, floating
          else{

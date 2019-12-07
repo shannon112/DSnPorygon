@@ -1,55 +1,58 @@
-cir> cirr cirp-n.aag
+cir> cirr strash05.aag
 
 cir> cirp
 
 Circuit Statistics
 ==================
-  PI           4
+  PI           3
   PO           2
-  AIG          6
+  AIG          4
 ------------------
-  Total       12
+  Total        9
 
 cir> cirp -pi
-PIs of the circuit: 1 2 6 7
+PIs of the circuit: 1 2 3
 
 cir> cirp -po
-POs of the circuit: 24 25
+POs of the circuit: 9 10
 
 cir> cirp -flo
-Gates with floating fanin(s): 19
+Gates with floating fanin(s): 4 5
+Gates defined but not used  : 3
 
 cir> cirg 1
 ==================================================
-= PI(1)"1GAT", line 2                            =
+= PI(1), line 2                                  =
 ==================================================
 
 cir> cirg 2
 ==================================================
-= PI(2)"2GAT", line 3                            =
+= PI(2), line 3                                  =
 ==================================================
 
 cir> cirg 3
-Error: Gate(3) not found!!
-Error: Illegal option!! (3)
+==================================================
+= PI(3), line 4                                  =
+==================================================
 
 cir> cirg 4
-Error: Gate(4) not found!!
-Error: Illegal option!! (4)
+==================================================
+= AIG(4), line 7                                 =
+==================================================
 
 cir> cirg 5
-Error: Gate(5) not found!!
-Error: Illegal option!! (5)
+==================================================
+= AIG(5), line 8                                 =
+==================================================
 
 cir> cirg 10
 ==================================================
-= AIG(10), line 8                                =
+= PO(10), line 6                                 =
 ==================================================
 
 cir> cirg 11
-==================================================
-= AIG(11), line 9                                =
-==================================================
+Error: Gate(11) not found!!
+Error: Illegal option!! (11)
 
 cir> cirg 12
 Error: Gate(12) not found!!
@@ -68,9 +71,8 @@ Error: Gate(21) not found!!
 Error: Illegal option!! (21)
 
 cir> cirg 22
-==================================================
-= AIG(22), line 11                               =
-==================================================
+Error: Gate(22) not found!!
+Error: Illegal option!! (22)
 
 cir> cirg 0
 ==================================================
@@ -79,52 +81,50 @@ cir> cirg 0
 
 cir> cirp -n
 
-[0] PI  1 (1GAT)
-[1] CONST0
-[2] AIG 10 1 0
-[3] PI  2 (2GAT)
-[4] PI  6 (6GAT)
-[5] AIG 11 !1 6
-[6] AIG 16 2 !11
-[7] AIG 22 !10 !16
-[8] PO  24 !22 (22GAT$PO)
-[9] PI  7 (7GAT)
-[10] AIG 19 *!15 7
-[11] AIG 23 !16 !19
-[12] PO  25 !23 (23GAT$PO)
+[0] PI  1
+[1] AIG 4 1 *8
+[2] PI  2
+[3] AIG 6 4 2
+[4] PO  9 6
+[5] AIG 5 *8 1
+[6] AIG 7 2 5
+[7] PO  10 7
 
 cir> cirg 3 -fani 0
-Error: Gate(3) not found!!
-Error: Illegal option!! (3)
+PI 3
 
 cir> cirg 3 -fani 1
-Error: Gate(3) not found!!
-Error: Illegal option!! (3)
+PI 3
 
 cir> cirg 3 -fani 2
-Error: Gate(3) not found!!
-Error: Illegal option!! (3)
+PI 3
 
 cir> cirg 5 -fani 5
-Error: Gate(5) not found!!
-Error: Illegal option!! (5)
+AIG 5
+  UNDEF 8
+  PI 1
 
 cir> cirg 7 -fani 5
-PI 7
+AIG 7
+  PI 2
+  AIG 5
+    UNDEF 8
+    PI 1
 
 cir> cirg 8 -fani 5
-Error: Gate(8) not found!!
-Error: Illegal option!! (8)
+UNDEF 8
 
 cir> cirg 10 -fani 5
-AIG 10
-  PI 1
-  CONST 0
+PO 10
+  AIG 7
+    PI 2
+    AIG 5
+      UNDEF 8
+      PI 1
 
 cir> cirg 11 -fani 5
-AIG 11
-  !PI 1
-  PI 6
+Error: Gate(11) not found!!
+Error: Illegal option!! (11)
 
 cir> cirg 12 -fani 5
 Error: Gate(12) not found!!
@@ -139,14 +139,12 @@ Error: Gate(14) not found!!
 Error: Illegal option!! (14)
 
 cir> cirg 15 -fani 5
-UNDEF 15
+Error: Gate(15) not found!!
+Error: Illegal option!! (15)
 
 cir> cirg 16 -fani 5
-AIG 16
-  PI 2
-  !AIG 11
-    !PI 1
-    PI 6
+Error: Gate(16) not found!!
+Error: Illegal option!! (16)
 
 cir> cirg 17 -fani 5
 Error: Gate(17) not found!!
@@ -161,228 +159,176 @@ Error: Gate(21) not found!!
 Error: Illegal option!! (21)
 
 cir> cirg 22 -fani 5
-AIG 22
-  !AIG 10
-    PI 1
-    CONST 0
-  !AIG 16
-    PI 2
-    !AIG 11
-      !PI 1
-      PI 6
+Error: Gate(22) not found!!
+Error: Illegal option!! (22)
 
 cir> cirg 23 -fani 5
-AIG 23
-  !AIG 16
-    PI 2
-    !AIG 11
-      !PI 1
-      PI 6
-  !AIG 19
-    !UNDEF 15
-    PI 7
+Error: Gate(23) not found!!
+Error: Illegal option!! (23)
 
 cir> cirg 24 -fani 5
-PO 24
-  !AIG 22
-    !AIG 10
-      PI 1
-      CONST 0
-    !AIG 16
-      PI 2
-      !AIG 11
-        !PI 1
-        PI 6
+Error: Gate(24) not found!!
+Error: Illegal option!! (24)
 
 cir> cirg 9 -fani 0
-Error: Gate(9) not found!!
-Error: Illegal option!! (9)
+PO 9
 
 cir> cirg 9 -fani 1
-Error: Gate(9) not found!!
-Error: Illegal option!! (9)
+PO 9
+  AIG 6
 
 cir> cirg 9 -fani 2
-Error: Gate(9) not found!!
-Error: Illegal option!! (9)
+PO 9
+  AIG 6
+    AIG 4
+    PI 2
 
 cir> cirg 9 -fani 3
-Error: Gate(9) not found!!
-Error: Illegal option!! (9)
+PO 9
+  AIG 6
+    AIG 4
+      PI 1
+      UNDEF 8
+    PI 2
 
 cir> cirg 9 -fani 4
-Error: Gate(9) not found!!
-Error: Illegal option!! (9)
+PO 9
+  AIG 6
+    AIG 4
+      PI 1
+      UNDEF 8
+    PI 2
 
 cir> cirw
-aag 23 4 0 2 6
+aag 8 3 0 2 4
 2
 4
+6
 12
 14
-45
-47
-20 2 0
-22 3 12
-32 4 23
-44 21 33
-38 31 14
-46 33 39
-i0 1GAT
-i1 2GAT
-i2 6GAT
-i3 7GAT
-o0 22GAT$PO
-o1 23GAT$PO
+8 2 16
+12 8 4
+10 16 2
+14 4 10
 c
 AAG output by Shang-Lun (Shannon) Lee
 
 cir> cirg 1 -fano 1
 PI 1
-  AIG 10
-  !AIG 11
+  AIG 4
+  AIG 5
 
 cir> cirg 1 -fano 2
 PI 1
-  AIG 10
-    !AIG 22
-  !AIG 11
-    !AIG 16
+  AIG 4
+    AIG 6
+  AIG 5
+    AIG 7
 
 cir> cirg 1 -fano 3
 PI 1
-  AIG 10
-    !AIG 22
-      !PO 24
-  !AIG 11
-    !AIG 16
-      !AIG 22
-      !AIG 23
+  AIG 4
+    AIG 6
+      PO 9
+  AIG 5
+    AIG 7
+      PO 10
 
 cir> cirg 1 -fano 4
 PI 1
-  AIG 10
-    !AIG 22
-      !PO 24
-  !AIG 11
-    !AIG 16
-      !AIG 22 (*)
-      !AIG 23
-        !PO 25
+  AIG 4
+    AIG 6
+      PO 9
+  AIG 5
+    AIG 7
+      PO 10
 
 cir> cirg 1 -fano 5
 PI 1
-  AIG 10
-    !AIG 22
-      !PO 24
-  !AIG 11
-    !AIG 16
-      !AIG 22 (*)
-      !AIG 23
-        !PO 25
+  AIG 4
+    AIG 6
+      PO 9
+  AIG 5
+    AIG 7
+      PO 10
 
 cir> cirg 0 -fano 1
 CONST 0
-  AIG 10
 
 cir> cirg 0 -fano 2
 CONST 0
-  AIG 10
-    !AIG 22
 
 cir> cirg 0 -fano 3
 CONST 0
-  AIG 10
-    !AIG 22
-      !PO 24
 
 cir> cirg 0 -fano 4
 CONST 0
-  AIG 10
-    !AIG 22
-      !PO 24
 
 cir> cirg 0 -fano 5
 CONST 0
-  AIG 10
-    !AIG 22
-      !PO 24
 
 cir> cirg 0 -fano 6
 CONST 0
-  AIG 10
-    !AIG 22
-      !PO 24
 
 cir> cirg 0 -fano 7
 CONST 0
-  AIG 10
-    !AIG 22
-      !PO 24
 
 cir> cirg 0 -fano 8
 CONST 0
-  AIG 10
-    !AIG 22
-      !PO 24
 
 cir> cirg 2 -fano 1
 PI 2
-  AIG 16
+  AIG 6
+  AIG 7
 
 cir> cirg 2 -fano 2
 PI 2
-  AIG 16
-    !AIG 22
-    !AIG 23
+  AIG 6
+    PO 9
+  AIG 7
+    PO 10
 
 cir> cirg 2 -fano 3
 PI 2
-  AIG 16
-    !AIG 22
-      !PO 24
-    !AIG 23
-      !PO 25
+  AIG 6
+    PO 9
+  AIG 7
+    PO 10
 
 cir> cirg 2 -fano 4
 PI 2
-  AIG 16
-    !AIG 22
-      !PO 24
-    !AIG 23
-      !PO 25
+  AIG 6
+    PO 9
+  AIG 7
+    PO 10
 
 cir> cirg 2 -fano 5
 PI 2
-  AIG 16
-    !AIG 22
-      !PO 24
-    !AIG 23
-      !PO 25
+  AIG 6
+    PO 9
+  AIG 7
+    PO 10
 
 cir> cirg 2 -fano 6
 PI 2
-  AIG 16
-    !AIG 22
-      !PO 24
-    !AIG 23
-      !PO 25
+  AIG 6
+    PO 9
+  AIG 7
+    PO 10
 
 cir> cirg 2 -fano 7
 PI 2
-  AIG 16
-    !AIG 22
-      !PO 24
-    !AIG 23
-      !PO 25
+  AIG 6
+    PO 9
+  AIG 7
+    PO 10
 
 cir> cirg 2 -fano 8
 PI 2
-  AIG 16
-    !AIG 22
-      !PO 24
-    !AIG 23
-      !PO 25
+  AIG 6
+    PO 9
+  AIG 7
+    PO 10
 
 cir> cirr opt01.aag -r
 Note: original circuit is replaced...
