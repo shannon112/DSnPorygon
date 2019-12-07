@@ -1,4 +1,4 @@
-# HW6 And-Inverter Graph with AIGER Format (.agg reader)
+# HW6 And-Inverter Graph with AIGER Format (.aag reader)
 
 ## 1. Promblem Description
 We are going to implement a special circuit representation, called “AIG” (And-Inverter Graph), from a circuit description file. The generated executable has the following usage:
@@ -201,12 +201,19 @@ CONST 0
       AIG 9
       AIG 10
 ```
-Compare to reference program
+Compare to reference program individually
 ```
 cd tests.fraig
-../ref/cirTest-ref -f do1 > log1_ref.txt 2>&1
-../cirTest -f do1 > log1.txt 2>&1
-diff log1.txt log1_ref.txt
+../ref/cirTest-ref -f do1 > log_ref.txt 2>&1
+../cirTest -f do1 > log.txt 2>&1
+diff log.txt log_ref.txt
+```
+Compare to all circuit with reference program automatically
+```
+cd tests.fraig
+bash autoTest.sh
+cd tests.fraig/ISCAS85
+bash autoTest.sh
 ```
 SelfCheck of homework upload
 ```
