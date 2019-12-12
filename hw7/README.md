@@ -7,7 +7,7 @@ taskMgr [-File <dofile>]
 ```
 Other than the commands in Homework #3#4, we will support these new commands:
 ```sh
-#TASKInit: Initialize task manager
+#TASKInit: Initialize task manager, numMachines is not a limitation, but a pre-assigned memory
 TASKInit <(size_t numMachines)>
 
 #TASKNew: Add new task nodes
