@@ -99,7 +99,7 @@ public:
 
    // return true if removed successfully (i.e. d is in the hash)
    // return fasle otherwise (i.e. nothing is removed)
-   bool remove(const Data& d) { return false; }
+   bool remove(const Data& d) { return true; }
 
 private:
    // Do not add any extra data member

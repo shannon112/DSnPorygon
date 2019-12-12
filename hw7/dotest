@@ -1,0 +1,12 @@
+taski 10
+taskn -n aaa 100
+taskn -n bbb 200
+taskn -n ccc 60
+taskn -n cc 10
+taskn -n c 30
+taskn -n cccc 40
+taskq -he
+taskr -r 2
+taskq -he
+taskn -r 10
+taskq -he
