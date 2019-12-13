@@ -1,0 +1,74 @@
+task> taski 10
+Task manager is initialized (10)
+
+task> taskn -n aaa 100
+Task node inserted: (aaa, 100)
+
+task> taskn -n bbb 200
+Task node inserted: (bbb, 200)
+
+task> taskn -n ccc 60
+Task node inserted: (ccc, 60)
+
+task> taskn -n cc 10
+Task node inserted: (cc, 10)
+
+task> taskn -n c 30
+Task node inserted: (c, 30)
+
+task> taskn -n cccc 40
+Task node inserted: (cccc, 40)
+
+task> taskq -he
+(cc, 10)
+(c, 30)
+(cccc, 40)
+(bbb, 200)
+(ccc, 60)
+(aaa, 100)
+Number of tasks: 6
+
+task> taskr -r 2
+Task node removed: (aaa, 100)
+Task node removed: (c, 30)
+... 2 task nodes are removed.
+
+task> taskq -he
+(cc, 10)
+(ccc, 60)
+(cccc, 40)
+(bbb, 200)
+Number of tasks: 4
+
+task> taskn -r 10
+Task node inserted: (uuxfit, 5555)
+Task node inserted: (omqjny, 18323)
+Task node inserted: (qsdpag, 2744)
+Task node inserted: (uekdcz, 4365)
+Task node inserted: (nvphqn, 9871)
+Task node inserted: (zhunuk, 17830)
+Task node inserted: (hjvxby, 10519)
+Task node inserted: (cerxjb, 400)
+Task node inserted: (lbgzxw, 5333)
+Task node inserted: (ojtnrn, 785)
+... 10 new task nodes are added.
+
+task> taskq -he
+(cc, 10)
+(ccc, 60)
+(cccc, 40)
+(bbb, 200)
+(uuxfit, 5555)
+(cerxjb, 400)
+(ojtnrn, 785)
+(uekdcz, 4365)
+(nvphqn, 9871)
+(zhunuk, 17830)
+(hjvxby, 10519)
+(omqjny, 18323)
+(lbgzxw, 5333)
+(qsdpag, 2744)
+Number of tasks: 14
+
+task> 
+task> 
