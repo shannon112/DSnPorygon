@@ -51,6 +51,13 @@ make cleanall
 ```
 
 ## 4. Testing
+Compare to reference program individually
+```
+cd dofiles
+../ref/taskMgr-ref -f do1 > log_ref.txt 2>&1
+../taskMgr -f do1 > log.txt 2>&1
+diff log.txt log_ref.txt
+```
 SelfCheck of homework upload
 ```
 mkdir r07921001_hw7
