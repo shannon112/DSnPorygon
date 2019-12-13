@@ -88,9 +88,11 @@ TaskMgr::add(size_t nMachines)
    // TODO...
    for (size_t i = 0, n = nMachines; i < n; ++i) {
       TaskNode node = TaskNode();
-      assert(_taskHash.insert(node));
-      _taskHeap.insert(node);
-      cout <<"Task node inserted: ("<<node.getName()<<", "<<node.getLoad()<<")"<<endl;
+      if(_taskHash.insert(node)){
+         _taskHeap.insert(node);
+         cout <<"Task node inserted: ("<<node.getName()<<", "<<node.getLoad()<<")"<<endl;
+      }
+      else --i;
    }
 }
 
@@ -119,6 +121,10 @@ bool
 TaskMgr::assign(size_t l)
 {
    // TODO...
+   if(!_taskHeap.size()) return false;
+   _taskHeap[0]+=l;
+   _taskHash.update(_taskHeap[0]);
+   _taskHeap.MinHeapify(0);
    return true;
 }
 

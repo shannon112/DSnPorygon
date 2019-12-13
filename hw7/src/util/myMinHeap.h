@@ -34,7 +34,7 @@ public:
       _data.push_back(d); 
       size_t now_idx = size()-1;
       while (now_idx>0){
-         size_t parant_idx = now_idx/2;
+         size_t parant_idx = (now_idx-1)/2;
          if (d.getLoad()>=_data[parant_idx].getLoad()) break;
          _data[now_idx] = _data[parant_idx];
          now_idx = parant_idx;
