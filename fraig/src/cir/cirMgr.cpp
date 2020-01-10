@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <cstdio>
+#include <cstdlib>
 #include <ctype.h>
 #include <cassert>
 #include <cstring>
@@ -20,6 +21,7 @@
 using namespace std;
 
 // TODO: Implement memeber functions for class CirMgr
+// ref to b04901036_hw6
 
 /*******************************/
 /*   Global variable and enum  */
@@ -152,6 +154,116 @@ parseError(CirParseError err)
 bool
 CirMgr::readCircuit(const string& fileName)
 {
+   string format;
+   ifstream input(fileName.c_str());
+   if(!input.is_open())//remember to close when error handling!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   {
+       cerr << "Cannot open design \"" << fileName << "\"!!" << endl;
+       return false;
+   }
+   input >> format;
+   input >> M;
+   input >> I;
+   input >> L;
+   input >> O;
+   input >> A;
+   input.ignore(1024,'\n');
+
+   _gates.resize(M+O+1);
+
+   _gates[0] = new PIGate(PI_GATE, 0, 0);
+   lineNo = 2;
+
+   int Idx;
+   _PIs.resize(I);
+   vector <int> PIline(I);
+   for(int i=0; i<I; ++i)
+   {
+       input.getline(buf, 1024);
+       Idx = atoi(buf)/2;
+       _gates[Idx] = new PIGate(PI_GATE, lineNo, Idx);
+       _PIs[i] = Idx;
+       PIline[i] = Idx;
+       ++lineNo;
+   }
+   //ignored latches
+   int input1, input2;
+   _POs.resize(O);
+   vector <int> POline(O);
+   for(int i=0, Idx = M+1; i<O; ++i, ++Idx)
+   {
+       input.getline(buf, 1024);
+       input1 = atoi(buf);
+       _gates[Idx] = new POGate(PO_GATE, lineNo, Idx, input1);
+       _POs[i] = Idx;
+       POline[i] = Idx;
+       ++lineNo;
+   }
+   for(int i=0; i<A; ++i)
+   {
+       input.getline(buf, 1024);
+       char *tok = strtok(buf, " \n");
+       Idx = atoi(tok)/2;
+       tok = strtok(NULL, " \n");
+       input1 = atoi(tok);
+       tok = strtok(NULL, " \n");
+       input2 = atoi(tok);
+       _gates[Idx] = new AIGGate(AIG_GATE, lineNo, Idx, input1, input2);
+       ++lineNo;
+   }
+   while(input.getline(buf, 1024))
+   {
+       if(buf[0]=='c')
+           break;
+       else if(buf[0]=='i')
+       {
+           char* tok = strtok(buf, "i \n");
+           int l = atoi(tok);
+           tok = strtok(NULL, " \n");
+           static_cast<PIGate*>(_gates[PIline[l]])->getSymbol() = tok;
+       }
+       //ignore latches once more
+       else if(buf[0]=='o')
+       {
+           char* tok = strtok(buf, "o \n");
+           int l = atoi(tok);
+           tok = strtok(NULL, " \n");
+           static_cast<POGate*>(_gates[POline[l]])->getSymbol() = tok;
+       }
+   }
+
+   input.close();
+
+   for(size_t i=0; i<_gates.size(); ++i)
+   {
+       if(_gates[i]!=NULL)
+       {
+           switch(_gates[i]->getType())
+           {
+           case AIG_GATE:
+               static_cast<AIGGate*>(_gates[i])->linkInputs();
+               break;
+           case PO_GATE:
+               static_cast<POGate*>(_gates[i])->linkInputs();
+               break;
+           default:
+               ;
+           }
+       }
+   }
+
+   for(size_t i=1; i<M+1; ++i)
+   {
+       if(_gates[i]!=NULL)
+       {
+           if( _gates[i]->getFanouts().empty() )
+               _Unused_gates.push_back(i);
+       }
+   }
+
+   sort(_Undef_gates.begin(), _Undef_gates.end());
+   sort(_Unused_gates.begin(), _Unused_gates.end());
+
    return true;
 }
 
@@ -170,24 +282,49 @@ Circuit Statistics
 void
 CirMgr::printSummary() const
 {
+    cout << "\nCircuit Statistics\n==================\n";
+    cout << "  PI " << setw(11) << right << I << endl;
+    cout << "  PO " << setw(11) << right << O << endl;
+    cout << "  AIG" << setw(11) << right << A << endl;
+    cout << "------------------\n  Total";
+    cout << setw(9) << right << I+O+A << endl;
 }
 
 void
 CirMgr::printNetlist() const
 {
-/*
-   cout << endl;
-   for (unsigned i = 0, n = _dfsList.size(); i < n; ++i) {
-      cout << "[" << i << "] ";
-      _dfsList[i]->printGate();
-   }
-*/
+    queue<unsigned int> dfs_print, reset;
+    int print_line = 0;
+
+    cout << endl;
+    for(size_t i=0; i<_POs.size(); ++i)
+    {
+        _gates[_POs[i]]->setMarked();
+        _gates[_POs[i]]->DFS(dfs_print);
+        while(!dfs_print.empty())
+        {
+            cout << "[" << print_line << "] ";
+            _gates[dfs_print.front()]->printGate();
+            ++print_line;
+            reset.push(dfs_print.front());
+            dfs_print.pop();
+        }
+    }
+    while(!reset.empty())
+    {
+        _gates[reset.front()]->resetMarked();
+        reset.pop();
+    }
 }
 
 void
 CirMgr::printPIs() const
 {
    cout << "PIs of the circuit:";
+   for(size_t i=0; i<_PIs.size(); ++i)
+   {
+       cout << ' ' << _PIs[i];
+   }
    cout << endl;
 }
 
@@ -195,12 +332,35 @@ void
 CirMgr::printPOs() const
 {
    cout << "POs of the circuit:";
+   for(size_t i=0; i<_POs.size(); ++i)
+   {
+       cout << ' ' << _POs[i];
+   }
    cout << endl;
 }
 
 void
 CirMgr::printFloatGates() const
 {
+   if(!_Undef_gates.empty())
+   {
+       cout << "Gates with floating fanin(s):";
+       for(size_t i=0; i<_Undef_gates.size(); ++i)
+       {
+           cout << ' ' << _Undef_gates[i];
+       }
+       cout << endl;
+   }
+
+   if(!_Unused_gates.empty())
+   {
+       cout << "Gates defined but not used  :";
+       for(size_t i=0; i<_Unused_gates.size(); ++i)
+       {
+           cout << ' ' << _Unused_gates[i];
+       }
+       cout << endl;
+   }
 }
 
 void
@@ -211,10 +371,61 @@ CirMgr::printFECPairs() const
 void
 CirMgr::writeAag(ostream& outfile) const
 {
+    queue<unsigned int> dfs_part, dfs_complete, reset;
+    for(size_t i=0; i<_POs.size(); ++i)
+    {
+        _gates[_POs[i]]->setMarked();
+        _gates[_POs[i]]->DFS(dfs_part);
+        while(!dfs_part.empty())
+        {
+            if(_gates[dfs_part.front()]->getType()==AIG_GATE)
+            {
+                dfs_complete.push(dfs_part.front());
+            }
+            reset.push(dfs_part.front());
+            dfs_part.pop();
+        }
+    }
+    while(!reset.empty())
+    {
+        _gates[reset.front()]->resetMarked();
+        reset.pop();
+    }
+
+    outfile << "aag " << M << ' ' << I << ' ' << L << ' ' << O << ' ' << dfs_complete.size() << '\n';
+    for(size_t i =0; i<_PIs.size(); ++i)
+    {
+        outfile << (_gates[_PIs[i]]->getGateID())*2 << '\n';
+    }
+    for(size_t i =0; i<_POs.size(); ++i)
+    {
+        outfile << _gates[_POs[i]]->getFanins()[0] << '\n';
+    }
+    CirGate* tmp_cir;
+    while(!dfs_complete.empty())
+    {
+        tmp_cir =  _gates[dfs_complete.front()];
+        outfile << (tmp_cir->getGateID())*2 << ' ' << tmp_cir->getFanins()[0] << ' ' << tmp_cir->getFanins()[1] << '\n';
+        dfs_complete.pop();
+    }
+    PIGate* tmp_PI;
+    for(size_t i =0; i<_PIs.size(); ++i)
+    {
+        tmp_PI = static_cast<PIGate*>(_gates[_PIs[i]]);
+        if(!tmp_PI->getSymbol().empty())
+            outfile << 'i' << i << ' ' << tmp_PI->getSymbol() << '\n';
+    }
+    POGate* tmp_PO;
+    for(size_t i =0; i<_POs.size(); ++i)
+    {
+        tmp_PO = static_cast<POGate*>(_gates[_POs[i]]);
+        if(!tmp_PO->getSymbol().empty())
+            outfile << 'o' << i << ' ' << tmp_PO->getSymbol() << '\n';
+    }
+    outfile << "c\nGJMI\n";
 }
 
 void
 CirMgr::writeGate(ostream& outfile, CirGate *g) const
 {
 }
-

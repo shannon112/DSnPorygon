@@ -13,12 +13,15 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <queue>
 
 using namespace std;
 
-// TODO: Feel free to define your own classes, variables, or functions.
-
 #include "cirDef.h"
+#include "cirGate.h"
+
+// TODO: Feel free to define your own classes, variables, or functions.
+// ref to b04901036_hw6
 
 extern CirMgr *cirMgr;
 
@@ -26,11 +29,19 @@ class CirMgr
 {
 public:
    CirMgr() {}
-   ~CirMgr() {} 
+   ~CirMgr() {
+       for(size_t i=0; i<_gates.size(); ++i)
+       {
+           if(_gates[i]!=NULL)
+               delete _gates[i];
+       }
+   } 
 
    // Access functions
    // return '0' if "gid" corresponds to an undefined gate.
-   CirGate* getGate(unsigned gid) const { return 0; }
+   CirGate* getGate(unsigned gid) const { return _gates[gid]; }
+   IdList& getUndef() { return _Undef_gates; }
+   IdList& getUnused() { return _Unused_gates; }
 
    // Member functions about circuit construction
    bool readCircuit(const string&);
@@ -61,7 +72,12 @@ public:
 
 private:
    ofstream           *_simLog;
-
+   GateList _gates;
+   IdList _PIs;
+   IdList _POs;
+   IdList _Undef_gates;
+   IdList _Unused_gates;
+   int M, I, L, O, A;
 };
 
 #endif // CIR_MGR_H
