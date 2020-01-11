@@ -10,6 +10,50 @@ Circuit Statistics
 ------------------
   Total       10
 
+fraig> cirg 11 -fani 4
+PO 11
+  AIG 4
+    PI 2
+    PI 3
+
+fraig> cirg 2 -fano 4
+PI 2
+  AIG 4
+    AIG 8
+      AIG 9
+      AIG 10
+    PO 11
+  AIG 5
+    AIG 7
+      AIG 9
+      AIG 10
+    AIG 8 (*)
+
+fraig> cirg 8 -fani 4
+AIG 8
+  AIG 5
+    !PI 1
+    PI 2
+  AIG 4
+    PI 2
+    PI 3
+
+fraig> cirg 1 -fano 4
+PI 1
+  !AIG 5
+    AIG 7
+      AIG 9
+      AIG 10
+    AIG 8
+      AIG 9
+      AIG 10
+
+fraig> cirg 6 -fano 4
+UNDEF 6
+  AIG 7
+    AIG 9
+    AIG 10
+
 fraig> cirsw
 Sweeping: AIG(5) removed...
 Sweeping: UNDEF(6) removed...

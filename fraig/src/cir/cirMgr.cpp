@@ -8,9 +8,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include <algorithm>
 #include <cstdio>
-#include <cstdlib>
 #include <ctype.h>
 #include <cassert>
 #include <cstring>
@@ -21,7 +19,6 @@
 using namespace std;
 
 // TODO: Implement memeber functions for class CirMgr
-// A part of functions in this file is ref to b04901036_hw6
 
 /*******************************/
 /*   Global variable and enum  */
@@ -54,9 +51,10 @@ enum CirParseError {
 /**************************************/
 /*   Static varaibles and functions   */
 /**************************************/
+unsigned visitedBase = 0;
 static unsigned lineNo = 0;  // in printint, lineNo needs to ++
 static unsigned colNo  = 0;  // in printing, colNo needs to ++
-static char buf[1024];
+//static char buf[1024];
 static string errMsg;
 static int errInt;
 static CirGate *errGate;
@@ -133,7 +131,7 @@ parseError(CirParseError err)
          break;
       case REDEF_CONST:
          cerr << "[ERROR] Line " << lineNo+1 << ", Col " << colNo+1
-              << ": Cannot redefine const (" << errInt << ")!!" << endl;
+              << ": Cannot redefine constant (" << errInt << ")!!" << endl;
          break;
       case NUM_TOO_SMALL:
          cerr << "[ERROR] Line " << lineNo+1 << ": " << errMsg
@@ -154,176 +152,205 @@ parseError(CirParseError err)
 bool
 CirMgr::readCircuit(const string& fileName)
 {
-   string format;
-   ifstream input(fileName.c_str());
-   if(!input.is_open())//remember to close when error handling!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-   {
-       cerr << "Cannot open design \"" << fileName << "\"!!" << endl;
-       return false;
+   fstream fin;
+   fin.open(fileName,ios::in); 
+   if (!fin){
+      cerr<<"Cannot open design \""<<fileName<<"\"!!"<<endl;
+      return false;
    }
-   input >> format;
-   input >> M;
-   input >> I;
-   input >> L;
-   input >> O;
-   input >> A;
-   input.ignore(1024,'\n');
-
-   _gates.resize(M+O+1);
-
-   _gates[0] = new PIGate(PI_GATE, 0, 0);
-   lineNo = 2;
-
-   int Idx;
-   _PIs.resize(I);
-   vector <int> PIline(I);
-   for(int i=0; i<I; ++i)
-   {
-       input.getline(buf, 1024);
-       Idx = atoi(buf)/2;
-       _gates[Idx] = new PIGate(PI_GATE, lineNo, Idx);
-       _PIs[i] = Idx;
-       PIline[i] = Idx;
-       ++lineNo;
+   if (!readHeader(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
    }
-   //ignored latches
-   int input1, input2;
-   _POs.resize(O);
-   vector <int> POline(O);
-   for(int i=0, Idx = M+1; i<O; ++i, ++Idx)
-   {
-       input.getline(buf, 1024);
-       input1 = atoi(buf);
-       _gates[Idx] = new POGate(PO_GATE, lineNo, Idx, input1);
-       _POs[i] = Idx;
-       POline[i] = Idx;
-       ++lineNo;
+   if (!readInput(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
    }
-   for(int i=0; i<A; ++i)
-   {
-       input.getline(buf, 1024);
-       char *tok = strtok(buf, " \n");
-       Idx = atoi(tok)/2;
-       tok = strtok(NULL, " \n");
-       input1 = atoi(tok);
-       tok = strtok(NULL, " \n");
-       input2 = atoi(tok);
-       _gates[Idx] = new AIGGate(AIG_GATE, lineNo, Idx, input1, input2);
-       ++lineNo;
+   if (_LA){ //assume no latch is defined
+      parseError(ILLEGAL_SYMBOL_NAME);
    }
-   while(input.getline(buf, 1024))
-   {
-       if(buf[0]=='c')
-           break;
-       else if(buf[0]=='i')
-       {
-           char* tok = strtok(buf, "i \n");
-           int l = atoi(tok);
-           tok = strtok(NULL, " \n");
-           static_cast<PIGate*>(_gates[PIline[l]])->getSymbol() = tok;
-       }
-       //ignore latches once more
-       else if(buf[0]=='o')
-       {
-           char* tok = strtok(buf, "o \n");
-           int l = atoi(tok);
-           tok = strtok(NULL, " \n");
-           static_cast<POGate*>(_gates[POline[l]])->getSymbol() = tok;
-       }
+   if (!readOutput(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
    }
-
-   input.close();
-
-   for(size_t i=0; i<_gates.size(); ++i)
-   {
-       if(_gates[i]!=NULL)
-       {
-           switch(_gates[i]->getType())
-           {
-           case AIG_GATE:
-               static_cast<AIGGate*>(_gates[i])->linkInputs();
-               break;
-           case PO_GATE:
-               static_cast<POGate*>(_gates[i])->linkInputs();
-               break;
-           default:
-               ;
-           }
-       }
+   if (!readAIGs(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
    }
-
-   for(size_t i=1; i<M+1; ++i)
-   {
-       if(_gates[i]!=NULL)
-       {
-           if( _gates[i]->getFanouts().empty() )
-               _Unused_gates.push_back(i);
-       }
+   if (!readSymbols(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
    }
-
-   sort(_Undef_gates.begin(), _Undef_gates.end());
-   sort(_Unused_gates.begin(), _Unused_gates.end());
-
+   if (!readComments(fin)){
+      parseError(ILLEGAL_SYMBOL_NAME);
+   }
+   connect();
    return true;
+}
+
+bool
+CirMgr::readHeader(fstream& fin){
+   string temp;
+   //start at lineNo 0;
+   if(fin>>temp>> _MaxVaIdx >> _PI >> _LA >> _PO >> _AIG ) return true;
+   else return false;
+}
+
+bool
+CirMgr::readInput(fstream& fin){
+   unsigned temp;
+   for(size_t i=0; i<_PI; ++i){
+      //start at line 1;
+      if (fin>>temp){
+         CirGate* pi = new CirPiGate(temp/2, ++lineNo,"PI");
+
+         //put into Mgr storage
+         _piList.push_back(pi);
+         _gateList.insert(GatePair(temp/2,pi));
+         _notuList.insert(temp/2);
+      }
+   }
+   CirGate* const0 = new CirPiGate(0, 0,"CONST");
+   _gateList.insert(GatePair(0, const0));
+   return true;
+}
+
+bool
+CirMgr::readOutput(fstream& fin){
+   unsigned temp;
+   for(size_t i=0; i<_PO; ++i){
+      if (fin>>temp){
+         CirGate* po = new CirPoGate(_MaxVaIdx+i+1, ++lineNo,"PO");
+         po->setFaninId(temp/2);
+         po->setFaninInv(temp%2);
+
+         //put into Mgr storage
+         _poList.push_back(po);
+         _gateList.insert(GatePair(_MaxVaIdx+i+1, po));
+      }
+   }
+   return true;
+}
+
+bool
+CirMgr::readAIGs(fstream& fin){
+   unsigned gate,fanin0, fanin1;
+   for(size_t i=0; i<_AIG; ++i){
+      if (fin>>gate>>fanin0>>fanin1){
+         CirGate* aig = new CirAigGate(gate/2, ++lineNo,"AIG");
+         aig->setFaninId(fanin0/2);
+         aig->setFaninInv(fanin0%2);
+         aig->setFaninId(fanin1/2);
+         aig->setFaninInv(fanin1%2);
+
+         //put into Mgr storage
+         _gateList.insert(GatePair(gate/2, aig));
+         _notuList.insert(gate/2);
+      }
+   }
+   return true;
+}
+
+bool
+CirMgr::readSymbols(fstream& fin){
+   string gateid,name;
+   while (fin>>gateid>>name){
+      if(gateid=="c") break;
+      if(gateid.substr(0,1)=="i"){
+         _piList[stoi(gateid.substr(1))]->setSymbolName(name);
+      } 
+      else if(gateid.substr(0,1)=="o"){
+         _poList[stoi(gateid.substr(1))]->setSymbolName(name);
+      }
+   }
+   return true;
+}
+
+bool
+CirMgr::readComments(fstream& fin){
+   return true;
+}
+
+void
+CirMgr::connect(){
+   //traversal gates
+   GateMap::iterator iter = _gateList.begin();
+   for (; iter != _gateList.end(); ++iter){
+      CirGate* gateNow = iter->second;
+      //traversal fanins to gate
+      for (size_t i = 0; i<gateNow->getFaninLen(); ++i){
+         unsigned gateInId = gateNow->getFaninId(i);
+         GateMap::iterator gateInIter = _gateList.find(gateInId);
+         //connect known, erase used gate from _notuList
+         if(gateInIter != _gateList.end()){
+            //set its fanin
+            CirGate* gateIn = gateInIter->second;
+            gateNow->setFanin(gateIn);
+            //set its fanin's fanout
+            gateIn->setFanout(gateNow); 
+            gateIn->setFanoutInv(gateNow->getFaninInv(i)); 
+            _notuList.erase(gateInId); 
+            if (gateIn->getTypeStr()=="UNDEF") _floList.insert(gateNow->getGateId());
+         }
+         //cannot find, floating
+         else{
+            _floList.insert(gateNow->getGateId()); 
+            //set its fanin
+            CirGate* pi = new CirPiGate(gateInId, 0, "UNDEF");
+            gateNow->setFanin(pi);
+            //set its fanin's fanout
+            pi->setFanout(gateNow); 
+            pi->setFanoutInv(gateNow->getFaninInv(i)); 
+            _gateList.insert(GatePair(gateInId,pi));
+         }
+      }
+   }
+   return;
 }
 
 /**********************************************************/
 /*   class CirMgr member functions for circuit printing   */
 /**********************************************************/
-/*********************
-Circuit Statistics
-==================
-  PI          20
-  PO          12
-  AIG        130
-------------------
-  Total      162
-*********************/
 void
 CirMgr::printSummary() const
 {
-    cout << "\nCircuit Statistics\n==================\n";
-    cout << "  PI " << setw(11) << right << I << endl;
-    cout << "  PO " << setw(11) << right << O << endl;
-    cout << "  AIG" << setw(11) << right << A << endl;
-    cout << "------------------\n  Total";
-    cout << setw(9) << right << I+O+A << endl;
+   cout<<endl;
+   cout<<"Circuit Statistics"<<endl;
+   cout<<"=================="<<endl;
+   cout<<"  PI"<<setw(12)<<right<<_PI<<endl;
+   cout<<"  PO"<<setw(12)<<right<<_PO<<endl;
+   cout<<"  AIG"<<setw(11)<<right<<_AIG<<endl;
+   cout<<"------------------"<<endl;
+   cout<<"  Total"<<setw(9)<<right<<_PI+_PO+_AIG<<endl;
 }
 
 void
 CirMgr::printNetlist() const
 {
-    queue<unsigned int> dfs_print, reset;
-    int print_line = 0;
+   lineNo = 0;
+   visitedBase++;
+   cout << endl;
+   for(size_t i = 0; i<_PO; ++i){
+      DFSVisitNet(_poList[i]);
+   }
+}
 
-    cout << endl;
-    for(size_t i=0; i<_POs.size(); ++i)
-    {
-        _gates[_POs[i]]->setMarked();
-        _gates[_POs[i]]->DFS(dfs_print);
-        while(!dfs_print.empty())
-        {
-            cout << "[" << print_line << "] ";
-            _gates[dfs_print.front()]->printGate();
-            ++print_line;
-            reset.push(dfs_print.front());
-            dfs_print.pop();
-        }
-    }
-    while(!reset.empty())
-    {
-        _gates[reset.front()]->resetMarked();
-        reset.pop();
-    }
+void
+CirMgr::DFSVisitNet(CirGate* gate) const
+{
+   if (gate->visitedNo>visitedBase) return;
+   else{
+      gate->visitedNo = visitedBase+1;
+      //traversal fanins to gate
+      for (size_t i = 0; i<gate->getFaninLen(); ++i)
+         DFSVisitNet(gate->getFanin(i));
+      gate->reportNetlist(lineNo);
+      ++lineNo;
+   }
 }
 
 void
 CirMgr::printPIs() const
 {
-   cout << "PIs of the circuit:";
-   for(size_t i=0; i<_PIs.size(); ++i)
-   {
-       cout << ' ' << _PIs[i];
+   cout << "PIs of the circuit: ";
+   for(size_t i = 0; i<_PI; ++i){
+      cout<<_piList[i]->getGateId();
+      if(i!=_PI-1) cout<<" ";
    }
    cout << endl;
 }
@@ -331,10 +358,10 @@ CirMgr::printPIs() const
 void
 CirMgr::printPOs() const
 {
-   cout << "POs of the circuit:";
-   for(size_t i=0; i<_POs.size(); ++i)
-   {
-       cout << ' ' << _POs[i];
+   cout << "POs of the circuit: ";
+   for(size_t i = 0; i<_PO; ++i){
+      cout<<_poList[i]->getGateId();
+      if(i!=_PO-1) cout<<" ";
    }
    cout << endl;
 }
@@ -342,24 +369,23 @@ CirMgr::printPOs() const
 void
 CirMgr::printFloatGates() const
 {
-   if(!_Undef_gates.empty())
-   {
-       cout << "Gates with floating fanin(s):";
-       for(size_t i=0; i<_Undef_gates.size(); ++i)
-       {
-           cout << ' ' << _Undef_gates[i];
-       }
-       cout << endl;
+   if (_floList.size()>0){
+      GateIntSet::iterator it = _floList.begin();
+      cout << "Gates with floating fanin(s): ";
+      for(; it != _floList.end(); it++) {
+         cout << *it;
+         if(it!=(--_floList.end())) cout<<" ";
+      } 
+      cout<<endl;
    }
-
-   if(!_Unused_gates.empty())
-   {
-       cout << "Gates defined but not used  :";
-       for(size_t i=0; i<_Unused_gates.size(); ++i)
-       {
-           cout << ' ' << _Unused_gates[i];
-       }
-       cout << endl;
+   if (_notuList.size()>0){
+      GateIntSet::iterator it = _notuList.begin();
+      cout << "Gates defined but not used  : ";
+      for(; it != _notuList.end(); it++) {
+         cout << *it;
+         if(it!=(--_notuList.end())) cout<<" ";
+      }
+      cout<<endl;
    }
 }
 
@@ -369,63 +395,53 @@ CirMgr::printFECPairs() const
 }
 
 void
-CirMgr::writeAag(ostream& outfile) const
+CirMgr::writeAag(ostream& outfile)
 {
-    queue<unsigned int> dfs_part, dfs_complete, reset;
-    for(size_t i=0; i<_POs.size(); ++i)
-    {
-        _gates[_POs[i]]->setMarked();
-        _gates[_POs[i]]->DFS(dfs_part);
-        while(!dfs_part.empty())
-        {
-            if(_gates[dfs_part.front()]->getType()==AIG_GATE)
-            {
-                dfs_complete.push(dfs_part.front());
-            }
-            reset.push(dfs_part.front());
-            dfs_part.pop();
-        }
-    }
-    while(!reset.empty())
-    {
-        _gates[reset.front()]->resetMarked();
-        reset.pop();
-    }
+   //DFS
+   GateList aigList;
+   visitedBase++;
+   for(size_t i = 0; i<_PO; ++i) 
+      DFSvisitAig(_poList[i],aigList);
+   //header
+   outfile<<"aag "<<_MaxVaIdx<<" "<<_PI<<" "<<_LA<<" "<<_PO<<" "<<aigList.size()<<endl;
+   //PI
+   for(size_t i = 0; i<_piList.size(); ++i)
+      outfile<<2*(_piList[i]->getGateId())<<endl;
+   //PO
+   for(size_t i = 0; i<_poList.size(); ++i)
+      outfile<<2*(_poList[i]->getFanin(0)->getGateId())+_poList[i]->getFaninInv(0)<<endl;
+   //AIG
+   for(size_t i = 0; i<aigList.size(); ++i)
+      outfile<<2*(aigList[i]->getGateId())
+      <<" "<<2*(aigList[i]->getFaninId(0))+aigList[i]->getFaninInv(0)
+      <<" "<<2*(aigList[i]->getFaninId(1))+aigList[i]->getFaninInv(1)<<endl;
+   //Symbol
+   size_t idx = 0;
+   for(size_t i = 0; i<_piList.size(); ++i)
+      if (_piList[i]->getSymbolName()!=0) outfile<<"i"<<idx++<<" "<<*(_piList[i]->getSymbolName())<<endl;
+   idx = 0;
+   for(size_t i = 0; i<_poList.size(); ++i)
+      if (_poList[i]->getSymbolName()!=0) outfile<<"o"<<idx++<<" "<<*(_poList[i]->getSymbolName())<<endl;
+   //Comment
+   outfile<<"c"<<endl;
+   outfile<<"AAG output by Shang-Lun (Shannon) Lee"<<endl;
+}
 
-    outfile << "aag " << M << ' ' << I << ' ' << L << ' ' << O << ' ' << dfs_complete.size() << '\n';
-    for(size_t i =0; i<_PIs.size(); ++i)
-    {
-        outfile << (_gates[_PIs[i]]->getGateID())*2 << '\n';
-    }
-    for(size_t i =0; i<_POs.size(); ++i)
-    {
-        outfile << _gates[_POs[i]]->getFanins()[0] << '\n';
-    }
-    CirGate* tmp_cir;
-    while(!dfs_complete.empty())
-    {
-        tmp_cir =  _gates[dfs_complete.front()];
-        outfile << (tmp_cir->getGateID())*2 << ' ' << tmp_cir->getFanins()[0] << ' ' << tmp_cir->getFanins()[1] << '\n';
-        dfs_complete.pop();
-    }
-    PIGate* tmp_PI;
-    for(size_t i =0; i<_PIs.size(); ++i)
-    {
-        tmp_PI = static_cast<PIGate*>(_gates[_PIs[i]]);
-        if(!tmp_PI->getSymbol().empty())
-            outfile << 'i' << i << ' ' << tmp_PI->getSymbol() << '\n';
-    }
-    POGate* tmp_PO;
-    for(size_t i =0; i<_POs.size(); ++i)
-    {
-        tmp_PO = static_cast<POGate*>(_gates[_POs[i]]);
-        if(!tmp_PO->getSymbol().empty())
-            outfile << 'o' << i << ' ' << tmp_PO->getSymbol() << '\n';
-    }
-    outfile << "c\nGJMI\n";
+void
+CirMgr::DFSvisitAig(CirGate* gate, GateList& aigList)
+{
+   if (gate->visitedNo>visitedBase) return;
+   else{
+      gate->visitedNo = visitedBase+1;
+      //traversal fanins to gate
+      for (size_t i = 0; i<gate->getFaninLen(); ++i)
+         DFSvisitAig(gate->getFanin(i),aigList);
+      if (gate->getTypeStr()=="AIG") aigList.push_back(gate);
+   }
 }
 
 void
 CirMgr::writeGate(ostream& outfile, CirGate *g) const
 {
 }
+

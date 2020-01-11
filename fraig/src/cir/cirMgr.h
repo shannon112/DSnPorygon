@@ -13,15 +13,12 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <queue>
 
 using namespace std;
 
-#include "cirDef.h"
-#include "cirGate.h"
-
 // TODO: Feel free to define your own classes, variables, or functions.
-// A part of functions in this file is ref to b04901036_hw6
+
+#include "cirDef.h"
 
 extern CirMgr *cirMgr;
 
@@ -29,26 +26,10 @@ class CirMgr
 {
 public:
    CirMgr() {}
-   ~CirMgr() {
-       for(size_t i=0; i<_gates.size(); ++i)
-       {
-           if(_gates[i]!=NULL)
-               delete _gates[i];
-       }
-   } 
-
-   // Access functions
-   // return '0' if "gid" corresponds to an undefined gate.
-   CirGate* getGate(unsigned gid) const { return _gates[gid]; }
-   IdList& getUndef() { return _Undef_gates; }
-   IdList& getUnused() { return _Unused_gates; }
-
-   // Member functions about circuit construction
-   bool readCircuit(const string&);
+   ~CirMgr() {} 
 
    // Member functions about circuit optimization
    void sweep();
-   bool isSwept(){return _swept;}
    void optimize();
 
    // Member functions about simulation
@@ -61,6 +42,14 @@ public:
    void printFEC() const;
    void fraig();
 
+   // Access functions
+   // return '0' if "gid" corresponds to an undefined gate.
+   CirGate* getGate(unsigned gid) const { 
+     return ( _gateList.find(gid) != _gateList.end()) ? _gateList.find(gid)->second : 0; }
+
+   // Member functions about circuit construction
+   bool readCircuit(const string&);
+
    // Member functions about circuit reporting
    void printSummary() const;
    void printNetlist() const;
@@ -68,18 +57,28 @@ public:
    void printPOs() const;
    void printFloatGates() const;
    void printFECPairs() const;
-   void writeAag(ostream&) const;
+   void writeAag(ostream&);
    void writeGate(ostream&, CirGate*) const;
 
 private:
+   bool readHeader(fstream&);
+   bool readInput(fstream&);
+   bool readOutput(fstream&);
+   bool readAIGs(fstream&);
+   bool readSymbols(fstream&);
+   bool readComments(fstream&);
+   void connect();
+   void DFSVisitNet(CirGate*) const;
+   void DFSVisitSweep(CirGate*) const;
+   void DFSvisitAig(CirGate*,GateList&);
+   unsigned _MaxVaIdx, _PI, _LA, _PO, _AIG; //header
+   GateMap _gateList;
+   GateList _piList;
+   GateList _poList;
+   GateIntSet _floList;
+   GateIntSet _notuList;
    ofstream           *_simLog;
-   GateList _gates;
-   IdList _PIs;
-   IdList _POs;
-   IdList _Undef_gates;
-   IdList _Unused_gates;
-   int M, I, L, O, A;
-   mutable bool _swept = false;
+
 };
 
 #endif // CIR_MGR_H

@@ -13,122 +13,122 @@
 #include <vector>
 #include <iostream>
 #include "cirDef.h"
+#include <map>
 #include "sat.h"
-#include <queue>
 
 using namespace std;
-
-// A part of functions in this file is ref to b04901036_hw6
-
-class CirGate;
 
 //------------------------------------------------------------------------
 //   Define classes
 //------------------------------------------------------------------------
+// TODO: Define your own data members and member functions, or classes
+
+
+/**************************************/
+/*   class CirGate                    */
+/**************************************/
 class CirGate
 {
 public:
-   CirGate(GateType typ = UNDEF_GATE, unsigned int line = 0, unsigned int ID = 0) : _typ(typ), _line(line), _GateID(ID), _marked(false) {}
+   CirGate(unsigned gateID, unsigned lineNo, string gateType) 
+   :_gateID(gateID),_lineNo(lineNo),_gateType(gateType){} 
    virtual ~CirGate() {}
 
-   // Basic access methods
-   string getTypeStr() const
-   {
-       switch(_typ)
-       {
-       case PI_GATE:
-           return "PI";
-       case PO_GATE:
-           return "PO";
-       case AIG_GATE:
-           return "AIG";
-       case UNDEF_GATE:
-           return "UNDEFINED";
-       case CONST_GATE:
-           return "CONST";
-       default:
-           return "ERROR";
-       }
-   }
-
-   unsigned int getLineNo() const { return _line; }
-   GateType getType() const { return _typ; }
-   IdList& getFanins() { return _fanins; }
-   IdList& getFanouts() { return _fanouts; }
-   unsigned int getGateID() { return _GateID; }
-   void setMarked() { _marked = true; }
-   void resetMarked() { _marked = false; }
-   bool getMarked() { return _marked; }
    virtual bool isAig() const { return false; }
+   
+   // itself basic access methods
+   string getTypeStr() const { return _gateType; }
+   unsigned getGateId() const {return _gateID;}
+   unsigned getLineNo() const {return _lineNo;}
+   string* getSymbolName() const { return _symbolName; }
+   void setSymbolName(const string name) { _symbolName=new string(name); }
 
-   // Printing functions
-   virtual void printGate() const = 0;
-   virtual void DFS(queue<unsigned int>& dfs_print) const = 0;
-   virtual void DFSFanin(queue<unsigned int>& reset, int max_level, int current_level) const = 0;
-   virtual void DFSFanout(queue<unsigned int>& reset, int max_level, int current_level) const = 0;
-   void reportGate() const;
+   // fanin id I/O
+   void setFaninId(const unsigned faninid){_faninIdList.push_back(faninid);}
+   unsigned getFaninId (const size_t& idx) const {return _faninIdList[idx];} 
+   // fanin inverse I/O
+   void setFaninInv(const unsigned fanininv){_faninInvList.push_back(fanininv);}
+   unsigned getFaninInv (const size_t& idx) const {return _faninInvList[idx];} 
+   // fanin list I/O
+   void setFanin(CirGate* fanin){_faninList.push_back(fanin);}
+   CirGate* getFanin (const size_t& idx) const {return _faninList[idx];} 
+   size_t getFaninLen() const {return _faninIdList.size();}
+
+   // fanout inverse I/O
+   void setFanoutInv(const unsigned fanoutinv){_fanoutInvList.push_back(fanoutinv);}
+   unsigned getFanoutInv (const size_t& idx) const {return _fanoutInvList[idx];} 
+   // fanout list I/O
+   void setFanout(CirGate* fanout){_fanoutList.push_back(fanout);}
+   CirGate* getFanout (const size_t& idx) const {return _fanoutList[idx];} 
+   size_t getFanoutLen () const {return _fanoutList.size();} 
+
+   // default
+   virtual void reportGate() const = 0;
+   virtual void reportNetlist(unsigned&) const = 0;
    void reportFanin(int level) const;
    void reportFanout(int level) const;
 
-private:
+   mutable unsigned visitedNo = 0;
+   mutable GateIntSet visiterId;
 
 protected:
-    GateType _typ;
-    unsigned int _line;
-    unsigned int _GateID;
-    IdList _fanins;
-    IdList _fanouts;
-    mutable bool _marked;
-};
-
-class AIGGate : public CirGate
-{
-public:
-    AIGGate(GateType typ, unsigned int line, unsigned int ID, unsigned int input1, unsigned int input2) : CirGate(typ, line, ID) { _fanins.push_back(input1); _fanins.push_back(input2); }
-    ~AIGGate() {}
-
-    void printGate() const;
-    void DFS(queue<unsigned int>& dfs_print) const;
-    void DFSFanin(queue<unsigned int>& reset, int max_level, int current_level) const;
-    void DFSFanout(queue<unsigned int>& reset, int max_level, int current_level) const;
-    void linkInputs();
-};
-
-class PIGate : public CirGate
-{
-public:
-    PIGate(GateType typ, unsigned int line, unsigned int ID) : CirGate(typ, line, ID) {}
-    ~PIGate() {}
-
-    string& getSymbol() { return _symbol; }
-    const string& getSymbol() const { return _symbol; }
-
-    void printGate() const;
-    void DFS(queue<unsigned int>& dfs_print) const;
-    void DFSFanin(queue<unsigned int>& reset, int max_level, int current_level) const;
-    void DFSFanout(queue<unsigned int>& reset, int max_level, int current_level) const;
+   //itself
+   unsigned _gateID;
+   unsigned _lineNo;
+   string _gateType;
+   string* _symbolName = 0;
+   //fanout
+   GateList _fanoutList;
+   vector<bool> _fanoutInvList;
+   //fanin
+   GateList _faninList;
+   vector<unsigned> _faninIdList;
+   vector<bool> _faninInvList;
 
 private:
-    string _symbol;
+   void DFSvisitIn(const int&, int, bool, const CirGate*) const;
+   void DFSvisitOut(const int&, int, bool, const CirGate*) const;
 };
 
-class POGate : public CirGate
+
+/**************************************/
+/*   class CirPiGate                  */
+/**************************************/
+class CirPiGate: public CirGate
 {
 public:
-    POGate(GateType typ, unsigned int line, unsigned int ID, unsigned int input) : CirGate(typ, line, ID) { _fanins.push_back(input); }
-    ~POGate() {}
+   CirPiGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){}
+   ~CirPiGate() {}
+   void reportGate() const;
+   void reportNetlist(unsigned&) const;
+};
 
-    string& getSymbol() { return _symbol; }
-    const string& getSymbol() const { return _symbol; }
 
-    void printGate() const;
-    void DFS(queue<unsigned int>& dfs_print) const;
-    void DFSFanin(queue<unsigned int>& reset, int max_level, int current_level) const;
-    void DFSFanout(queue<unsigned int>& reset, int max_level, int current_level) const;
-    void linkInputs();
+/**************************************/
+/*   class CirPoGate                  */
+/**************************************/
+class CirPoGate: public CirGate
+{
+public:
+   CirPoGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){}
+   ~CirPoGate() {}
+   // Basic access methods
+   void reportGate() const;
+   void reportNetlist(unsigned&) const;
+};
 
-private:
-    string _symbol;
+
+/**************************************/
+/*   class CirAigGate                 */
+/**************************************/
+class CirAigGate: public CirGate
+{
+public:
+   CirAigGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){}
+   ~CirAigGate() {}
+   // Basic access methods
+   void reportGate() const;
+   void reportNetlist(unsigned&) const;
 };
 
 #endif // CIR_GATE_H

@@ -9,19 +9,27 @@
 #ifndef CIR_DEF_H
 #define CIR_DEF_H
 
+#include <map>
 #include <vector>
-#include "myHashMap.h"
+#include <set>
 
 using namespace std;
 
 // TODO: define your own typedef or enum
+class SatSolver;
 
 class CirGate;
 class CirMgr;
-class SatSolver;
+
+class CirPiGate;
+class CirPoGate;
+class CirAigGate;
+
+typedef map<unsigned, CirGate*>   GateMap;
+typedef pair<unsigned, CirGate*>  GatePair;
 
 typedef vector<CirGate*>           GateList;
-typedef vector<unsigned>           IdList;
+typedef set<unsigned>            GateIntSet;
 
 enum GateType
 {

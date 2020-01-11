@@ -17,361 +17,171 @@
 
 using namespace std;
 
-// A part of functions in this file is ref to b04901036_hw6
-
 extern CirMgr *cirMgr;
+
+// TODO: Implement memeber functions for class(es) in cirGate.h
 
 /**************************************/
 /*   class CirGate member functions   */
 /**************************************/
-void
-CirGate::reportGate() const
-{
-    string second_line;
-    stringstream ss;
-
-    cout << "==================================================\n";
-    ss << _GateID;
-    if(_GateID!=0)
-        second_line = "= " + getTypeStr() + "(" + ss.str() + ")";
-    else
-        second_line = "= CONST(0)";
-
-    ss.str("");
-    switch(_typ)
-    {
-    case PO_GATE:
-        if( !static_cast<const POGate*>(this)->getSymbol().empty() )
-            second_line = second_line + "\"" + static_cast<const POGate*>(this)->getSymbol() + "\"";
-            break;
-    case PI_GATE:
-        if( !static_cast<const PIGate*>(this)->getSymbol().empty() )
-            second_line = second_line + "\"" + static_cast<const PIGate*>(this)->getSymbol() + "\"";
-            break;
-    default:
-        ;
-    }
-    ss << _line;
-    second_line = second_line + ", line " + ss.str();
-    cout << setw(49) << left << second_line << "=\n";
-    cout << "==================================================\n";
-}
+extern unsigned visitedBase;
 
 void
 CirGate::reportFanin(int level) const
 {
    assert (level >= 0);
-   queue<unsigned int> reset;
-   this->DFSFanin(reset, level, 0);
-   while(!reset.empty())
-   {
-       cirMgr->getGate(reset.front())->resetMarked();
-       reset.pop();
-   }
+   visitedBase++;
+   DFSvisitIn(level, level, false, this);
 }
 
 void
 CirGate::reportFanout(int level) const
 {
    assert (level >= 0);
-   queue<unsigned int> reset;
-   this->DFSFanout(reset, level, 0);
-   while(!reset.empty())
-   {
-       cirMgr->getGate(reset.front())->resetMarked();
-       reset.pop();
+   visitedBase++;
+   DFSvisitOut(level, level, false, this);
+}
+
+void 
+CirGate::DFSvisitIn(const int& total_level, int level, bool inverse, const CirGate* gate) const {
+   if (level>=0){
+      const string isInverse = inverse ? "!":"";
+      cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
+
+      //already visited, and can be expand, then stop to expand
+      if((gate->visitedNo > visitedBase)&&(gate->getTypeStr()=="AIG")&&(level>0)&&(gate->getFaninLen()>0)) {
+         if (gate->getFanin(0)->visitedNo > visitedBase){
+            cout<<" (*)"<<endl;
+            return;
+         }
+      }
+      //havent visited yet
+      gate->visitedNo = visitedBase+1;
+      cout<<endl;
+      //find fanins and recursively do DFSvisit
+      for (size_t i = 0; i<gate->getFaninLen(); ++i)
+         if(cirMgr->getGate(gate->getFanin(i)->getGateId()) !=0 )
+            DFSvisitIn(total_level, level-1, gate->getFaninInv(i), gate->getFanin(i));
    }
 }
 
-void AIGGate::printGate() const
-{
-    cout << "AIG " << _GateID << " ";
-    if(cirMgr->getGate(_fanins[0]/2)==NULL)
-        cout << '*';
-    if(_fanins[0]%2)
-        cout << '!';
-    cout << _fanins[0]/2 << " ";
-    if(cirMgr->getGate(_fanins[1]/2)==NULL)
-        cout << '*';
-    if(_fanins[1]%2)
-        cout << '!';
-    cout << _fanins[1]/2;
-    cout << endl;
-}
+void 
+CirGate::DFSvisitOut(const int& total_level, int level, bool inverse, const CirGate* gate) const {
+   const string isInverse = inverse ? "!":"";
+   cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
 
-void PIGate::printGate() const
-{
-    if(_GateID!=0)
-    {
-        cout << "PI  " << _GateID;
-        if(!_symbol.empty())
-            cout << " (" << _symbol << ")";
-    }
-    else
-        cout << "CONST0";
-    cout << endl;
-}
-
-void POGate::printGate() const
-{
-    cout << "PO  " << _GateID << " ";
-    if(cirMgr->getGate(_fanins[0]/2)==NULL)
-        cout << '*';
-    if(_fanins[0]%2)
-        cout << '!';
-    cout << _fanins[0]/2;
-    if(!_symbol.empty())
-            cout << " (" << _symbol << ")";
-    cout << endl;
-}
-
-void AIGGate::DFS(queue<unsigned int>& dfs_print) const
-{
-    if(cirMgr->getGate(_fanins[0]/2) != NULL)
-        if(!cirMgr->getGate(_fanins[0]/2)->getMarked())
-        {
-            cirMgr->getGate(_fanins[0]/2)->setMarked();
-            cirMgr->getGate(_fanins[0]/2)->DFS(dfs_print);
-        }
-    if(cirMgr->getGate(_fanins[1]/2) != NULL)
-        if(!cirMgr->getGate(_fanins[1]/2)->getMarked())
-        {
-            cirMgr->getGate(_fanins[1]/2)->setMarked();
-            cirMgr->getGate(_fanins[1]/2)->DFS(dfs_print);
-        }
-    dfs_print.push(_GateID);
-}
-
-void PIGate::DFS(queue<unsigned int>& dfs_print) const
-{
-    dfs_print.push(_GateID);
-}
-
-void POGate::DFS(queue<unsigned int>& dfs_print) const
-{
-    if(cirMgr->getGate(_fanins[0]/2) != NULL)
-        if(!cirMgr->getGate(_fanins[0]/2)->getMarked())
-        {
-            cirMgr->getGate(_fanins[0]/2)->setMarked();
-            cirMgr->getGate(_fanins[0]/2)->DFS(dfs_print);
-        }
-    dfs_print.push(_GateID);
-}
-
-void AIGGate::DFSFanin(queue<unsigned int>& reset, int max_level, int current_level) const
-{
-    cout << "AIG " << _GateID;
-    if(current_level==max_level)
-    {
-        cout << endl;
-        return;
-    }
-    if(_marked)
-    {
-        cout << " (*)\n";
-        return;
-    }
-    _marked = true;
-    reset.push(_GateID);
-    cout << endl;
-
-    if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanins[0]/2)==NULL)){}
-    else{
-      for(int i=0; i<=current_level; ++i)
-         cout << "  ";
-      if(_fanins[0]%2)
-         cout << '!';
-      if(cirMgr->getGate(_fanins[0]/2)==NULL)
-      {
-         cout << "UNDEF " << _fanins[0]/2 << endl;
-      }
-      else
-      {
-         cirMgr->getGate(_fanins[0]/2)->DFSFanin(reset, max_level, current_level+1);
-      }
-    }
-
-    if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanins[1]/2)==NULL)){}
-    else{
-      for(int i=0; i<=current_level; ++i)
-         cout << "  ";
-      if(_fanins[1]%2)
-         cout << '!';
-      if(cirMgr->getGate(_fanins[1]/2)==NULL)
-      {
-         cout << "UNDEF " << _fanins[1]/2 << endl;
-      }
-      else
-      {
-         cirMgr->getGate(_fanins[1]/2)->DFSFanin(reset, max_level, current_level+1);
-      }
-    }
-}
-
-void PIGate::DFSFanin(queue<unsigned int>& reset, int max_level, int current_level) const
-{
-    if(_GateID!=0)
-        cout << "PI " << _GateID << endl;
-    else
-        cout << "CONST 0" << endl;
-}
-
-void POGate::DFSFanin(queue<unsigned int>& reset, int max_level, int current_level) const
-{
-    cout << "PO " << _GateID;
-    if(current_level==max_level)
-    {
-        cout << endl;
-        return;
-    }
-    if(_marked)
-    {
-        cout << " (*)\n";
-        return;
-    }
-    _marked = true;
-    reset.push(_GateID);
-    cout << endl;
-   
-    if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanins[0]/2)==NULL)) return;
-    else{
-      for(int i=0; i<=current_level; ++i)
-         cout << "  ";
-      if(_fanins[0]%2)
-         cout << '!';
-      if(cirMgr->getGate(_fanins[0]/2)==NULL)
-      {
-         cout << "UNDEF " << _fanins[0]/2 << endl;
-      }
-      else
-      {
-         cirMgr->getGate(_fanins[0]/2)->DFSFanin(reset, max_level, current_level+1);
-      }
-    }
-}
-
-void AIGGate::DFSFanout(queue<unsigned int>& reset, int max_level, int current_level) const
-{
-    cout << "AIG " << _GateID;
-    if(current_level==max_level)
-    {
-        cout << endl;
-        return;
-    }
-    if(_marked)
-    {
-        cout << " (*)\n";
-        return;
-    }
-    _marked = true;
-    reset.push(_GateID);
-    cout << endl;
-
-   for(size_t it=0; it<_fanouts.size(); ++it)
-   {
-      if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanouts[it]/2)==NULL)){}
-      else{
-         for(int i=0; i<=current_level; ++i)
-               cout << "  ";
-         if(_fanouts[it]%2)
-               cout << '!';
-         if(cirMgr->getGate(_fanouts[it]/2)==NULL)
-         {
-               cout << "UNDEF " << _fanouts[it]/2 << endl;
-         }
-         else
-         {
-               cirMgr->getGate(_fanouts[it]/2)->DFSFanout(reset, max_level, current_level+1);
+   //already visited, and can be expand, then stop to expand
+   if((gate->visitedNo > visitedBase)&&(level>0)){
+      cout<<" (*)"<<endl;
+      return;
+   }
+   cout<<endl;
+   //if still have ability to print next
+   if (level-1>=0){
+      //if still have ability to visit next
+      if (gate->getFanoutLen()>0){
+         gate->visitedNo = visitedBase+1;
+         //find fanouts and recursively do DFSvisit
+         for (size_t i = 0; i<gate->getFanoutLen(); ++i){
+            if(cirMgr->getGate(gate->getFanout(i)->getGateId()) !=0 )
+               DFSvisitOut(total_level, level-1, gate->getFanoutInv(i), gate->getFanout(i));
          }
       }
    }
 }
 
-void PIGate::DFSFanout(queue<unsigned int>& reset, int max_level, int current_level) const
+/**************************************/
+/*   class CirPiGate member functions   */
+/**************************************/
+void
+CirPiGate::reportGate() const
 {
-    if(_GateID!=0)
-        cout << "PI " << _GateID;
-    else
-        cout << "CONST 0";
-    if(current_level==max_level)
-    {
-        cout << endl;
-        return;
-    }
-    if(_marked)
-    {
-        cout << " (*)\n";
-        return;
-    }
-    _marked = true;
-    reset.push(_GateID);
-    cout << endl;
+   //lineNo&gateId=0 -> const, lineNo=0&gateId=others -> not-used
+   int gateId = getGateId();
+   int lineNo = getLineNo();
+   stringstream ss;
+   if(lineNo==0){
+      if(gateId==0)
+         ss<<"= CONST(0), line 0";
+      else
+         ss<<"= UNDEF("<<getGateId()<<"), line 0";
+   }
+   else{
+      if (getSymbolName()==0) ss<<"= PI("<<getGateId()<<"), line "<<getLineNo()+1;
+      else ss<<"= PI("<<getGateId()<<")\""<<*getSymbolName()<<"\", line "<<getLineNo()+1;
+   }
+   cout<<"=================================================="<<endl;
+   cout<<setw(49)<<left<<ss.str()<<"="<<endl;
+   cout<<"=================================================="<<endl;
+}
 
-   for(size_t it=0; it<_fanouts.size(); ++it)
-   {
-      if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanouts[it]/2)==NULL)){}
-      else{
-         for(int i=0; i<=current_level; ++i)
-               cout << "  ";
-         if(_fanouts[it]%2)
-               cout << '!';
-         if(cirMgr->getGate(_fanouts[it]/2)==NULL)
-         {
-               if (!cirMgr->isSwept()) cout << "UNDEF " << _fanouts[it]/2 << endl;
-         }
-         else
-         {
-               cirMgr->getGate(_fanouts[it]/2)->DFSFanout(reset, max_level, current_level+1);
-         }
-      }
+void 
+CirPiGate::reportNetlist(unsigned& idx) const
+{
+   int gateId = getGateId();
+   int lineNo = getLineNo();
+   if(lineNo==0){
+      if(gateId==0)
+         cout<<"["<<idx<<"] "<<"CONST0"<<endl;
+      else --idx;
+   }
+   else{
+      if (getSymbolName()==0) cout<<"["<<idx<<"] "<<setw(4)<<left<<"PI "<<gateId<<endl;
+      else cout<<"["<<idx<<"] "<<setw(4)<<left<<"PI "<<gateId<<" ("<<*getSymbolName()<<")"<<endl;
    }
 }
 
-void POGate::DFSFanout(queue<unsigned int>& reset, int max_level, int current_level) const
+
+/**************************************/
+/*   class CirPoGate member functions   */
+/**************************************/
+void
+CirPoGate::reportGate() const
 {
-    cout << "PO " << _GateID << endl;
+   stringstream ss;
+   if (getSymbolName()==0) ss<<"= PO("<<getGateId()<<"), line "<<getLineNo()+1;
+   else ss<<"= PO("<<getGateId()<<")\""<<*getSymbolName()<<"\", line "<<getLineNo()+1;
+   cout<<"=================================================="<<endl;
+   cout<<setw(49)<<left<<ss.str()<<"="<<endl;
+   cout<<"=================================================="<<endl;
 }
 
-void AIGGate::linkInputs()
+void 
+CirPoGate::reportNetlist(unsigned& idx) const
 {
-    CirGate* tmp;
-    tmp = cirMgr->getGate(_fanins[0]/2);
-    if(tmp==NULL)
-    {
-        cirMgr->getUndef().push_back(_GateID);
-    }
-    else
-    {
-        tmp->getFanouts().push_back( (_GateID*2)+(_fanins[0]%2) );
-    }
-
-    tmp = cirMgr->getGate(_fanins[1]/2);
-    if(tmp==NULL)
-    {
-        if(!cirMgr->getUndef().empty())
-        {
-            if(cirMgr->getUndef().back()!=_GateID)
-                cirMgr->getUndef().push_back(_GateID);
-        }
-        else
-            cirMgr->getUndef().push_back(_GateID);
-    }
-    else
-    {
-        tmp->getFanouts().push_back( (_GateID*2)+(_fanins[1]%2) );
-    }
+   int gateId = getGateId();
+   int faninId = getFaninId(0);
+   const string isFloating = (getFanin(0)->getLineNo()==0)&&(getFanin(0)->getGateId()!=0) ? "*":"";
+   const string isInverse = getFaninInv(0) ? "!":"";
+   if (getSymbolName()==0) cout<<"["<<idx<<"] "<<setw(4)<<left<<"PO "<<gateId<<" "<<isFloating<<isInverse<<faninId<<endl;
+   else  cout<<"["<<idx<<"] "<<setw(4)<<left<<"PO "<<gateId<<" "<<isFloating<<isInverse<<faninId<<" ("<<*getSymbolName()<<")"<<endl;
 }
 
-void POGate::linkInputs()
+
+/**************************************/
+/*   class CirAigGate member functions   */
+/**************************************/
+void
+CirAigGate::reportGate() const
 {
-    CirGate* tmp;
-    tmp = cirMgr->getGate(_fanins[0]/2);
-    if(tmp==NULL)
-    {
-        cirMgr->getUndef().push_back(_GateID);
-    }
-    else
-    {
-        tmp->getFanouts().push_back( (_GateID*2)+(_fanins[0]%2) );
-    }
+   stringstream ss;
+   ss<<"= AIG("<<getGateId()<<"), line "<<getLineNo()+1;
+   cout<<"=================================================="<<endl;
+   cout<<setw(49)<<left<<ss.str()<<"="<<endl;
+   cout<<"=================================================="<<endl;
+}
+
+void 
+CirAigGate::reportNetlist(unsigned& idx) const
+{
+   int gateId = getGateId();
+   int faninId0 = getFaninId(0);
+   int faninId1 = getFaninId(1);
+   const string isFloating0 = (getFanin(0)->getLineNo()==0)&&(getFanin(0)->getGateId()!=0) ? "*":"";
+   const string isFloating1 = (getFanin(1)->getLineNo()==0)&&(getFanin(1)->getGateId()!=0) ? "*":"";
+   const string isInverse0 = getFaninInv(0) ? "!":"";
+   const string isInverse1 = getFaninInv(1) ? "!":"";
+   cout<<"["<<idx<<"] "<<setw(4)<<left<<"AIG "<<gateId<<" "
+   <<isFloating0<<isInverse0<<faninId0<<" "
+   <<isFloating1<<isInverse1<<faninId1<<endl;
 }
