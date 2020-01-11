@@ -395,22 +395,22 @@ CirMgr::writeAag(ostream& outfile)
    outfile<<"aag "<<_MaxVaIdx<<" "<<_PI<<" "<<_LA<<" "<<_PO<<" "<<aigList.size()<<endl;
    //PI
    for(size_t i = 0; i<_piList.size(); ++i)
-      cout<<2*(_piList[i]->getGateId())<<endl;
+      outfile<<2*(_piList[i]->getGateId())<<endl;
    //PO
    for(size_t i = 0; i<_poList.size(); ++i)
-      cout<<2*(_poList[i]->getFanin(0)->getGateId())+_poList[i]->getFaninInv(0)<<endl;
+      outfile<<2*(_poList[i]->getFanin(0)->getGateId())+_poList[i]->getFaninInv(0)<<endl;
    //AIG
    for(size_t i = 0; i<aigList.size(); ++i)
-      cout<<2*(aigList[i]->getGateId())
+      outfile<<2*(aigList[i]->getGateId())
       <<" "<<2*(aigList[i]->getFaninId(0))+aigList[i]->getFaninInv(0)
       <<" "<<2*(aigList[i]->getFaninId(1))+aigList[i]->getFaninInv(1)<<endl;
    //Symbol
    size_t idx = 0;
    for(size_t i = 0; i<_piList.size(); ++i)
-      if (_piList[i]->getSymbolName()!=0) cout<<"i"<<idx++<<" "<<*(_piList[i]->getSymbolName())<<endl;
+      if (_piList[i]->getSymbolName()!=0) outfile<<"i"<<idx++<<" "<<*(_piList[i]->getSymbolName())<<endl;
    idx = 0;
    for(size_t i = 0; i<_poList.size(); ++i)
-      if (_poList[i]->getSymbolName()!=0) cout<<"o"<<idx++<<" "<<*(_poList[i]->getSymbolName())<<endl;
+      if (_poList[i]->getSymbolName()!=0) outfile<<"o"<<idx++<<" "<<*(_poList[i]->getSymbolName())<<endl;
    //Comment
    outfile<<"c"<<endl;
    outfile<<"AAG output by Shang-Lun (Shannon) Lee"<<endl;
