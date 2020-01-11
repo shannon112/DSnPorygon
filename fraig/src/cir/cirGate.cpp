@@ -174,29 +174,37 @@ void AIGGate::DFSFanin(queue<unsigned int>& reset, int max_level, int current_le
     _marked = true;
     reset.push(_GateID);
     cout << endl;
-    for(int i=0; i<=current_level; ++i)
-        cout << "  ";
-    if(_fanins[0]%2)
-        cout << '!';
-    if(cirMgr->getGate(_fanins[0]/2)==NULL)
-    {
-        cout << "UNDEF " << _fanins[0]/2 << endl;
+
+    if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanins[0]/2)==NULL)){}
+    else{
+      for(int i=0; i<=current_level; ++i)
+         cout << "  ";
+      if(_fanins[0]%2)
+         cout << '!';
+      if(cirMgr->getGate(_fanins[0]/2)==NULL)
+      {
+         cout << "UNDEF " << _fanins[0]/2 << endl;
+      }
+      else
+      {
+         cirMgr->getGate(_fanins[0]/2)->DFSFanin(reset, max_level, current_level+1);
+      }
     }
-    else
-    {
-        cirMgr->getGate(_fanins[0]/2)->DFSFanin(reset, max_level, current_level+1);
-    }
-    for(int i=0; i<=current_level; ++i)
-        cout << "  ";
-    if(_fanins[1]%2)
-        cout << '!';
-    if(cirMgr->getGate(_fanins[1]/2)==NULL)
-    {
-        cout << "UNDEF " << _fanins[1]/2 << endl;
-    }
-    else
-    {
-        cirMgr->getGate(_fanins[1]/2)->DFSFanin(reset, max_level, current_level+1);
+
+    if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanins[1]/2)==NULL)){}
+    else{
+      for(int i=0; i<=current_level; ++i)
+         cout << "  ";
+      if(_fanins[1]%2)
+         cout << '!';
+      if(cirMgr->getGate(_fanins[1]/2)==NULL)
+      {
+         cout << "UNDEF " << _fanins[1]/2 << endl;
+      }
+      else
+      {
+         cirMgr->getGate(_fanins[1]/2)->DFSFanin(reset, max_level, current_level+1);
+      }
     }
 }
 
@@ -224,17 +232,21 @@ void POGate::DFSFanin(queue<unsigned int>& reset, int max_level, int current_lev
     _marked = true;
     reset.push(_GateID);
     cout << endl;
-    for(int i=0; i<=current_level; ++i)
-        cout << "  ";
-    if(_fanins[0]%2)
-        cout << '!';
-    if(cirMgr->getGate(_fanins[0]/2)==NULL)
-    {
-        cout << "UNDEF " << _fanins[0]/2 << endl;
-    }
-    else
-    {
-        cirMgr->getGate(_fanins[0]/2)->DFSFanin(reset, max_level, current_level+1);
+   
+    if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanins[0]/2)==NULL)) return;
+    else{
+      for(int i=0; i<=current_level; ++i)
+         cout << "  ";
+      if(_fanins[0]%2)
+         cout << '!';
+      if(cirMgr->getGate(_fanins[0]/2)==NULL)
+      {
+         cout << "UNDEF " << _fanins[0]/2 << endl;
+      }
+      else
+      {
+         cirMgr->getGate(_fanins[0]/2)->DFSFanin(reset, max_level, current_level+1);
+      }
     }
 }
 
@@ -254,21 +266,25 @@ void AIGGate::DFSFanout(queue<unsigned int>& reset, int max_level, int current_l
     _marked = true;
     reset.push(_GateID);
     cout << endl;
-    for(size_t it=0; it<_fanouts.size(); ++it)
-    {
-        for(int i=0; i<=current_level; ++i)
-            cout << "  ";
-        if(_fanouts[it]%2)
-            cout << '!';
-        if(cirMgr->getGate(_fanouts[it]/2)==NULL)
-        {
-            cout << "UNDEF " << _fanouts[it]/2 << endl;
-        }
-        else
-        {
-            cirMgr->getGate(_fanouts[it]/2)->DFSFanout(reset, max_level, current_level+1);
-        }
-    }
+
+   for(size_t it=0; it<_fanouts.size(); ++it)
+   {
+      if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanouts[it]/2)==NULL)){}
+      else{
+         for(int i=0; i<=current_level; ++i)
+               cout << "  ";
+         if(_fanouts[it]%2)
+               cout << '!';
+         if(cirMgr->getGate(_fanouts[it]/2)==NULL)
+         {
+               cout << "UNDEF " << _fanouts[it]/2 << endl;
+         }
+         else
+         {
+               cirMgr->getGate(_fanouts[it]/2)->DFSFanout(reset, max_level, current_level+1);
+         }
+      }
+   }
 }
 
 void PIGate::DFSFanout(queue<unsigned int>& reset, int max_level, int current_level) const
@@ -290,21 +306,25 @@ void PIGate::DFSFanout(queue<unsigned int>& reset, int max_level, int current_le
     _marked = true;
     reset.push(_GateID);
     cout << endl;
-    for(size_t it=0; it<_fanouts.size(); ++it)
-    {
-        for(int i=0; i<=current_level; ++i)
-            cout << "  ";
-        if(_fanouts[it]%2)
-            cout << '!';
-        if(cirMgr->getGate(_fanouts[it]/2)==NULL)
-        {
-            cout << "UNDEF " << _fanouts[it]/2 << endl;
-        }
-        else
-        {
-            cirMgr->getGate(_fanouts[it]/2)->DFSFanout(reset, max_level, current_level+1);
-        }
-    }
+
+   for(size_t it=0; it<_fanouts.size(); ++it)
+   {
+      if ((cirMgr->isSwept())&&(cirMgr->getGate(_fanouts[it]/2)==NULL)){}
+      else{
+         for(int i=0; i<=current_level; ++i)
+               cout << "  ";
+         if(_fanouts[it]%2)
+               cout << '!';
+         if(cirMgr->getGate(_fanouts[it]/2)==NULL)
+         {
+               if (!cirMgr->isSwept()) cout << "UNDEF " << _fanouts[it]/2 << endl;
+         }
+         else
+         {
+               cirMgr->getGate(_fanouts[it]/2)->DFSFanout(reset, max_level, current_level+1);
+         }
+      }
+   }
 }
 
 void POGate::DFSFanout(queue<unsigned int>& reset, int max_level, int current_level) const

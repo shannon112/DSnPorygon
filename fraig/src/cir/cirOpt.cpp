@@ -34,7 +34,6 @@ void
 CirMgr::sweep()
 {
   queue<unsigned int> dfs_print, reset;
-  set<unsigned int> remains;
 
   //go DFS to find which gates are using
   for(size_t i=0; i<_POs.size(); ++i){
@@ -83,6 +82,7 @@ CirMgr::sweep()
       _gates[reset.front()]->resetMarked();
       reset.pop();
   }
+  _swept = true;
 }
 
 // Recursively simplifying from POs;

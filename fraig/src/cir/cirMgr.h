@@ -48,6 +48,7 @@ public:
 
    // Member functions about circuit optimization
    void sweep();
+   bool isSwept(){return _swept;}
    void optimize();
 
    // Member functions about simulation
@@ -78,6 +79,7 @@ private:
    IdList _Undef_gates;
    IdList _Unused_gates;
    int M, I, L, O, A;
+   mutable bool _swept = false;
 };
 
 #endif // CIR_MGR_H
