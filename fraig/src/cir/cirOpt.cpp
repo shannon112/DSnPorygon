@@ -10,7 +10,6 @@
 #include "cirMgr.h"
 #include "cirGate.h"
 #include "util.h"
-#include <set>
 
 using namespace std;
 
