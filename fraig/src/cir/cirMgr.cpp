@@ -21,7 +21,7 @@
 using namespace std;
 
 // TODO: Implement memeber functions for class CirMgr
-// ref to b04901036_hw6
+// A part of functions in this file is ref to b04901036_hw6
 
 /*******************************/
 /*   Global variable and enum  */

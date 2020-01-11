@@ -21,7 +21,7 @@ using namespace std;
 #include "cirGate.h"
 
 // TODO: Feel free to define your own classes, variables, or functions.
-// ref to b04901036_hw6
+// A part of functions in this file is ref to b04901036_hw6
 
 extern CirMgr *cirMgr;
 

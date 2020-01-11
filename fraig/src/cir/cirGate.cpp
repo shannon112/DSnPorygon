@@ -17,7 +17,7 @@
 
 using namespace std;
 
-// all the functions in this file is ref to b04901036_hw6
+// A part of functions in this file is ref to b04901036_hw6
 
 extern CirMgr *cirMgr;
 
