@@ -2,16 +2,16 @@ fraig> cirr one_gate.aag
 
 fraig> cirp -n 
 
-[0] CONST0
-[1] PI  1
-[2] AIG 2 0 !1
+[0] PI  1
+[1] CONST0
+[2] AIG 2 !1 0
 [3] PO  3 2
 
 fraig> cirg 3 -fani 4
 PO 3
   AIG 2
-    CONST 0
     !PI 1
+    CONST 0
 
 fraig> cirg 0 -fano 4
 CONST 0
@@ -29,8 +29,8 @@ AIG 2
 
 fraig> cirg 2 -fani 4
 AIG 2
-  CONST 0
   !PI 1
+  CONST 0
 
 fraig> cirp
 
@@ -84,6 +84,7 @@ Circuit Statistics
   Total        2
 
 fraig> cirp -flo
+Gates defined but not used  : 1
 
 fraig> cirp -pi
 PIs of the circuit: 1

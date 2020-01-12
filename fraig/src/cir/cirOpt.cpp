@@ -138,8 +138,7 @@ CirMgr::optimizeGate(CirGate* gate){
         replaceGate(gate,gateIn0,gateIn0Sign);
         gateIn1->rmFanout(gate);
         deleteGate(gate->getGateId());
-        //update _notuList
-        //update _floList
+        if(gateIn1->getFaninLen()==0) _notuList.insert(gateIn1->getGateId());
       }
 
       //case 2 : Fanin has const0 => replace by const0
@@ -148,8 +147,7 @@ CirMgr::optimizeGate(CirGate* gate){
         replaceGate(gate,gateIn1,gateIn1Sign);
         gateIn0->rmFanout(gate);
         deleteGate(gate->getGateId());
-        //update _notuList
-        //update _floList
+        if(gateIn0->getFaninLen()==0) _notuList.insert(gateIn0->getGateId());
       }
 
       //case 3 : Identical fanin => replace by fanin
