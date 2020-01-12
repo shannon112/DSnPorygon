@@ -43,22 +43,26 @@ public:
    string* getSymbolName() const { return _symbolName; }
    void setSymbolName(const string name) { _symbolName=new string(name); }
 
-   // fanin id I/O
+   // fanin id I/O, only be used in the beginning
    void setFaninId(const unsigned faninid){_faninIdList.push_back(faninid);}
    unsigned getFaninId (const size_t& idx) const {return _faninIdList[idx];} 
+   size_t getFaninIdLen() const {return _faninIdList.size();}
+
    // fanin inverse I/O
-   void setFaninInv(const unsigned fanininv){_faninInvList.push_back(fanininv);}
-   unsigned getFaninInv (const size_t& idx) const {return _faninInvList[idx];} 
+   void setFaninInv(const bool fanininv){_faninInvList.push_back(fanininv);}
+   bool getFaninInv (const size_t& idx) const {return _faninInvList[idx];} 
    // fanin list I/O
    void setFanin(CirGate* fanin){_faninList.push_back(fanin);}
+   void rmFanin(CirGate*);
    CirGate* getFanin (const size_t& idx) const {return _faninList[idx];} 
-   size_t getFaninLen() const {return _faninIdList.size();}
+   size_t getFaninLen() const {return _faninList.size();}
 
    // fanout inverse I/O
-   void setFanoutInv(const unsigned fanoutinv){_fanoutInvList.push_back(fanoutinv);}
-   unsigned getFanoutInv (const size_t& idx) const {return _fanoutInvList[idx];} 
+   void setFanoutInv(const bool fanoutinv){_fanoutInvList.push_back(fanoutinv);}
+   bool getFanoutInv (const size_t& idx) const {return _fanoutInvList[idx];} 
    // fanout list I/O
    void setFanout(CirGate* fanout){_fanoutList.push_back(fanout);}
+   void rmFanout(CirGate* fanout);
    CirGate* getFanout (const size_t& idx) const {return _fanoutList[idx];} 
    size_t getFanoutLen () const {return _fanoutList.size();} 
 

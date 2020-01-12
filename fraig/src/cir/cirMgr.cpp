@@ -273,7 +273,7 @@ CirMgr::connect(){
    for (; iter != _gateList.end(); ++iter){
       CirGate* gateNow = iter->second;
       //traversal fanins to gate
-      for (size_t i = 0; i<gateNow->getFaninLen(); ++i){
+      for (size_t i = 0; i<gateNow->getFaninIdLen(); ++i){
          unsigned gateInId = gateNow->getFaninId(i);
          GateMap::iterator gateInIter = _gateList.find(gateInId);
          //connect known, erase used gate from _notuList

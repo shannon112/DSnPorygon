@@ -26,6 +26,34 @@ extern CirMgr *cirMgr;
 /**************************************/
 extern unsigned visitedBase;
 
+void 
+CirGate::rmFanin(CirGate* fanin)
+{ 
+   size_t i = 0;
+   for(auto iter = _faninList.begin(); iter != _faninList.end(); ++iter,++i){ 
+      if(*iter == fanin) {
+         _faninList.erase(iter); 
+         _faninInvList.erase(_faninInvList.begin()+i);
+         //cout<<_faninList.size()<<_faninInvList.size()<<endl;
+         return;
+      } 
+   } 
+}
+
+void 
+CirGate::rmFanout(CirGate* fanout)
+{ 
+   size_t i = 0;
+   for(auto iter = _fanoutList.begin(); iter != _fanoutList.end(); ++iter) {
+      if(*iter == fanout) {
+         _fanoutList.erase(iter); 
+         _fanoutInvList.erase(_fanoutInvList.begin()+i);
+         //cout<<_fanoutList.size()<<_fanoutInvList.size()<<endl;
+         return;
+      } 
+   } 
+}
+
 void
 CirGate::reportFanin(int level) const
 {
@@ -150,7 +178,7 @@ void
 CirPoGate::reportNetlist(unsigned& idx) const
 {
    int gateId = getGateId();
-   int faninId = getFaninId(0);
+   int faninId = getFanin(0)->getGateId();
    const string isFloating = (getFanin(0)->getLineNo()==0)&&(getFanin(0)->getGateId()!=0) ? "*":"";
    const string isInverse = getFaninInv(0) ? "!":"";
    if (getSymbolName()==0) cout<<"["<<idx<<"] "<<setw(4)<<left<<"PO "<<gateId<<" "<<isFloating<<isInverse<<faninId<<endl;
@@ -175,8 +203,8 @@ void
 CirAigGate::reportNetlist(unsigned& idx) const
 {
    int gateId = getGateId();
-   int faninId0 = getFaninId(0);
-   int faninId1 = getFaninId(1);
+   int faninId0 = getFanin(0)->getGateId();
+   int faninId1 = getFanin(1)->getGateId();
    const string isFloating0 = (getFanin(0)->getLineNo()==0)&&(getFanin(0)->getGateId()!=0) ? "*":"";
    const string isFloating1 = (getFanin(1)->getLineNo()==0)&&(getFanin(1)->getGateId()!=0) ? "*":"";
    const string isInverse0 = getFaninInv(0) ? "!":"";

@@ -68,15 +68,19 @@ private:
    bool readSymbols(fstream&);
    bool readComments(fstream&);
    void connect();
+   void deleteGate(const unsigned&);
    void DFSVisitNet(CirGate*) const;
    void DFSVisitSweep(CirGate*) const;
+   void DFSVisitOpt(CirGate*);
    void DFSvisitAig(CirGate*,GateList&);
+   void optimizeGate(CirGate*);
+   void replaceGate(CirGate*,CirGate*, const bool&); //replace A with B
    unsigned _MaxVaIdx, _PI, _LA, _PO, _AIG; //header
-   GateMap _gateList;
-   GateList _piList;
-   GateList _poList;
-   GateIntSet _floList;
-   GateIntSet _notuList;
+   GateMap           _gateList;
+   GateList            _piList;
+   GateList            _poList;
+   GateIntSet         _floList;
+   GateIntSet        _notuList;
    ofstream           *_simLog;
 
 };
