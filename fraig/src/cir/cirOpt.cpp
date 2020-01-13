@@ -94,6 +94,7 @@ CirMgr::optimize()
 void
 CirMgr::DFSVisitOpt(CirGate* gate)
 {
+  //cout<<"DFS to "<<gate->getGateId()<<endl;
    if (gate->visitedNo>visitedBase) return;
    else{
       gate->visitedNo = visitedBase+1;
@@ -114,6 +115,8 @@ CirMgr::optimizeGate(CirGate* gate){
       string gateIn1type = gateIn1->getTypeStr();
       bool gateIn1Sign = gate->getFaninInv(1);
       
+      //cout<<"this is "<<gate->getGateId()<<",fanin"<<gate->getFaninLen()<<",fanout"<<gate->getFanoutLen()<<endl;
+
       //case 1 : Fanin has const1 => replace by other fanin
       if((gateIn0type=="CONST")&&(gateIn0Sign==1)){
         string isInverse = gateIn1Sign ? "!":"";
@@ -138,7 +141,7 @@ CirMgr::optimizeGate(CirGate* gate){
         replaceGate(gate,gateIn0,gateIn0Sign);
         gateIn1->rmFanout(gate);
         deleteGate(gate->getGateId());
-        if(gateIn1->getFaninLen()==0) _notuList.insert(gateIn1->getGateId());
+        if(gateIn1->getFanoutLen()==0) _notuList.insert(gateIn1->getGateId());
       }
 
       //case 2 : Fanin has const0 => replace by const0
@@ -147,24 +150,42 @@ CirMgr::optimizeGate(CirGate* gate){
         replaceGate(gate,gateIn1,gateIn1Sign);
         gateIn0->rmFanout(gate);
         deleteGate(gate->getGateId());
-        if(gateIn0->getFaninLen()==0) _notuList.insert(gateIn0->getGateId());
+        if(gateIn0->getFanoutLen()==0) _notuList.insert(gateIn0->getGateId());
       }
 
       //case 3 : Identical fanin => replace by fanin
       else if((gateIn0==gateIn1)&&(gateIn0Sign==gateIn1Sign)){
         string isInverse = gateIn0Sign ? "!":"";
         cout<<"Simplifying: "<<gateIn0->getGateId()<<" merging "<<isInverse<<gate->getGateId()<<"..."<<endl;
-        replaceGate(gate,gateIn0,gateIn0Sign);
+        // in <- X <- out
+        for(size_t j=0; j<gate->getFanoutLen(); ++j)
+          (gate->getFanout(j))->replaceFanin(gate, gateIn0, gateIn0Sign);
+        // in -> X -> out
+        gateIn0->rmFanout(gate); gateIn0->rmFanout(gate);
+        for(size_t j=0; j<gate->getFanoutLen(); ++j){
+          gateIn0->setFanout(gate->getFanout(j));
+          gateIn0->setFanoutInv(gateIn0Sign);
+        }
         deleteGate(gate->getGateId());
       }
+
       //case 4 : Inverted fanin => replace by const0
       else if((gateIn0==gateIn1)&&(gateIn0Sign!=gateIn1Sign)){
         cout<<"Simplifying: 0 merging "<<gate->getGateId()<<"..."<<endl;
-        replaceGate(gate,getGate(0),0);
-        gateIn0->rmFanout(gate);
+        CirGate* constGate = getGate(0);
+        // in <- X <- out
+        for(size_t j=0; j<gate->getFanoutLen(); ++j)
+          (gate->getFanout(j))->replaceFanin(gate, constGate, gate->getFanoutInv(j));
+        // in -> X -> out
+        for(size_t j=0; j<gate->getFanoutLen(); ++j){
+          constGate->setFanout(gate->getFanout(j));
+          constGate->setFanoutInv(gate->getFanoutInv(j));
+        }
+        gateIn0->rmFanout(gate); gateIn0->rmFanout(gate);
         deleteGate(gate->getGateId());
-        if(gateIn0->getFaninLen()==0) _notuList.insert(gateIn0->getGateId()); 
+        if(gateIn0->getFanoutLen()==0) _notuList.insert(gateIn0->getGateId()); 
       }
+
       else{
         //cout<<"save, do not need to optimize"<<endl;
       }
@@ -176,15 +197,9 @@ void
 CirMgr::replaceGate(CirGate* gateA, CirGate* gateB, const bool& gateBSign) 
 {
   // in <- X <- out
-  for(size_t j=0; j<gateA->getFanoutLen(); --j){
-    (gateA->getFanout(j))->setFanin(gateB);
-    (gateA->getFanout(j))->setFaninInv(gateBSign);
-    (gateA->getFanout(j))->rmFanin(gateA);
-  }
+  for(size_t j=0; j<gateA->getFanoutLen(); ++j)
+    (gateA->getFanout(j))->replaceFanin(gateA, gateB, gateBSign);
   // in -> X -> out
-  for(size_t j=0; j<gateA->getFanoutLen(); --j){
-    gateB->setFanout(gateA->getFanout(j));
-    gateB->setFanoutInv(gateBSign);
-    gateB->rmFanout(gateA);
-  }
+  for(size_t j=0; j<gateA->getFanoutLen(); ++j)
+    gateB->replaceFanout(gateA, gateA->getFanout(j), gateBSign);
 }

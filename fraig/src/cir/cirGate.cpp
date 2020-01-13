@@ -34,21 +34,53 @@ CirGate::rmFanin(CirGate* fanin)
       if(*iter == fanin) {
          _faninList.erase(iter); 
          _faninInvList.erase(_faninInvList.begin()+i);
-         //cout<<_faninList.size()<<_faninInvList.size()<<endl;
+         //cout<<getGateId()<<"fanin"<<_faninList.size()<<_faninInvList.size()<<endl;
          return;
       } 
-   } 
+   }
 }
 
 void 
 CirGate::rmFanout(CirGate* fanout)
 { 
    size_t i = 0;
-   for(auto iter = _fanoutList.begin(); iter != _fanoutList.end(); ++iter) {
+   for(auto iter = _fanoutList.begin(); iter != _fanoutList.end(); ++iter,++i) {
       if(*iter == fanout) {
          _fanoutList.erase(iter); 
          _fanoutInvList.erase(_fanoutInvList.begin()+i);
-         //cout<<_fanoutList.size()<<_fanoutInvList.size()<<endl;
+         //cout<<getGateId()<<"fanout"<<_fanoutList.size()<<_fanoutInvList.size()<<endl;
+         return;
+      } 
+   } 
+}
+
+void 
+CirGate::replaceFanin(CirGate* faninOld, CirGate* faninNew, bool faninSignNew)
+{ 
+   size_t i = 0;
+   for(auto iter = _faninList.begin(); iter != _faninList.end(); ++iter,++i){ 
+      if(*iter == faninOld) {
+         _faninList.erase(iter); 
+         _faninList.insert(iter, faninNew); 
+         _faninInvList.erase(_faninInvList.begin()+i);
+         _faninInvList.insert(_faninInvList.begin()+i,faninSignNew);
+         //cout<<getGateId()<<"fanin"<<_faninList.size()<<_faninInvList.size()<<endl;
+         return;
+      } 
+   }
+}
+
+void 
+CirGate::replaceFanout(CirGate* fanoutOld, CirGate* fanoutNew, bool fanoutSignNew)
+{ 
+   size_t i = 0;
+   for(auto iter = _fanoutList.begin(); iter != _fanoutList.end(); ++iter,++i) {
+      if(*iter == fanoutOld) {
+         _fanoutList.erase(iter); 
+         _fanoutList.insert(iter, fanoutNew); 
+         _fanoutInvList.erase(_fanoutInvList.begin()+i);
+         _fanoutInvList.insert(_fanoutInvList.begin()+i, fanoutSignNew);
+         //cout<<getGateId()<<"fanout"<<_fanoutList.size()<<_fanoutInvList.size()<<endl;
          return;
       } 
    } 

@@ -54,6 +54,7 @@ public:
    // fanin list I/O
    void setFanin(CirGate* fanin){_faninList.push_back(fanin);}
    void rmFanin(CirGate*);
+   void replaceFanin(CirGate*,CirGate*,bool);
    CirGate* getFanin (const size_t& idx) const {return _faninList[idx];} 
    size_t getFaninLen() const {return _faninList.size();}
 
@@ -63,6 +64,7 @@ public:
    // fanout list I/O
    void setFanout(CirGate* fanout){_fanoutList.push_back(fanout);}
    void rmFanout(CirGate* fanout);
+   void replaceFanout(CirGate*,CirGate*,bool);
    CirGate* getFanout (const size_t& idx) const {return _fanoutList[idx];} 
    size_t getFanoutLen () const {return _fanoutList.size();} 
 
