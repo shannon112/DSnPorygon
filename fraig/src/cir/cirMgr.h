@@ -87,9 +87,14 @@ private:
    void DFSVisitOpt(CirGate*);
    void optimizeGate(CirGate*);
 
+   // Member functions about fraig
+   void DFSVisitStrash(CirGate*);
+   void strashGate(CirGate*);
+
    // Data member
    unsigned _MaxVaIdx, _PI, _LA, _PO, _AIG; //header
    GateMap           _gateList;
+   GateHash           _hashmap;
    GateList            _piList;
    GateList            _poList;
    GateIntSet         _floList;

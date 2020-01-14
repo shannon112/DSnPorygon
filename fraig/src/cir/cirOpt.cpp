@@ -36,7 +36,11 @@ CirMgr::deleteGate(const unsigned& id)
 {
   GateMap::iterator gateIter = _gateList.find(id);
   if(gateIter != _gateList.end()){
-    if (gateIter->second->getTypeStr()=="AIG") _AIG = _AIG-1;
+    if (gateIter->second->getTypeStr()=="AIG") {
+      _AIG = _AIG-1;
+      _floList.erase(id);
+      _notuList.erase(id);
+    }
     else if (gateIter->second->getTypeStr()=="PI") _PI = _PI-1;
     else if (gateIter->second->getTypeStr()=="PO") _PO = _PO-1;
     delete gateIter->second;
@@ -69,7 +73,6 @@ CirMgr::sweep()
           (gatenow->getFanin(j))->rmFanouts(gatenow);
         for(size_t j=0; j<gatenow->getFanoutLen(); ++j)
           (gatenow->getFanout(j))->rmFanins(gatenow);
-        _floList.erase(gatenow->getGateId());
         deleteGate(gatenow->getGateId());
       }
       //simple remove and update its fanout _flolist

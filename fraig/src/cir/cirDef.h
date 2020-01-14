@@ -12,6 +12,7 @@
 #include <map>
 #include <vector>
 #include <set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -27,6 +28,9 @@ class CirAigGate;
 
 typedef map<unsigned, CirGate*>   GateMap;
 typedef pair<unsigned, CirGate*>  GatePair;
+typedef unordered_map<size_t, CirGate*>  GateHash;
+typedef pair<size_t, CirGate*>  HashPair;
+
 
 typedef vector<CirGate*>           GateList;
 typedef set<unsigned>            GateIntSet;
