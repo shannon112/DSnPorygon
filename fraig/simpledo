@@ -1,5 +1,9 @@
 cirr simple.aag
 cirp
+cirp -flo
+cirp -po
+cirp -pi
+cirp -n
 cirg 11 -fani 4
 cirg 2 -fano 4
 cirg 8 -fani 4

@@ -19,50 +19,75 @@ using namespace std;
 /*******************************/
 /*   Global variable and enum  */
 /*******************************/
+extern unsigned visitedBase;
 
 /**************************************/
 /*   Static varaibles and functions   */
 /**************************************/
-extern unsigned visitedBase;
+
 /**************************************************/
-/*   Public member functions about optimization   */
+/*   Public member functions about sweep   */
 /**************************************************/
 // Remove unused gates
 // DFS list should NOT be changed
 // UNDEF, float and unused list may be changed
 void
-CirMgr::deleteGate(const unsigned& id){
+CirMgr::deleteGate(const unsigned& id)
+{
   GateMap::iterator gateIter = _gateList.find(id);
   if(gateIter != _gateList.end()){
-    _gateList.erase(gateIter);
     if (gateIter->second->getTypeStr()=="AIG") _AIG = _AIG-1;
     else if (gateIter->second->getTypeStr()=="PI") _PI = _PI-1;
     else if (gateIter->second->getTypeStr()=="PO") _PO = _PO-1;
     delete gateIter->second;
+    _gateList.erase(gateIter);
   }
 }
 
 void
 CirMgr::sweep()
 {
+  //DFS visit and marked
   visitedBase++;
   for(size_t i = 0; i<_PO; ++i) DFSVisitSweep(_poList[i]);
 
-  // clean _floList and _notuList
-  _floList.clear();
+  // clean _notuList
   _notuList.clear();
 
-  //delete those unused gates
-  for (auto iter = _gateList.begin(); iter!=_gateList.end(); ++iter){
-    CirGate* gatenow = iter->second;
+  //go through every gate, delete those unused gates
+  size_t gates = getGateListSize();
+  for (size_t i = 0; i<gates; ++i){
+    CirGate* gatenow = getGate(i);
+
+    //cout<<"this is "<<gatenow->getGateId()<<gatenow->visitedNo<<endl;
+
     if (gatenow->visitedNo<=visitedBase){
-      if ((gatenow->getTypeStr()!="PI")&&(gatenow->getTypeStr()!="CONST")){
+      //remove and update its fanin fanout
+      if (gatenow->getTypeStr()=="AIG"){
         cout<<"Sweeping: "<<gatenow->getTypeStr()<<"("<<gatenow->getGateId()<<") removed..."<<endl;
+        for(size_t j=0; j<gatenow->getFaninLen(); ++j)
+          (gatenow->getFanin(j))->rmFanouts(gatenow);
+        for(size_t j=0; j<gatenow->getFanoutLen(); ++j)
+          (gatenow->getFanout(j))->rmFanins(gatenow);
+        _floList.erase(gatenow->getGateId());
         deleteGate(gatenow->getGateId());
       }
-      else{
-        if (gatenow->getTypeStr()=="PI")
-          _notuList.insert(gatenow-> getGateId());
+      //simple remove and update its fanout _flolist
+      else if (gatenow->getTypeStr()=="UNDEF"){
+        cout<<"Sweeping: "<<gatenow->getTypeStr()<<"("<<gatenow->getGateId()<<") removed..."<<endl;
+        for(size_t j=0; j<gatenow->getFanoutLen(); ++j){
+          (gatenow->getFanout(j))->rmFanins(gatenow);
+          size_t undefcount = 0;
+          for(size_t k=0; k<gatenow->getFanout(j)->getFaninLen(); ++k)
+            if (gatenow->getFanout(j)->getFanin(k)->getTypeStr()=="UNDEF") ++undefcount;
+          if(undefcount==0) _floList.erase(gatenow->getFanout(j)->getGateId());
+        }
+        deleteGate(gatenow->getGateId());
+      }
+      //simple preserve and update its fanout
+      else if (gatenow->getTypeStr()=="PI"){
+        gatenow->clearFanouts();
+        _notuList.insert(gatenow-> getGateId());
       }
     }
   }
@@ -80,7 +105,9 @@ CirMgr::DFSVisitSweep(CirGate* gate) const
    }
 }
 
-
+/**************************************************/
+/*   Public member functions about optimization   */
+/**************************************************/
 // Recursively simplifying from POs;
 // _dfsList needs to be reconstructed afterwards
 // UNDEF gates may be delete if its fanout becomes empty...
@@ -106,7 +133,8 @@ CirMgr::DFSVisitOpt(CirGate* gate)
 }
 
 void
-CirMgr::optimizeGate(CirGate* gate){
+CirMgr::optimizeGate(CirGate* gate)
+{
   CirGate* gateIn0 = gate->getFanin(0);
   CirGate* gateIn1 = gate->getFanin(1);
   if ((gateIn0)&&(gateIn1)){
@@ -122,7 +150,7 @@ CirMgr::optimizeGate(CirGate* gate){
         string isInverse = gateIn1Sign ? "!":"";
         cout<<"Simplifying: "<<gateIn1->getGateId()<<" merging "<<isInverse<<gate->getGateId()<<"..."<<endl;
         replaceGate(gate,gateIn1,gateIn1Sign);
-        gateIn0->rmFanout(gate);
+        gateIn0->rmFanouts(gate);
         deleteGate(gate->getGateId());
       }
 
@@ -131,7 +159,7 @@ CirMgr::optimizeGate(CirGate* gate){
         string isInverse = gateIn0Sign ? "!":"";
         cout<<"Simplifying: "<<gateIn0->getGateId()<<" merging "<<isInverse<<gate->getGateId()<<"..."<<endl;
         replaceGate(gate,gateIn0,gateIn0Sign);
-        gateIn1->rmFanout(gate);
+        gateIn1->rmFanouts(gate);
         deleteGate(gate->getGateId());
       }
 
@@ -139,7 +167,7 @@ CirMgr::optimizeGate(CirGate* gate){
       else if((gateIn0type=="CONST")&&(gateIn0Sign==0)){
         cout<<"Simplifying: "<<gateIn0->getGateId()<<" merging "<<gate->getGateId()<<"..."<<endl;
         replaceGate(gate,gateIn0,gateIn0Sign);
-        gateIn1->rmFanout(gate);
+        gateIn1->rmFanouts(gate);
         deleteGate(gate->getGateId());
         if(gateIn1->getFanoutLen()==0) _notuList.insert(gateIn1->getGateId());
       }
@@ -148,7 +176,7 @@ CirMgr::optimizeGate(CirGate* gate){
       else if((gateIn1type=="CONST")&&(gateIn1Sign==0)){
         cout<<"Simplifying: "<<gateIn1->getGateId()<<" merging "<<gate->getGateId()<<"..."<<endl;
         replaceGate(gate,gateIn1,gateIn1Sign);
-        gateIn0->rmFanout(gate);
+        gateIn0->rmFanouts(gate);
         deleteGate(gate->getGateId());
         if(gateIn0->getFanoutLen()==0) _notuList.insert(gateIn0->getGateId());
       }
@@ -159,9 +187,9 @@ CirMgr::optimizeGate(CirGate* gate){
         cout<<"Simplifying: "<<gateIn0->getGateId()<<" merging "<<isInverse<<gate->getGateId()<<"..."<<endl;
         // in <- X <- out
         for(size_t j=0; j<gate->getFanoutLen(); ++j)
-          (gate->getFanout(j))->replaceFanin(gate, gateIn0, gateIn0Sign);
+          (gate->getFanout(j))->replaceFanins(gate, gateIn0, gateIn0Sign);
         // in -> X -> out
-        gateIn0->rmFanout(gate); gateIn0->rmFanout(gate);
+        gateIn0->rmFanouts(gate); gateIn0->rmFanouts(gate);
         for(size_t j=0; j<gate->getFanoutLen(); ++j){
           gateIn0->setFanout(gate->getFanout(j));
           gateIn0->setFanoutInv(gateIn0Sign);
@@ -175,13 +203,13 @@ CirMgr::optimizeGate(CirGate* gate){
         CirGate* constGate = getGate(0);
         // in <- X <- out
         for(size_t j=0; j<gate->getFanoutLen(); ++j)
-          (gate->getFanout(j))->replaceFanin(gate, constGate, gate->getFanoutInv(j));
+          (gate->getFanout(j))->replaceFanins(gate, constGate, gate->getFanoutInv(j));
         // in -> X -> out
         for(size_t j=0; j<gate->getFanoutLen(); ++j){
           constGate->setFanout(gate->getFanout(j));
           constGate->setFanoutInv(gate->getFanoutInv(j));
         }
-        gateIn0->rmFanout(gate); gateIn0->rmFanout(gate);
+        gateIn0->rmFanouts(gate); gateIn0->rmFanouts(gate);
         deleteGate(gate->getGateId());
         if(gateIn0->getFanoutLen()==0) _notuList.insert(gateIn0->getGateId()); 
       }
@@ -198,8 +226,8 @@ CirMgr::replaceGate(CirGate* gateA, CirGate* gateB, const bool& gateBSign)
 {
   // in <- X <- out
   for(size_t j=0; j<gateA->getFanoutLen(); ++j)
-    (gateA->getFanout(j))->replaceFanin(gateA, gateB, gateBSign);
+    (gateA->getFanout(j))->replaceFanins(gateA, gateB, gateBSign);
   // in -> X -> out
   for(size_t j=0; j<gateA->getFanoutLen(); ++j)
-    gateB->replaceFanout(gateA, gateA->getFanout(j), gateBSign);
+    gateB->replaceFanouts(gateA, gateA->getFanout(j), gateBSign);
 }

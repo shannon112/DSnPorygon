@@ -43,8 +43,7 @@ public:
    void fraig();
 
    // Access functions
-   // return '0' if "gid" corresponds to an undefined gate.
-   CirGate* getGate(unsigned gid) const { 
+   CirGate* getGate(unsigned gid) const {  // return '0' if "gid" corresponds to an undefined gate.
      return ( _gateList.find(gid) != _gateList.end()) ? _gateList.find(gid)->second : 0; }
 
    // Member functions about circuit construction
@@ -57,10 +56,15 @@ public:
    void printPOs() const;
    void printFloatGates() const;
    void printFECPairs() const;
+   void printCircuitIO() const;
+
+   // Member functions about circuit writing
    void writeAag(ostream&);
+   void DFSvisitWaag(CirGate*,GateList&);
    void writeGate(ostream&, CirGate*) const;
 
 private:
+   // Member functions about circuit construction
    bool readHeader(fstream&);
    bool readInput(fstream&);
    bool readOutput(fstream&);
@@ -68,13 +72,21 @@ private:
    bool readSymbols(fstream&);
    bool readComments(fstream&);
    void connect();
+
+   // Access functions
+   size_t getGateListSize(){return _gateList.size();}
    void deleteGate(const unsigned&);
+   void replaceGate(CirGate*,CirGate*, const bool&); //replace A with B
+
+   // Member functions about circuit reporting
    void DFSVisitNet(CirGate*) const;
+
+   // Member functions about circuit optimization
    void DFSVisitSweep(CirGate*) const;
    void DFSVisitOpt(CirGate*);
-   void DFSvisitAig(CirGate*,GateList&);
    void optimizeGate(CirGate*);
-   void replaceGate(CirGate*,CirGate*, const bool&); //replace A with B
+
+   // Data member
    unsigned _MaxVaIdx, _PI, _LA, _PO, _AIG; //header
    GateMap           _gateList;
    GateList            _piList;

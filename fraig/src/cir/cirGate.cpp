@@ -18,16 +18,16 @@
 using namespace std;
 
 extern CirMgr *cirMgr;
+extern unsigned visitedBase;
 
 // TODO: Implement memeber functions for class(es) in cirGate.h
 
 /**************************************/
 /*   class CirGate member functions   */
 /**************************************/
-extern unsigned visitedBase;
-
+/****   fanin I/O     ****/
 void 
-CirGate::rmFanin(CirGate* fanin)
+CirGate::rmFanins(CirGate* fanin)
 { 
    size_t i = 0;
    for(auto iter = _faninList.begin(); iter != _faninList.end(); ++iter,++i){ 
@@ -41,21 +41,7 @@ CirGate::rmFanin(CirGate* fanin)
 }
 
 void 
-CirGate::rmFanout(CirGate* fanout)
-{ 
-   size_t i = 0;
-   for(auto iter = _fanoutList.begin(); iter != _fanoutList.end(); ++iter,++i) {
-      if(*iter == fanout) {
-         _fanoutList.erase(iter); 
-         _fanoutInvList.erase(_fanoutInvList.begin()+i);
-         //cout<<getGateId()<<"fanout"<<_fanoutList.size()<<_fanoutInvList.size()<<endl;
-         return;
-      } 
-   } 
-}
-
-void 
-CirGate::replaceFanin(CirGate* faninOld, CirGate* faninNew, bool faninSignNew)
+CirGate::replaceFanins(CirGate* faninOld, CirGate* faninNew, bool faninSignNew)
 { 
    size_t i = 0;
    for(auto iter = _faninList.begin(); iter != _faninList.end(); ++iter,++i){ 
@@ -70,8 +56,23 @@ CirGate::replaceFanin(CirGate* faninOld, CirGate* faninNew, bool faninSignNew)
    }
 }
 
+/****   fanout I/O     ****/
 void 
-CirGate::replaceFanout(CirGate* fanoutOld, CirGate* fanoutNew, bool fanoutSignNew)
+CirGate::rmFanouts(CirGate* fanout)
+{ 
+   size_t i = 0;
+   for(auto iter = _fanoutList.begin(); iter != _fanoutList.end(); ++iter,++i) {
+      if(*iter == fanout) {
+         _fanoutList.erase(iter); 
+         _fanoutInvList.erase(_fanoutInvList.begin()+i);
+         //cout<<getGateId()<<"fanout"<<_fanoutList.size()<<_fanoutInvList.size()<<endl;
+         return;
+      } 
+   } 
+}
+
+void 
+CirGate::replaceFanouts(CirGate* fanoutOld, CirGate* fanoutNew, bool fanoutSignNew)
 { 
    size_t i = 0;
    for(auto iter = _fanoutList.begin(); iter != _fanoutList.end(); ++iter,++i) {
@@ -86,6 +87,7 @@ CirGate::replaceFanout(CirGate* fanoutOld, CirGate* fanoutNew, bool fanoutSignNe
    } 
 }
 
+/****   Nested report circuit      ****/
 void
 CirGate::reportFanin(int level) const
 {
@@ -103,7 +105,8 @@ CirGate::reportFanout(int level) const
 }
 
 void 
-CirGate::DFSvisitIn(const int& total_level, int level, bool inverse, const CirGate* gate) const {
+CirGate::DFSvisitIn(const int& total_level, int level, bool inverse, const CirGate* gate) const 
+{
    if (level>=0){
       const string isInverse = inverse ? "!":"";
       cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
@@ -126,7 +129,8 @@ CirGate::DFSvisitIn(const int& total_level, int level, bool inverse, const CirGa
 }
 
 void 
-CirGate::DFSvisitOut(const int& total_level, int level, bool inverse, const CirGate* gate) const {
+CirGate::DFSvisitOut(const int& total_level, int level, bool inverse, const CirGate* gate) const 
+{
    const string isInverse = inverse ? "!":"";
    cout<<string(2*(total_level-level),' ')<<isInverse<<gate->getTypeStr()<<" "<<gate->getGateId();
 

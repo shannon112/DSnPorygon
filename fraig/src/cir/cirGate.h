@@ -18,11 +18,7 @@
 
 using namespace std;
 
-//------------------------------------------------------------------------
-//   Define classes
-//------------------------------------------------------------------------
 // TODO: Define your own data members and member functions, or classes
-
 
 /**************************************/
 /*   class CirGate                    */
@@ -31,51 +27,49 @@ class CirGate
 {
 public:
    CirGate(unsigned gateID, unsigned lineNo, string gateType) 
-   :_gateID(gateID),_lineNo(lineNo),_gateType(gateType){} 
+      :_gateID(gateID),_lineNo(lineNo),_gateType(gateType){} 
    virtual ~CirGate() {}
-
    virtual bool isAig() const { return false; }
    
-   // itself basic access methods
+   // gate basic I/O methods
    string getTypeStr() const { return _gateType; }
-   unsigned getGateId() const {return _gateID;}
-   unsigned getLineNo() const {return _lineNo;}
    string* getSymbolName() const { return _symbolName; }
    void setSymbolName(const string name) { _symbolName=new string(name); }
+   unsigned getGateId() const {return _gateID;}
+   unsigned getLineNo() const {return _lineNo;}
+   virtual void reportGate() const = 0;
+   virtual void reportNetlist(unsigned&) const = 0;
 
-   // fanin id I/O, only be used in the beginning
+   // fanin id I/O <<only be used at the beginning>>
    void setFaninId(const unsigned faninid){_faninIdList.push_back(faninid);}
    unsigned getFaninId (const size_t& idx) const {return _faninIdList[idx];} 
    size_t getFaninIdLen() const {return _faninIdList.size();}
 
-   // fanin inverse I/O
+   // fanin I/O
    void setFaninInv(const bool fanininv){_faninInvList.push_back(fanininv);}
    bool getFaninInv (const size_t& idx) const {return _faninInvList[idx];} 
-   // fanin list I/O
    void setFanin(CirGate* fanin){_faninList.push_back(fanin);}
-   void rmFanin(CirGate*);
-   void replaceFanin(CirGate*,CirGate*,bool);
    CirGate* getFanin (const size_t& idx) const {return _faninList[idx];} 
+   void rmFanins(CirGate*); //rm fanin and faninInv
+   void clearFanins(){_faninList.clear();_faninInvList.clear();}
+   void replaceFanins(CirGate*,CirGate*,bool); //replace fanin and faninInv
    size_t getFaninLen() const {return _faninList.size();}
 
-   // fanout inverse I/O
+   // fanout I/O
    void setFanoutInv(const bool fanoutinv){_fanoutInvList.push_back(fanoutinv);}
    bool getFanoutInv (const size_t& idx) const {return _fanoutInvList[idx];} 
-   // fanout list I/O
    void setFanout(CirGate* fanout){_fanoutList.push_back(fanout);}
-   void rmFanout(CirGate* fanout);
-   void replaceFanout(CirGate*,CirGate*,bool);
    CirGate* getFanout (const size_t& idx) const {return _fanoutList[idx];} 
+   void rmFanouts(CirGate* fanout); //rm fanout and fanoutInv
+   void clearFanouts(){_fanoutList.clear();_fanoutInvList.clear();}
+   void replaceFanouts(CirGate*,CirGate*,bool); //replace fanin and faninInv
    size_t getFanoutLen () const {return _fanoutList.size();} 
 
-   // default
-   virtual void reportGate() const = 0;
-   virtual void reportNetlist(unsigned&) const = 0;
+   // nested report circuit
    void reportFanin(int level) const;
    void reportFanout(int level) const;
 
    mutable unsigned visitedNo = 0;
-   mutable GateIntSet visiterId;
 
 protected:
    //itself
@@ -88,10 +82,12 @@ protected:
    vector<bool> _fanoutInvList;
    //fanin
    GateList _faninList;
-   vector<unsigned> _faninIdList;
    vector<bool> _faninInvList;
+   //faninId
+   vector<unsigned> _faninIdList;
 
 private:
+   // nested report circuit
    void DFSvisitIn(const int&, int, bool, const CirGate*) const;
    void DFSvisitOut(const int&, int, bool, const CirGate*) const;
 };

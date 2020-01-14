@@ -304,7 +304,7 @@ CirMgr::connect(){
 }
 
 /**********************************************************/
-/*   class CirMgr member functions for circuit printing   */
+/*   class CirMgr member functions for circuit reporting   */
 /**********************************************************/
 void
 CirMgr::printSummary() const
@@ -317,6 +317,7 @@ CirMgr::printSummary() const
    cout<<"  AIG"<<setw(11)<<right<<_AIG<<endl;
    cout<<"------------------"<<endl;
    cout<<"  Total"<<setw(9)<<right<<_PI+_PO+_AIG<<endl;
+   //printCircuitIO();
 }
 
 void
@@ -395,13 +396,26 @@ CirMgr::printFECPairs() const
 }
 
 void
+CirMgr::printCircuitIO() const
+{
+   for (auto iter = _gateList.begin(); iter != _gateList.end(); ++iter){
+      CirGate* gateNow = iter->second;
+      cout<<"this is "<<gateNow->getGateId()<<" faninLen "<<gateNow->getFaninIdLen()<<" fanoutLen "<<gateNow->getFanoutLen()<<endl;
+   }
+}
+
+/**********************************************************/
+/*   class CirMgr member functions for circuit writing   */
+/**********************************************************/
+
+void
 CirMgr::writeAag(ostream& outfile)
 {
    //DFS
    GateList aigList;
    visitedBase++;
    for(size_t i = 0; i<_PO; ++i) 
-      DFSvisitAig(_poList[i],aigList);
+      DFSvisitWaag(_poList[i],aigList);
    //header
    outfile<<"aag "<<_MaxVaIdx<<" "<<_PI<<" "<<_LA<<" "<<_PO<<" "<<aigList.size()<<endl;
    //PI
@@ -428,14 +442,14 @@ CirMgr::writeAag(ostream& outfile)
 }
 
 void
-CirMgr::DFSvisitAig(CirGate* gate, GateList& aigList)
+CirMgr::DFSvisitWaag(CirGate* gate, GateList& aigList)
 {
    if (gate->visitedNo>visitedBase) return;
    else{
       gate->visitedNo = visitedBase+1;
       //traversal fanins to gate
       for (size_t i = 0; i<gate->getFaninLen(); ++i)
-         DFSvisitAig(gate->getFanin(i),aigList);
+         DFSvisitWaag(gate->getFanin(i),aigList);
       if (gate->getTypeStr()=="AIG") aigList.push_back(gate);
    }
 }
@@ -444,4 +458,3 @@ void
 CirMgr::writeGate(ostream& outfile, CirGate *g) const
 {
 }
-
