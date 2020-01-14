@@ -149,6 +149,13 @@ parseError(CirParseError err)
 /**************************************************************/
 /*   class CirMgr member functions for circuit construction   */
 /**************************************************************/
+void
+CirMgr::clear()
+{
+   for (auto iter = _gateList.begin(); iter != _gateList.end(); ++iter)
+      delete iter->second;
+}
+
 bool
 CirMgr::readCircuit(const string& fileName)
 {

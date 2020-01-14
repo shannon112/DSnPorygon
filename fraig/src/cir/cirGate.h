@@ -100,7 +100,9 @@ class CirPiGate: public CirGate
 {
 public:
    CirPiGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){}
-   ~CirPiGate() {}
+   ~CirPiGate() {
+     if(_symbolName) delete _symbolName;
+   }
    void reportGate() const;
    void reportNetlist(unsigned&) const;
 };
@@ -113,7 +115,9 @@ class CirPoGate: public CirGate
 {
 public:
    CirPoGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){}
-   ~CirPoGate() {}
+   ~CirPoGate() {
+     if(_symbolName) delete _symbolName;
+   }
    // Basic access methods
    void reportGate() const;
    void reportNetlist(unsigned&) const;
@@ -127,7 +131,9 @@ class CirAigGate: public CirGate
 {
 public:
    CirAigGate(unsigned gateID, unsigned lineNo, string gateType):CirGate(gateID,lineNo,gateType){}
-   ~CirAigGate() {}
+   ~CirAigGate() {
+     if(_symbolName) delete _symbolName;
+   }
    // Basic access methods
    void reportGate() const;
    void reportNetlist(unsigned&) const;

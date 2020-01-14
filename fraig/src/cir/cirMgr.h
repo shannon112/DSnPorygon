@@ -26,7 +26,7 @@ class CirMgr
 {
 public:
    CirMgr() {}
-   ~CirMgr() {} 
+   ~CirMgr() { clear(); } 
 
    // Member functions about circuit optimization
    void sweep();
@@ -45,6 +45,7 @@ public:
    // Access functions
    CirGate* getGate(unsigned gid) const {  // return '0' if "gid" corresponds to an undefined gate.
      return ( _gateList.find(gid) != _gateList.end()) ? _gateList.find(gid)->second : 0; }
+   void clear();
 
    // Member functions about circuit construction
    bool readCircuit(const string&);
