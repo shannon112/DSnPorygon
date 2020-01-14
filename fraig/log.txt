@@ -1,165 +1,142 @@
-fraig> cirr strash.aag
+fraig> cirr opt2.aag
 
-fraig> cirp
+fraig> cirp -n 
 
-Circuit Statistics
-==================
-  PI           3
-  PO           2
-  AIG          4
-------------------
-  Total        9
+[0] PI  1
+[1] CONST0
+[2] AIG 3 1 0
+[3] AIG 5 3 0
+[4] PI  2
+[5] AIG 4 !0 2
+[6] AIG 6 4 !1
+[7] AIG 7 5 6
+[8] PO  8 7
 
-fraig> cirp -n
-
-[0] PI  3
-[1] AIG 4 3 *8
-[2] PI  2
-[3] AIG 6 4 2
-[4] PO  9 6
-[5] AIG 5 *8 3
-[6] AIG 7 5 2
-[7] PO  10 7
-
-fraig> cirp -flo
-Gates with floating fanin(s): 4 5
-Gates defined but not used  : 1
-
-fraig> cirp -po
-POs of the circuit: 9 10
-
-fraig> cirp -pi
-PIs of the circuit: 1 2 3
-
-fraig> cirg 3 -fano 4
-PI 3
-  AIG 4
-    AIG 6
-      PO 9
-  AIG 5
-    AIG 7
-      PO 10
-
-fraig> cirg 2 -fano 4
-PI 2
-  AIG 6
-    PO 9
-  AIG 7
-    PO 10
-
-fraig> cirg 1 -fano 5
-PI 1
-
-fraig> cirg 10 -fani 4
-PO 10
+fraig> cirg 8 -fani 4
+PO 8
   AIG 7
     AIG 5
-      UNDEF 8
-      PI 3
-    PI 2
+      AIG 3
+        PI 1
+        CONST 0
+      CONST 0
+    AIG 6
+      AIG 4
+        !CONST 0
+        PI 2
+      !PI 1
 
-fraig> cirg 9 -fani 5
-PO 9
-  AIG 6
-    AIG 4
-      PI 3
-      UNDEF 8
-    PI 2
+fraig> cirg 0 -fano 4
+CONST 0
+  AIG 3
+    AIG 5
+      AIG 7
+        PO 8
+  !AIG 4
+    AIG 6
+      AIG 7 (*)
+  AIG 5 (*)
 
-fraig> cirg 5 -fani 3
-AIG 5
-  UNDEF 8
-  PI 3
+fraig> cirg 1 -fano 4
+PI 1
+  AIG 3
+    AIG 5
+      AIG 7
+        PO 8
+  !AIG 6
+    AIG 7 (*)
 
-fraig> cirg 5 -fano 3
-AIG 5
-  AIG 7
-    PO 10
-
-fraig> cirg 8 -fano 3
-UNDEF 8
+fraig> cirg 2 -fano 4
+PI 2
   AIG 4
     AIG 6
-      PO 9
-  AIG 5
-    AIG 7
-      PO 10
+      AIG 7
+        PO 8
 
-fraig> cirstrash
-Strashing: 4 merging 5...
-Strashing: 6 merging 7...
+fraig> cirg 7 -fano 4
+AIG 7
+  PO 8
+
+fraig> cirg 7 -fani 4
+AIG 7
+  AIG 5
+    AIG 3
+      PI 1
+      CONST 0
+    CONST 0
+  AIG 6
+    AIG 4
+      !CONST 0
+      PI 2
+    !PI 1
 
 fraig> cirp
 
 Circuit Statistics
 ==================
-  PI           3
-  PO           2
-  AIG          2
+  PI           2
+  PO           1
+  AIG          5
 ------------------
-  Total        7
-
-fraig> cirp -n
-
-[0] PI  3
-[1] AIG 4 3 *8
-[2] PI  2
-[3] AIG 6 4 2
-[4] PO  9 6
-[5] PO  10 6
+  Total        8
 
 fraig> cirp -flo
-Gates with floating fanin(s): 4
-Gates defined but not used  : 1
-
-fraig> cirp -po
-POs of the circuit: 9 10
 
 fraig> cirp -pi
-PIs of the circuit: 1 2 3
+PIs of the circuit: 1 2
 
-fraig> cirg 3 -fano 4
-PI 3
-  AIG 4
-    AIG 6
-      PO 9
-      PO 10
+fraig> cirp -po
+POs of the circuit: 8
+
+fraig> ciropt
+Simplifying: 0 merging 3...
+Simplifying: 0 merging 5...
+Simplifying: 2 merging 4...
+Simplifying: 0 merging 7...
+
+fraig> cirp -n 
+
+[0] CONST0
+[1] PO  8 0
+
+fraig> cirg 8 -fani 4
+PO 8
+  CONST 0
+
+fraig> cirg 0 -fano 4
+CONST 0
+  PO 8
+
+fraig> cirg 1 -fano 4
+PI 1
+  !AIG 6
 
 fraig> cirg 2 -fano 4
 PI 2
   AIG 6
-    PO 9
-    PO 10
 
-fraig> cirg 1 -fano 5
-PI 1
+fraig> cirg 7 -fano 4
 
-fraig> cirg 10 -fani 4
-PO 10
-  AIG 6
-    AIG 4
-      PI 3
-      UNDEF 8
-    PI 2
+fraig> cirg 7 -fani 4
 
-fraig> cirg 9 -fani 5
-PO 9
-  AIG 6
-    AIG 4
-      PI 3
-      UNDEF 8
-    PI 2
+fraig> cirp
 
-fraig> cirg 5 -fani 3
+Circuit Statistics
+==================
+  PI           2
+  PO           1
+  AIG          1
+------------------
+  Total        4
 
-fraig> cirg 5 -fano 3
+fraig> cirp -flo
+Gates defined but not used  : 6
 
-fraig> cirg 8 -fano 4
-UNDEF 8
-  AIG 4
-    AIG 6
-      PO 9
-      PO 10
+fraig> cirp -pi
+PIs of the circuit: 1 2
+
+fraig> cirp -po
+POs of the circuit: 8
 
 fraig> 
 fraig> 

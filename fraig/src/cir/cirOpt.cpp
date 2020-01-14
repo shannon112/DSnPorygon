@@ -229,8 +229,8 @@ CirMgr::replaceGate(CirGate* gateA, CirGate* gateB, const bool& gateBSign)
 {
   // in <- X <- out
   for(size_t j=0; j<gateA->getFanoutLen(); ++j)
-    (gateA->getFanout(j))->replaceFanins(gateA, gateB, gateBSign);
+    (gateA->getFanout(j))->replaceFanins(gateA, gateB, gateBSign!=(gateA->getFanoutInv(j)));
   // in -> X -> out
   for(size_t j=0; j<gateA->getFanoutLen(); ++j)
-    gateB->replaceFanouts(gateA, gateA->getFanout(j), gateBSign);
+    gateB->replaceFanouts(gateA, gateA->getFanout(j), gateBSign!=(gateA->getFanoutInv(j)));
 }
