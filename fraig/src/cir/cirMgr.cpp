@@ -407,7 +407,7 @@ CirMgr::printCircuitIO() const
 {
    for (auto iter = _gateList.begin(); iter != _gateList.end(); ++iter){
       CirGate* gateNow = iter->second;
-      cout<<"this is "<<gateNow->getGateId()<<" faninLen "<<gateNow->getFaninIdLen()<<" fanoutLen "<<gateNow->getFanoutLen()<<endl;
+      cout<<"this is "<<gateNow->getGateId()<<gateNow->getTypeStr()<<gateNow->getLineNo()<<" faninLen "<<gateNow->getFaninIdLen()<<" fanoutLen "<<gateNow->getFanoutLen()<<endl;
    }
 }
 

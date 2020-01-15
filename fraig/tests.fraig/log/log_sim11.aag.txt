@@ -1,0 +1,64 @@
+fraig> cirr sim11.aag
+
+fraig> cirp
+
+Circuit Statistics
+==================
+  PI           2
+  PO           2
+  AIG          2
+------------------
+  Total        6
+
+fraig> cirp -pi
+PIs of the circuit: 1 2
+
+fraig> cirp -po
+POs of the circuit: 5 6
+
+fraig> cirp -n
+
+[0] PI  1
+[1] PI  2
+[2] AIG 3 1 2
+[3] PO  5 3
+[4] AIG 4 !1 2
+[5] PO  6 4
+
+fraig> cirp -fl
+
+fraig> cirsw
+
+fraig> ciropt
+
+fraig> cirstra
+
+fraig> cirp
+
+Circuit Statistics
+==================
+  PI           2
+  PO           2
+  AIG          2
+------------------
+  Total        6
+
+fraig> cirp -pi
+PIs of the circuit: 1 2
+
+fraig> cirp -po
+POs of the circuit: 5 6
+
+fraig> cirp -n
+
+[0] PI  1
+[1] PI  2
+[2] AIG 3 1 2
+[3] PO  5 3
+[4] AIG 4 !1 2
+[5] PO  6 4
+
+fraig> cirp -fl
+
+fraig> q -f
+

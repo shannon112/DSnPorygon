@@ -1,0 +1,74 @@
+fraig> cirr test2.aag
+
+fraig> cirp
+
+Circuit Statistics
+==================
+  PI           5
+  PO           3
+  AIG          2
+------------------
+  Total       10
+
+fraig> cirp -pi
+PIs of the circuit: 1 2 3 4 5
+
+fraig> cirp -po
+POs of the circuit: 17 18 19
+
+fraig> cirp -n
+
+[0] CONST0
+[1] PO  17 0
+[2] PI  2
+[3] PI  3
+[4] AIG 7 2 3
+[5] PO  18 7
+[6] PI  5
+[7] PI  4
+[8] AIG 12 5 4
+[9] PO  19 12
+
+fraig> cirp -fl
+Gates defined but not used  : 1
+
+fraig> cirsw
+
+fraig> ciropt
+
+fraig> cirstra
+
+fraig> cirp
+
+Circuit Statistics
+==================
+  PI           5
+  PO           3
+  AIG          2
+------------------
+  Total       10
+
+fraig> cirp -pi
+PIs of the circuit: 1 2 3 4 5
+
+fraig> cirp -po
+POs of the circuit: 17 18 19
+
+fraig> cirp -n
+
+[0] CONST0
+[1] PO  17 0
+[2] PI  2
+[3] PI  3
+[4] AIG 7 2 3
+[5] PO  18 7
+[6] PI  5
+[7] PI  4
+[8] AIG 12 5 4
+[9] PO  19 12
+
+fraig> cirp -fl
+Gates defined but not used  : 1
+
+fraig> q -f
+

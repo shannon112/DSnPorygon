@@ -55,16 +55,13 @@ CirMgr::sweep()
   visitedBase++;
   for(size_t i = 0; i<_PO; ++i) DFSVisitSweep(_poList[i]);
 
-  // clean _notuList
-  _notuList.clear();
-
   //go through every gate, delete those unused gates
   size_t gates = getGateListSize();
   for (size_t i = 0; i<gates; ++i){
     CirGate* gatenow = getGate(i);
 
     //cout<<"this is "<<gatenow->getGateId()<<gatenow->visitedNo<<endl;
-
+    if(!gatenow) continue;
     if (gatenow->visitedNo<=visitedBase){
       //remove and update its fanin fanout
       if (gatenow->getTypeStr()=="AIG"){
@@ -169,7 +166,7 @@ CirMgr::optimizeGate(CirGate* gate)
       //case 2 : Fanin has const0 => replace by const0
       else if((gateIn0type=="CONST")&&(gateIn0Sign==0)){
         cout<<"Simplifying: "<<gateIn0->getGateId()<<" merging "<<gate->getGateId()<<"..."<<endl;
-        replaceGate(gate,gateIn0,gateIn0Sign);
+        replaceGate(gate,gateIn0,0);
         gateIn1->rmFanouts(gate);
         deleteGate(gate->getGateId());
         if(gateIn1->getFanoutLen()==0) _notuList.insert(gateIn1->getGateId());
@@ -178,7 +175,7 @@ CirMgr::optimizeGate(CirGate* gate)
       //case 2 : Fanin has const0 => replace by const0
       else if((gateIn1type=="CONST")&&(gateIn1Sign==0)){
         cout<<"Simplifying: "<<gateIn1->getGateId()<<" merging "<<gate->getGateId()<<"..."<<endl;
-        replaceGate(gate,gateIn1,gateIn1Sign);
+        replaceGate(gate,gateIn1,0);
         gateIn0->rmFanouts(gate);
         deleteGate(gate->getGateId());
         if(gateIn0->getFanoutLen()==0) _notuList.insert(gateIn0->getGateId());
@@ -190,12 +187,12 @@ CirMgr::optimizeGate(CirGate* gate)
         cout<<"Simplifying: "<<gateIn0->getGateId()<<" merging "<<isInverse<<gate->getGateId()<<"..."<<endl;
         // in <- X <- out
         for(size_t j=0; j<gate->getFanoutLen(); ++j)
-          (gate->getFanout(j))->replaceFanins(gate, gateIn0, gateIn0Sign);
+          (gate->getFanout(j))->replaceFanins(gate, gateIn0, gateIn0Sign!=(gate->getFanoutInv(j)));
         // in -> X -> out
         gateIn0->rmFanouts(gate); gateIn0->rmFanouts(gate);
         for(size_t j=0; j<gate->getFanoutLen(); ++j){
           gateIn0->setFanout(gate->getFanout(j));
-          gateIn0->setFanoutInv(gateIn0Sign);
+          gateIn0->setFanoutInv(gateIn0Sign!=(gate->getFanoutInv(j)));
         }
         deleteGate(gate->getGateId());
       }

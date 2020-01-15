@@ -28,8 +28,8 @@ class CirAigGate;
 
 typedef map<unsigned, CirGate*>   GateMap;
 typedef pair<unsigned, CirGate*>  GatePair;
-typedef unordered_map<size_t, CirGate*>  GateHash;
-typedef pair<size_t, CirGate*>  HashPair;
+typedef unordered_map<unsigned long long int, CirGate*>  GateHash;
+typedef pair<unsigned long long int, CirGate*>  HashPair;
 
 
 typedef vector<CirGate*>           GateList;

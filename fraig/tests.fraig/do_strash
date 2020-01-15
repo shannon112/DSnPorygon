@@ -1,0 +1,29 @@
+cirr test2.aag
+cirp
+cirp -n
+cirp -flo
+cirp -po
+cirp -pi
+cirg 3 -fano 4
+cirg 2 -fano 4
+cirg 1 -fano 5
+cirg 10 -fani 4
+cirg 9 -fani 5
+cirg 5 -fani 3
+cirg 5 -fano 3
+cirg 8 -fano 3
+cirstrash
+cirp
+cirp -n
+cirp -flo
+cirp -po
+cirp -pi
+cirg 3 -fano 4
+cirg 2 -fano 4
+cirg 1 -fano 5
+cirg 10 -fani 4
+cirg 9 -fani 5
+cirg 5 -fani 3
+cirg 5 -fano 3
+cirg 8 -fano 4
+q -f 
