@@ -8,23 +8,34 @@ fraig [-File <dofile>]
 Other than the commands in Homework #3#4#6, we will support these new commands:
 ```sh
 #CIRRead: read in a circuit and construct the netlist
+CIRRead <(string fileName)> [-Replace]
+
 #CIRPrint: print circuit
 CIRPrint [-Summary | -Netlist | -PI | -PO | -FLoating | -FECpairs]
+
 #CIRGate: report a gate
 CIRGate <(int gateId)> [-FANIn (int level) | -FANOut (int level)]
+
 #CIRWrite: write the netlist to an ASCII AIG file (.aag)
 CIRWrite [(int gateId)] [-Output (string aagFile)]
 
+#----------------------------------------------------------------------#
+
 #CIRSWeep: remove unused gates
 CIRSWeep
+
 #CIROPTimize: perform trivial optimizations
 CIROPTimize
+
 #CIRSTRash: perform structural hash on the circuit netlist
 CIRSTRash
+
 #CIRSIMulate: perform Boolean logic simulation on the circuit
 CIRSimulate <-Random | -File <string patternFile>> [-Output (string logFile)]
+
 #CIRFraig: perform FRAIG operation on the circuit
 CIRFraig
+
 #CIRMiter: create a miter circuit
 CIRMiter <(string inFile1)> <(string inFile2)>
 ```
