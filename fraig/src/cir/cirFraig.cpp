@@ -81,6 +81,12 @@ CirMgr::strashGate(CirGate* gate)
 
   if(faninId0 < faninId1)
     ss<<faninInv0<<faninType0<<faninId0<<faninInv1<<faninType1<<faninId1;
+  else if (faninId0 == faninId1){
+    if (faninInv0<faninInv1)
+      ss<<faninInv0<<faninType0<<faninId0<<faninInv1<<faninType1<<faninId1;
+    else
+      ss<<faninInv1<<faninType0<<faninId0<<faninInv0<<faninType1<<faninId1;
+  }
   else
     ss<<faninInv1<<faninType1<<faninId1<<faninInv0<<faninType0<<faninId0;
   //cout<<ss.str()<<endl;
